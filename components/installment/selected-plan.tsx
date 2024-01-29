@@ -1,7 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
-import { rowBgColor } from "@/lib/client";
 
 interface CardSelectedPlanProps {
   calculatedData: AllInstallmentOption | undefined;
@@ -38,7 +37,11 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             <div>
               <Label className="font-semibold">Monthly Payment:</Label>
               <Label
-                className={`ml-2 ${rowBgColor(+calculatedData.selected.monthlyPayment, calculatedData.monthlyBudget)} `}
+                className={`ml-2 ${
+                  +calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
+                    ? "bg-green-100 dark:bg-green-800"
+                    : "bg-red-100 dark:bg-red-800"
+                } `}
               >
                 ₱{calculatedData.selected.monthlyPayment}
               </Label>
@@ -63,7 +66,6 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
       {paymentDifferences && (
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Display Total Payments */}
             <div>
               <Label className="font-semibold">Total Full Payment:</Label>
               <Label className="ml-2">₱{paymentDifferences.totalFullPayment.toLocaleString()}</Label>
