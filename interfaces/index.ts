@@ -12,6 +12,7 @@ export type InstallmentOption = {
 export type AllInstallmentOption = {
   selected?: InstallmentOption;
   others: Array<InstallmentOption>;
+  monthlyBudget?: number;
 };
 
 export type PaymentDifferences = {

@@ -34,8 +34,8 @@ export default function Home() {
       setCalculatedData(res);
       setPaymentDifferences({
         totalFullPayment: values.amount,
-        totalInstallmentWithInterest: values.installmentAmount,
-        totalInstallmentWithZeroPercent: +res.selected.totalPayment,
+        totalInstallmentWithInterest: +res.selected.totalPayment,
+        totalInstallmentWithZeroPercent: values.installmentAmount,
       });
     } catch (error) {
       toast.error("Error fetching data");
@@ -68,7 +68,7 @@ export default function Home() {
       <CardSelectedPlan calculatedData={calculatedData} paymentDifferences={paymentDifferences} />
 
       {/* Table of Other Installment Plan */}
-      <OtherPlanTable calculatedData={calculatedData} />
+      <OtherPlanTable calculatedData={calculatedData} budget={calculatedData?.monthlyBudget} />
     </main>
   );
 }
