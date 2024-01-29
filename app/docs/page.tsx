@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cleanMarkdown } from "@/lib/server";
+import { cleanMarkdown } from "@/lib/client";
 import ReactMarkdown from "react-markdown";
 import { GUIDE_MD } from "@/constant/_guide-data";
 
