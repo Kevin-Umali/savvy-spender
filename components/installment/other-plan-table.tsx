@@ -1,12 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AllInstallmentOption } from "@/interfaces";
+import { rowBgColor } from "@/lib";
 
 interface OtherPlanTableProps {
   calculatedData: AllInstallmentOption | undefined;
+  budget?: number | null;
 }
 
-const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData }) => {
+const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget }) => {
   return (
     <Card>
       <CardHeader>
@@ -36,7 +38,9 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData }) => {
                   <TableCell>{installment.simpleInterest}%</TableCell>
                   <TableCell>{installment.factorRate}</TableCell>
                   <TableCell>{installment.eirPA}%</TableCell>
-                  <TableCell>₱{installment.monthlyPayment}</TableCell>
+                  <TableCell className={rowBgColor(+installment.monthlyPayment, budget)}>
+                    ₱{installment.monthlyPayment}
+                  </TableCell>
                   <TableCell>₱{installment.interest}</TableCell>
                   <TableCell>₱{installment.totalPayment}</TableCell>
                 </TableRow>

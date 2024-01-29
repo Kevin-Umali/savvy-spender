@@ -17,10 +17,11 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit }) =
     resolver: zodResolver(CalculateFormSchema),
     defaultValues: {
       amount: 10000,
-      installmentAmount: 0,
       interestRate: 1,
-      processingFee: 0,
       numInstallments: "3",
+      processingFee: 0,
+      installmentAmount: 0,
+      monthlyBudget: 0,
     },
   });
 
@@ -55,28 +56,6 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit }) =
               )}
             />
 
-            {/* Installment Amount Field */}
-            <FormField
-              name="installmentAmount"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Installment Amount
-                    <Label className="ml-2 text-gray-500 text-xs">(Optional)</Label>
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Enter installment amount of the items" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is for specifying the installment amount for your purchase, usually with a 0% interest rate.
-                    Note that the installment amount is distinct from the principal/total amount.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Interest Rate Field */}
             <FormField
               name="interestRate"
@@ -89,28 +68,6 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit }) =
                   </FormControl>
                   <FormDescription>
                     This is for entering the interest rate that will be applied to your purchase, if applicable.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Processing Fee Field */}
-            <FormField
-              name="processingFee"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Processing Fee
-                    <Label className="ml-2 text-gray-500 text-xs">(Optional)</Label>
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Enter processing fee" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is for specifying any associated processing fee for your installment, which may apply to your
-                    transaction
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -146,6 +103,72 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit }) =
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Processing Fee Field */}
+              <FormField
+                name="processingFee"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Processing Fee
+                      <Label className="ml-2 text-gray-500 text-xs">(Optional)</Label>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter processing fee" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This is for specifying any associated processing fee for your installment, which may apply to your
+                      transaction
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Installment Amount Field */}
+              <FormField
+                name="installmentAmount"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Installment Amount
+                      <Label className="ml-2 text-gray-500 text-xs">(Optional)</Label>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter installment amount of the items" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This is for specifying the installment amount for your purchase, usually with a 0% interest rate.
+                      Note that the installment amount is distinct from the principal/total amount.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Monthly Budget Field */}
+              <FormField
+                name="monthlyBudget"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Monthly Budget
+                      <Label className="ml-2 text-gray-500 text-xs">(Optional)</Label>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter processing fee" {...field} />
+                    </FormControl>
+                    <FormDescription>This is for how much you can pay on a monthly basis.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <Button className="mx-auto w-full" type="submit">
               Calculate
             </Button>
