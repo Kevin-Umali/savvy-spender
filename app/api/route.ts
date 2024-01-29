@@ -1,4 +1,4 @@
-import { calculateInstallmentOption } from "@/lib";
+import { calculateInstallmentOption } from "@/lib/server";
 import { NextRequest, NextResponse } from "next/server";
 
 interface InstallmentRequest {

@@ -90,17 +90,3 @@ export const calculateInstallmentOption = (
     totalPayment: formattedTotalPayment, // Total payment amount, rounded to two decimal places
   };
 };
-
-export const cleanMarkdown = (content: string): string => {
-  return content
-    .split("\n")
-    .map((line) => line.trimStart())
-    .join("\n");
-};
-
-export const rowBgColor = (monthlyPayment: number, budget?: number | null) => {
-  if (!budget || budget === null || budget === 0) {
-    return ""; // No color if budget is nullish or zero
-  }
-  return monthlyPayment <= budget ? "bg-green-100" : "bg-red-100";
-};

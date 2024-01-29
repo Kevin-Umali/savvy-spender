@@ -1,33 +1,35 @@
 import type { Metadata } from "next";
-import { cleanMarkdown } from "@/lib";
+import { cleanMarkdown } from "@/lib/client";
 import ReactMarkdown from "react-markdown";
 import { BANK_CONVERSION_LIST_MD } from "@/constant/_bank-conversion-list-data";
 
 export const metadata: Metadata = {
-  title: "Savvy Spender - Payment Calculator Documentation",
+  title: "Savvy Spender - Balance Conversion Calculator Documentation",
   description:
-    "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+    "Learn how payment calculations work with Savvy Spender's Balance Conversion Calculator Documentation. Understand the details behind calculating payments and comparing options.",
   keywords: [
     "Payment Calculator Documentation",
     "Calculating Payments",
     "Payment Calculation Explained",
     "Payment Comparison Documentation",
     "Financial Calculations",
+    "Balance Conversion Calculator Documentation",
+    "Balance Conversion Documentation",
   ],
-  metadataBase: new URL("https://www.savvyspendercalculator.com/"),
-  applicationName: "Savvy Spender Calculator",
+  metadataBase: new URL("https://www.savvyspender.info/"),
+  applicationName: "Savvy Spender Balance Conversion Calculator",
   openGraph: {
     type: "website",
-    url: "https://www.savvyspendercalculator.com/",
-    title: "Savvy Spender - Payment Calculator Documentation",
+    url: "https://www.savvyspender.info/",
+    title: "Savvy Spender - Balance Conversion Calculator Documentation",
     description:
-      "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+      "Learn how payment calculations work with Savvy Spender's Balance Conversion Calculator Documentation. Understand the details behind calculating payments and comparing options.",
   },
   twitter: {
-    site: "https://www.savvyspendercalculator.com/",
-    title: "Savvy Spender - Payment Calculator Documentation",
+    site: "https://www.savvyspender.info/",
+    title: "Savvy Spender - Balance Conversion Calculator Documentation",
     description:
-      "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+      "Learn how payment calculations work with Savvy Spender's Balance Conversion Calculator Documentation. Understand the details behind calculating payments and comparing options.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: {
