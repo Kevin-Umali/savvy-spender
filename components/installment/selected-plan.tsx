@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
-import { rowBgColor } from "@/lib";
+import { rowBgColor } from "@/lib/client";
 
 interface CardSelectedPlanProps {
   calculatedData: AllInstallmentOption | undefined;
@@ -38,7 +38,7 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             <div>
               <Label className="font-semibold">Monthly Payment:</Label>
               <Label
-                className={`ml-2 ${rowBgColor(+calculatedData.selected.monthlyPayment, calculatedData.monthlyBudget)}`}
+                className={`ml-2 ${rowBgColor(+calculatedData.selected.monthlyPayment, calculatedData.monthlyBudget)} `}
               >
                 ₱{calculatedData.selected.monthlyPayment}
               </Label>
