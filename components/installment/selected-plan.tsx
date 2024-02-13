@@ -58,6 +58,34 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
         </CardContent>
       )}
 
+      {calculatedData?.selected?.suggestedPrincipal && (
+        <>
+          <CardHeader>
+            <CardTitle>Optimal Principal Insight</CardTitle>
+            <CardDescription>
+              Discover the ideal principal to keep your total installment just under the 0% interest threshold.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label className="font-semibold">Suggested Principal:</Label>
+                <Label className="ml-2">
+                  ₱{calculatedData?.selected?.suggestedPrincipal.suggested.toLocaleString()}
+                </Label>
+              </div>
+              <div>
+                <Label className="font-semibold">Total Installment With Interest:</Label>
+                <Label className="ml-2">
+                  ₱{calculatedData?.selected?.suggestedPrincipal.totalPayment.toLocaleString()}
+                </Label>
+              </div>
+            </div>
+          </CardContent>
+        </>
+      )}
+
       <CardHeader>
         <CardTitle>Payment Comparison</CardTitle>
         <CardDescription>See how different payment methods compare.</CardDescription>

@@ -52,41 +52,89 @@ export const calculateRate = (
   return rate;
 };
 
+export const suggestPrincipalBinarySearch = (
+  installmentAmountWithZeroInterest: number,
+  interestRate: number,
+  numInstallments: number,
+  processingFee: number
+) => {
+  let low = 0;
+  let high = installmentAmountWithZeroInterest;
+  let middle;
+  let totalCostWithInterest;
+  let bestSuggestion = 0;
+
+  while (low <= high) {
+    middle = (low + high) / 2;
+    let totalInterest = middle * interestRate * numInstallments;
+    totalCostWithInterest = middle + totalInterest + processingFee;
+
+    if (totalCostWithInterest <= installmentAmountWithZeroInterest) {
+      bestSuggestion = middle;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+
+  return Math.floor(bestSuggestion);
+};
+
+const calculateSimpleInterest = (amount: number, rate: number, periods: number) => amount * rate * periods;
+
+const formatNumber = (number: number, decimals: number) => Number(number.toFixed(decimals));
+
 export const calculateInstallmentOption = (
   principal: number,
+  installmentAmount: number,
   monthlyInterestRate: number, // Monthly interest rate as a decimal
-  numInstallments: number, // Number of monthly installments
-  processingFee: number = 0 // Optional processing fee
+  numInstallments: number,
+  processingFee: number = 0
 ): InstallmentOption => {
-  // Calculate the total interest over the loan period.
-  const simpleInterestTotal = principal * monthlyInterestRate * numInstallments;
-  const simpleInterestPercentage = (simpleInterestTotal / principal) * 100;
+  const simpleInterestTotal = calculateSimpleInterest(principal, monthlyInterestRate, numInstallments);
+  const simpleInterestPercentage = formatNumber((simpleInterestTotal / principal) * 100, 2);
 
-  // The factor rate formula as per the specification: (1 + interest percentage) / number of installments.
-  // The interest percentage must be in decimal form for this calculation.
+  // Factor rate calculation for installment payments
   const factorRateValue = (1 + simpleInterestPercentage / 100) / numInstallments;
-  const formattedFactorRateValue = Number(factorRateValue.toFixed(4));
+  const formattedFactorRateValue = formatNumber(factorRateValue, 4);
 
-  // Calculate the total payment by adding the principal, total interest, and processing fee.
   const totalPayment = principal + simpleInterestTotal;
-  const formattedTotalPayment = Number((totalPayment + processingFee).toFixed(2));
+  const formattedTotalPayment = formatNumber(totalPayment + processingFee, 2);
 
-  // Determine the monthly payment by dividing the total payment by the number of installments.
   const monthlyPayment = totalPayment / numInstallments;
-  const formattedMonthlyPayment = Number(monthlyPayment.toFixed(2));
+  const formattedMonthlyPayment = formatNumber(monthlyPayment, 2);
 
-  // Calculate the Effective Interest Rate per annum (EIR PA)
-  // Here, we multiply by 12 to convert the rate to an annual rate
+  // Assuming calculateRate() is a defined function elsewhere in your codebase for calculating EIR
   const eirPAValue = calculateRate(numInstallments, -factorRateValue, 1) * 12;
-  const eirPAPercentage = eirPAValue * 100;
+  const eirPAPercentage = formatNumber(eirPAValue * 100, 2);
+
+  // Use a binary search method to suggest a principal amount
+  const suggestedPrincipal = suggestPrincipalBinarySearch(
+    installmentAmount,
+    monthlyInterestRate,
+    numInstallments,
+    processingFee
+  );
+
+  // Calculate the suggested principal or amount
+  const simpleInterestTotalSuggested = calculateSimpleInterest(
+    suggestedPrincipal,
+    monthlyInterestRate,
+    numInstallments
+  );
+  const totalPaymentSuggested = formatNumber(suggestedPrincipal + simpleInterestTotalSuggested + processingFee, 2);
 
   return {
-    months: numInstallments, // Number of months for the loan repayment
-    simpleInterest: simpleInterestPercentage.toFixed(2), // Simple interest rate as a percentage
-    factorRate: formattedFactorRateValue, // Factor rate as a decimal, rounded to four places
-    eirPA: eirPAPercentage.toFixed(2), // Effective annual interest rate as a percentage
-    monthlyPayment: formattedMonthlyPayment, // Monthly payment, rounded to two decimal places
-    interest: simpleInterestTotal, // Total interest amount over the period
-    totalPayment: formattedTotalPayment, // Total payment amount, rounded to two decimal places
+    months: numInstallments,
+    simpleInterest: simpleInterestPercentage.toString(),
+    factorRate: formattedFactorRateValue,
+    eirPA: eirPAPercentage.toString(),
+    monthlyPayment: formattedMonthlyPayment,
+    interest: simpleInterestTotal,
+    totalPayment: formattedTotalPayment,
+    suggestedPrincipal: {
+      suggested: suggestedPrincipal,
+      totalPayment: totalPaymentSuggested,
+    },
   };
 };
