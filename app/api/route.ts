@@ -1,8 +1,9 @@
-import { calculateInstallmentOption } from "@/lib/server";
+import { calculateInstallmentOption, suggestPrincipalBinarySearch } from "@/lib/server";
 import { NextRequest, NextResponse } from "next/server";
 
 interface InstallmentRequest {
   amount: number;
+  installmentAmount: number;
   interestRate: number;
   processingFee: number;
   monthlyBudget: number;
@@ -11,15 +12,27 @@ interface InstallmentRequest {
 }
 
 export async function POST(request: NextRequest) {
-  const { amount, interestRate, processingFee, monthlyBudget, numInstallments, installmentPlanList } =
-    (await request.json()) as InstallmentRequest;
+  const {
+    amount,
+    installmentAmount,
+    interestRate,
+    processingFee,
+    monthlyBudget,
+    numInstallments,
+    installmentPlanList,
+  } = (await request.json()) as InstallmentRequest;
 
   const allInstallmentPlans = installmentPlanList.map((installment) =>
-    calculateInstallmentOption(amount, interestRate, +installment, processingFee)
+    calculateInstallmentOption(amount, installmentAmount, interestRate, +installment, processingFee)
   );
 
   const selectedInstallmentPlan = allInstallmentPlans.find((plan) => plan.months === +numInstallments);
 
   const otherInstallmentPlans = allInstallmentPlans.filter((plan) => plan.months !== +numInstallments);
-  return NextResponse.json({ selected: selectedInstallmentPlan, others: otherInstallmentPlans, monthlyBudget });
+
+  return NextResponse.json({
+    selected: selectedInstallmentPlan,
+    others: otherInstallmentPlans,
+    monthlyBudget,
+  });
 }

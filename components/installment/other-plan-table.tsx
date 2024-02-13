@@ -24,10 +24,11 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
                 <TableHead>Months</TableHead>
                 <TableHead>Simple Interest</TableHead>
                 <TableHead>Factor Rate</TableHead>
-                <TableHead>Effective Interest Rate PA</TableHead>
+                <TableHead>EIR PA</TableHead>
                 <TableHead>Monthly Payment</TableHead>
                 <TableHead>Interest</TableHead>
-                <TableHead>Total Payment w/ processing fee</TableHead>
+                <TableHead>Total Payment w/PF</TableHead>
+                <TableHead>Suggested Principal / Total Payment</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -48,6 +49,9 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
                   </TableCell>
                   <TableCell>₱{installment.interest}</TableCell>
                   <TableCell>₱{installment.totalPayment}</TableCell>
+                  <TableCell>
+                    ₱{installment.suggestedPrincipal.suggested} / ₱{installment.suggestedPrincipal.totalPayment}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

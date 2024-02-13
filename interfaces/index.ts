@@ -7,6 +7,12 @@ export type InstallmentOption = {
   interest: number | string;
   totalPayment: number | string;
   processingFee?: number | string;
+  suggestedPrincipal: SuggestedPrincipalOption;
+};
+
+export type SuggestedPrincipalOption = {
+  suggested: number | string;
+  totalPayment: number | string;
 };
 
 export type AllInstallmentOption = {
