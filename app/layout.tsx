@@ -17,9 +17,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Savvy Spender - Balance Conversion Calculator",
+  title: "Savvy Spender - Bank Calculator",
   description:
-    "Calculate your payment options with Savvy Spender's Balance Conversion Calculator. Compare full payment, installment, and 0% interest plans.",
+    "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
   keywords: [
     "Payment Calculator",
     "Installment Calculator",
@@ -28,21 +28,25 @@ export const metadata: Metadata = {
     "Payment Comparison",
     "Balance Conversion",
     "Balance Conversion Calculator",
+    "Credit-to-Cash",
+    "Credit-to-Cash Calculator",
+    "Loan",
+    "Loan Calculator",
   ],
   metadataBase: new URL("https://www.savvyspender.info/"),
-  applicationName: "Savvy Spender Balance Conversion Calculator",
+  applicationName: "Savvy Spender Bank Calculator",
   openGraph: {
     type: "website",
     url: "https://www.savvyspender.info/",
-    title: "Savvy Spender - Balance Conversion Calculator",
+    title: "Savvy Spender - Bank Calculator",
     description:
-      "Calculate your payment options with Savvy Spender's Balance Conversion Calculator. Compare full payment, installment, and 0% interest plans.",
+      "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
   },
   twitter: {
     site: "https://www.savvyspender.info/",
-    title: "Savvy Spender - Balance Conversion Calculator",
+    title: "Savvy Spender - Bank Calculator",
     description:
-      "Calculate your payment options with Savvy Spender's Balance Conversion Calculator. Compare full payment, installment, and 0% interest plans.",
+      "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: {
