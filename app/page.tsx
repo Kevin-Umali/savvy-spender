@@ -3,12 +3,14 @@
 import { CALCULATOR_CONFIG } from "@/constant";
 import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
 import { CalculateForm } from "@/schema";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 
 import CardInstallmentForm from "@/components/installment/card-form";
 import CardSelectedPlan from "@/components/installment/selected-plan";
 import OtherPlanTable from "@/components/installment/other-plan-table";
+import CostBreakdown from "@/components/installment/cost-breakdown";
+import AmortizationSchedule from "@/components/installment/amortization-schedule";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircledIcon } from "@radix-ui/react-icons";
 import type { CalculatorType } from "@/constant";
@@ -17,8 +19,11 @@ export default function Home() {
   const [calculatedData, setCalculatedData] = useState<AllInstallmentOption>();
   const [paymentDifferences, setPaymentDifferences] = useState<PaymentDifferences>();
   const [hasCalculated, setHasCalculated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formValues, setFormValues] = useState<{ amount: number; monthlyRate: number }>({ amount: 0, monthlyRate: 0 });
 
-  const calculateInstallmentData = async (values: CalculateForm) => {
+  const calculateInstallmentData = useCallback(async (values: CalculateForm) => {
+    setIsLoading(true);
     try {
       const calculatorType = (values.calculatorType ?? "balance-conversion") as CalculatorType;
       const config = CALCULATOR_CONFIG[calculatorType];
@@ -42,11 +47,18 @@ export default function Home() {
         totalInstallmentWithZeroPercent: installmentAmount > 0 ? installmentAmount : undefined,
       });
 
+      setFormValues({
+        amount: values.amount,
+        monthlyRate: values.interestRate / 100,
+      });
+
       setHasCalculated(true);
     } catch (error) {
       toast.error("Error fetching data");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   const onSubmit = (values: CalculateForm) => {
     calculateInstallmentData(values);
@@ -54,7 +66,7 @@ export default function Home() {
 
   return (
     <main className="items-center justify-between p-4 space-y-4">
-      {hasCalculated && (
+      {hasCalculated && !isLoading && (
         <Alert className="border-green-200 text-green-800 bg-green-50 dark:border-green-200 dark:bg-green-100 dark:text-green-800 [&>svg]:text-green-800">
           <CheckCircledIcon className="h-4 w-4" />
           <AlertTitle>Ready to Explore Your Options</AlertTitle>
@@ -66,13 +78,27 @@ export default function Home() {
       )}
 
       {/* Installment Form */}
-      <CardInstallmentForm onSubmit={onSubmit} />
+      <CardInstallmentForm onSubmit={onSubmit} isLoading={isLoading} />
 
       {/* Selected Installment Plan and Difference */}
-      <CardSelectedPlan calculatedData={calculatedData} paymentDifferences={paymentDifferences} />
+      <CardSelectedPlan calculatedData={calculatedData} paymentDifferences={paymentDifferences} isLoading={isLoading} />
+
+      {/* Cost Breakdown */}
+      {(hasCalculated || isLoading) && (
+        <CostBreakdown calculatedData={calculatedData} amount={formValues.amount} />
+      )}
 
       {/* Table of Other Installment Plan */}
-      <OtherPlanTable calculatedData={calculatedData} budget={calculatedData?.monthlyBudget} />
+      <OtherPlanTable calculatedData={calculatedData} budget={calculatedData?.monthlyBudget} isLoading={isLoading} />
+
+      {/* Amortization Schedule */}
+      {hasCalculated && (
+        <AmortizationSchedule
+          selected={calculatedData?.selected}
+          principal={formValues.amount}
+          monthlyRate={formValues.monthlyRate}
+        />
+      )}
     </main>
   );
 }
