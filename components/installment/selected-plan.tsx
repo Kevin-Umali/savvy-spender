@@ -8,6 +8,10 @@ interface CardSelectedPlanProps {
 }
 
 const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, paymentDifferences }) => {
+  const hasBudget = (calculatedData?.monthlyBudget ?? 0) > 0;
+  const isBalanceConversion = calculatedData?.calculatorType === "balance-conversion";
+  const isPersonalLoan = calculatedData?.calculatorType === "personal-loan";
+
   return (
     <Card>
       <CardHeader>
@@ -38,9 +42,11 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
               <Label className="font-semibold">Monthly Payment:</Label>
               <Label
                 className={`ml-2 ${
-                  +calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
-                    ? "bg-green-100 dark:bg-green-800"
-                    : "bg-red-100 dark:bg-red-800"
+                  hasBudget
+                    ? +calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
+                      ? "bg-green-100 dark:bg-green-800"
+                      : "bg-red-100 dark:bg-red-800"
+                    : ""
                 } `}
               >
                 ₱{calculatedData.selected.monthlyPayment}
@@ -52,13 +58,47 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             </div>
             <div>
               <Label className="font-semibold">Total Payment:</Label>
-              <Label className="ml-2">₱{calculatedData.selected.totalPayment} w/ processing fee</Label>
+              <Label className="ml-2">₱{calculatedData.selected.totalPayment} w/ fees</Label>
             </div>
           </div>
         </CardContent>
       )}
 
-      {calculatedData?.selected?.suggestedPrincipal && (
+      {/* DST & Net Proceeds for Personal Loans */}
+      {isPersonalLoan && calculatedData?.dst !== undefined && (
+        <>
+          <CardHeader>
+            <CardTitle>Loan Disbursement Details</CardTitle>
+            <CardDescription>
+              Fees deducted from your loan amount before disbursement.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label className="font-semibold">Documentary Stamp Tax:</Label>
+                <Label className="ml-2">
+                  {calculatedData.dst > 0
+                    ? `₱${calculatedData.dst.toLocaleString()}`
+                    : "Exempt (≤ ₱250K)"}
+                </Label>
+              </div>
+              {calculatedData.netProceeds !== undefined && (
+                <div>
+                  <Label className="font-semibold">Estimated Net Proceeds:</Label>
+                  <Label className="ml-2 font-semibold text-primary">
+                    ₱{calculatedData.netProceeds.toLocaleString()}
+                  </Label>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </>
+      )}
+
+      {/* Suggested Principal - only for Balance Conversion with installmentAmount > 0 */}
+      {isBalanceConversion && calculatedData?.selected?.suggestedPrincipal &&
+        +calculatedData.selected.suggestedPrincipal.suggested > 0 && (
         <>
           <CardHeader>
             <CardTitle>Optimal Principal Insight</CardTitle>
@@ -87,22 +127,26 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
       )}
 
       <CardHeader>
-        <CardTitle>Payment Comparison</CardTitle>
-        <CardDescription>See how different payment methods compare.</CardDescription>
+        <CardTitle>Payment Summary</CardTitle>
+        <CardDescription>Compare your payment amounts at a glance.</CardDescription>
       </CardHeader>
 
       {paymentDifferences && (
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <Label className="font-semibold">Total Full Payment:</Label>
+              <Label className="font-semibold">
+                {isPersonalLoan ? "Loan Amount:" : "Total Full Payment:"}
+              </Label>
               <Label className="ml-2">₱{paymentDifferences.totalFullPayment.toLocaleString()}</Label>
             </div>
             <div>
-              <Label className="font-semibold">Total Installment With Interest:</Label>
+              <Label className="font-semibold">Total With Interest + Fees:</Label>
               <Label className="ml-2">₱{paymentDifferences.totalInstallmentWithInterest.toLocaleString()}</Label>
             </div>
-            {paymentDifferences.totalInstallmentWithZeroPercent !== undefined && (
+            {isBalanceConversion &&
+              paymentDifferences.totalInstallmentWithZeroPercent !== undefined &&
+              paymentDifferences.totalInstallmentWithZeroPercent > 0 && (
               <div>
                 <Label className="font-semibold">Total Installment With 0% Interest:</Label>
                 <Label className="ml-2">₱{paymentDifferences.totalInstallmentWithZeroPercent.toLocaleString()}</Label>

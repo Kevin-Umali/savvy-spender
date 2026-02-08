@@ -8,11 +8,14 @@ interface OtherPlanTableProps {
 }
 
 const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget = 0 }) => {
+  const hasBudget = budget > 0;
+  const isBalanceConversion = calculatedData?.calculatorType === "balance-conversion";
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Other Installment Plan</CardTitle>
-        <CardDescription>Details of the installment of other plan.</CardDescription>
+        <CardTitle>Other Installment Plans</CardTitle>
+        <CardDescription>Compare all available installment terms side by side.</CardDescription>
       </CardHeader>
 
       {calculatedData?.others && (
@@ -27,8 +30,8 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
                 <TableHead>EIR PA</TableHead>
                 <TableHead>Monthly Payment</TableHead>
                 <TableHead>Interest</TableHead>
-                <TableHead>Total Payment w/PF</TableHead>
-                <TableHead>Suggested Principal / Total Payment</TableHead>
+                <TableHead>Total Payment w/ Fees</TableHead>
+                {isBalanceConversion && <TableHead>Suggested Principal / Total</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -40,18 +43,22 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
                   <TableCell>{installment.eirPA}%</TableCell>
                   <TableCell
                     className={
-                      +installment.monthlyPayment <= budget
-                        ? "bg-green-100 dark:bg-green-800"
-                        : "bg-red-100 dark:bg-red-800"
+                      hasBudget
+                        ? +installment.monthlyPayment <= budget
+                          ? "bg-green-100 dark:bg-green-800"
+                          : "bg-red-100 dark:bg-red-800"
+                        : ""
                     }
                   >
                     ₱{installment.monthlyPayment}
                   </TableCell>
                   <TableCell>₱{installment.interest}</TableCell>
                   <TableCell>₱{installment.totalPayment}</TableCell>
-                  <TableCell>
-                    ₱{installment.suggestedPrincipal.suggested} / ₱{installment.suggestedPrincipal.totalPayment}
-                  </TableCell>
+                  {isBalanceConversion && (
+                    <TableCell>
+                      ₱{installment.suggestedPrincipal.suggested} / ₱{installment.suggestedPrincipal.totalPayment}
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

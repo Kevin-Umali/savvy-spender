@@ -1,6 +1,6 @@
 "use client";
 
-import { INSTALLMENT_PLAN_LIST } from "@/constant";
+import { CALCULATOR_CONFIG } from "@/constant";
 import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
 import { CalculateForm } from "@/schema";
 import { useState } from "react";
@@ -11,19 +11,21 @@ import CardSelectedPlan from "@/components/installment/selected-plan";
 import OtherPlanTable from "@/components/installment/other-plan-table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircledIcon } from "@radix-ui/react-icons";
+import type { CalculatorType } from "@/constant";
 
 export default function Home() {
   const [calculatedData, setCalculatedData] = useState<AllInstallmentOption>();
   const [paymentDifferences, setPaymentDifferences] = useState<PaymentDifferences>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   const calculateInstallmentData = async (values: CalculateForm) => {
-    setIsLoading(true);
-
     try {
+      const calculatorType = (values.calculatorType ?? "balance-conversion") as CalculatorType;
+      const config = CALCULATOR_CONFIG[calculatorType];
+
       const response = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify({ ...values, installmentPlanList: INSTALLMENT_PLAN_LIST }),
+        body: JSON.stringify({ ...values, installmentPlanList: config.installmentPlans }),
       });
 
       if (!response.ok) {
@@ -32,15 +34,17 @@ export default function Home() {
 
       const res = await response.json();
       setCalculatedData(res);
+
+      const installmentAmount = values.installmentAmount ?? 0;
       setPaymentDifferences({
         totalFullPayment: values.amount,
         totalInstallmentWithInterest: +res.selected.totalPayment,
-        totalInstallmentWithZeroPercent: values.installmentAmount,
+        totalInstallmentWithZeroPercent: installmentAmount > 0 ? installmentAmount : undefined,
       });
+
+      setHasCalculated(true);
     } catch (error) {
       toast.error("Error fetching data");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -50,7 +54,7 @@ export default function Home() {
 
   return (
     <main className="items-center justify-between p-4 space-y-4">
-      {!isLoading && (
+      {hasCalculated && (
         <Alert className="border-green-200 text-green-800 bg-green-50 dark:border-green-200 dark:bg-green-100 dark:text-green-800 [&>svg]:text-green-800">
           <CheckCircledIcon className="h-4 w-4" />
           <AlertTitle>Ready to Explore Your Options</AlertTitle>
