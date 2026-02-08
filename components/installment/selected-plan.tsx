@@ -1,13 +1,23 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
+import { formatCurrency, formatPercent } from "@/lib/client";
 
 interface CardSelectedPlanProps {
   calculatedData: AllInstallmentOption | undefined;
   paymentDifferences: PaymentDifferences | undefined;
+  isLoading?: boolean;
 }
 
-const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, paymentDifferences }) => {
+const Skeleton: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <div className={`animate-pulse bg-muted rounded ${className}`} />
+);
+
+const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, paymentDifferences, isLoading = false }) => {
+  const hasBudget = (calculatedData?.monthlyBudget ?? 0) > 0;
+  const isBalanceConversion = calculatedData?.calculatorType === "balance-conversion";
+  const isPersonalLoan = calculatedData?.calculatorType === "personal-loan";
+
   return (
     <Card>
       <CardHeader>
@@ -15,101 +25,162 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
         <CardDescription>Details of the installment plan you selected.</CardDescription>
       </CardHeader>
 
-      {calculatedData?.selected && (
+      {isLoading ? (
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      ) : calculatedData?.selected ? (
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <Label className="font-semibold">Months:</Label>
-              <Label className="ml-2">{calculatedData.selected.months}</Label>
+              <Label className="text-xs text-muted-foreground">Months</Label>
+              <p className="text-sm font-semibold">{calculatedData.selected.months}</p>
             </div>
             <div>
-              <Label className="font-semibold">Simple Interest:</Label>
-              <Label className="ml-2">{calculatedData.selected.simpleInterest}%</Label>
+              <Label className="text-xs text-muted-foreground">Simple Interest</Label>
+              <p className="text-sm font-semibold">{formatPercent(calculatedData.selected.simpleInterest)}</p>
             </div>
             <div>
-              <Label className="font-semibold">Factor Rate:</Label>
-              <Label className="ml-2">{calculatedData.selected.factorRate}</Label>
+              <Label className="text-xs text-muted-foreground">Factor Rate</Label>
+              <p className="text-sm font-semibold">{calculatedData.selected.factorRate}</p>
             </div>
             <div>
-              <Label className="font-semibold">Effective Interest Rate PA:</Label>
-              <Label className="ml-2">{calculatedData.selected.eirPA}%</Label>
+              <Label className="text-xs text-muted-foreground">Effective Interest Rate PA</Label>
+              <p className="text-sm font-semibold">{formatPercent(calculatedData.selected.eirPA)}</p>
             </div>
             <div>
-              <Label className="font-semibold">Monthly Payment:</Label>
-              <Label
-                className={`ml-2 ${
-                  +calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
-                    ? "bg-green-100 dark:bg-green-800"
-                    : "bg-red-100 dark:bg-red-800"
-                } `}
+              <Label className="text-xs text-muted-foreground">Monthly Payment</Label>
+              <p
+                className={`text-sm font-semibold ${
+                  hasBudget
+                    ? +calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                    : ""
+                }`}
               >
-                ₱{calculatedData.selected.monthlyPayment}
-              </Label>
+                {formatCurrency(calculatedData.selected.monthlyPayment)}
+                {hasBudget && (
+                  <span className="text-xs font-normal ml-1">
+                    {+calculatedData.selected.monthlyPayment <= (calculatedData?.monthlyBudget ?? 0)
+                      ? "(within budget)"
+                      : "(exceeds budget)"}
+                  </span>
+                )}
+              </p>
             </div>
             <div>
-              <Label className="font-semibold">Interest:</Label>
-              <Label className="ml-2">₱{calculatedData.selected.interest}</Label>
+              <Label className="text-xs text-muted-foreground">Total Interest</Label>
+              <p className="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                {formatCurrency(calculatedData.selected.interest)}
+              </p>
             </div>
             <div>
-              <Label className="font-semibold">Total Payment:</Label>
-              <Label className="ml-2">₱{calculatedData.selected.totalPayment} w/ processing fee</Label>
+              <Label className="text-xs text-muted-foreground">Total Payment (w/ fees)</Label>
+              <p className="text-sm font-bold text-primary">{formatCurrency(calculatedData.selected.totalPayment)}</p>
             </div>
           </div>
         </CardContent>
-      )}
+      ) : null}
 
-      {calculatedData?.selected?.suggestedPrincipal && (
+      {/* DST & Net Proceeds for Personal Loans */}
+      {!isLoading && isPersonalLoan && calculatedData?.dst !== undefined && (
         <>
           <CardHeader>
-            <CardTitle>Optimal Principal Insight</CardTitle>
-            <CardDescription>
-              Discover the ideal principal to keep your total installment just under the 0% interest threshold.
-            </CardDescription>
+            <CardTitle>Loan Disbursement Details</CardTitle>
+            <CardDescription>Fees deducted from your loan amount before disbursement.</CardDescription>
           </CardHeader>
-
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label className="font-semibold">Suggested Principal:</Label>
-                <Label className="ml-2">
-                  ₱{calculatedData?.selected?.suggestedPrincipal.suggested.toLocaleString()}
-                </Label>
+                <Label className="text-xs text-muted-foreground">Documentary Stamp Tax</Label>
+                <p className="text-sm font-semibold">
+                  {calculatedData.dst > 0 ? formatCurrency(calculatedData.dst) : "Exempt (≤ ₱250K)"}
+                </p>
               </div>
-              <div>
-                <Label className="font-semibold">Total Installment With Interest:</Label>
-                <Label className="ml-2">
-                  ₱{calculatedData?.selected?.suggestedPrincipal.totalPayment.toLocaleString()}
-                </Label>
-              </div>
+              {calculatedData.netProceeds !== undefined && (
+                <div>
+                  <Label className="text-xs text-muted-foreground">Estimated Net Proceeds</Label>
+                  <p className="text-sm font-bold text-primary">{formatCurrency(calculatedData.netProceeds)}</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </>
       )}
 
-      <CardHeader>
-        <CardTitle>Payment Comparison</CardTitle>
-        <CardDescription>See how different payment methods compare.</CardDescription>
-      </CardHeader>
-
-      {paymentDifferences && (
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <Label className="font-semibold">Total Full Payment:</Label>
-              <Label className="ml-2">₱{paymentDifferences.totalFullPayment.toLocaleString()}</Label>
-            </div>
-            <div>
-              <Label className="font-semibold">Total Installment With Interest:</Label>
-              <Label className="ml-2">₱{paymentDifferences.totalInstallmentWithInterest.toLocaleString()}</Label>
-            </div>
-            {paymentDifferences.totalInstallmentWithZeroPercent !== undefined && (
-              <div>
-                <Label className="font-semibold">Total Installment With 0% Interest:</Label>
-                <Label className="ml-2">₱{paymentDifferences.totalInstallmentWithZeroPercent.toLocaleString()}</Label>
+      {/* Suggested Principal - Balance Conversion only */}
+      {!isLoading &&
+        isBalanceConversion &&
+        calculatedData?.selected?.suggestedPrincipal &&
+        +calculatedData.selected.suggestedPrincipal.suggested > 0 && (
+          <>
+            <CardHeader>
+              <CardTitle>Optimal Principal Insight</CardTitle>
+              <CardDescription>
+                The ideal principal to keep your total installment just under the 0% interest threshold.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Suggested Principal</Label>
+                  <p className="text-sm font-semibold">
+                    {formatCurrency(calculatedData.selected.suggestedPrincipal.suggested)}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Total With Interest</Label>
+                  <p className="text-sm font-semibold">
+                    {formatCurrency(calculatedData.selected.suggestedPrincipal.totalPayment)}
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
-        </CardContent>
+            </CardContent>
+          </>
+        )}
+
+      {/* Payment Summary */}
+      {!isLoading && paymentDifferences && (
+        <>
+          <CardHeader>
+            <CardTitle>Payment Summary</CardTitle>
+            <CardDescription>Compare your payment amounts at a glance.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-xs text-muted-foreground">
+                  {isPersonalLoan ? "Loan Amount" : "Cash Price (Full Payment)"}
+                </Label>
+                <p className="text-sm font-semibold">{formatCurrency(paymentDifferences.totalFullPayment)}</p>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Total With Interest + Fees</Label>
+                <p className="text-sm font-bold text-primary">
+                  {formatCurrency(paymentDifferences.totalInstallmentWithInterest)}
+                </p>
+              </div>
+              {isBalanceConversion &&
+                paymentDifferences.totalInstallmentWithZeroPercent !== undefined &&
+                paymentDifferences.totalInstallmentWithZeroPercent > 0 && (
+                  <div>
+                    <Label className="text-xs text-muted-foreground">0% Merchant Installment</Label>
+                    <p className="text-sm font-semibold">
+                      {formatCurrency(paymentDifferences.totalInstallmentWithZeroPercent)}
+                    </p>
+                  </div>
+                )}
+            </div>
+          </CardContent>
+        </>
       )}
     </Card>
   );

@@ -19,6 +19,9 @@ export type AllInstallmentOption = {
   selected?: InstallmentOption;
   others: Array<InstallmentOption>;
   monthlyBudget?: number;
+  calculatorType?: string;
+  dst?: number;
+  netProceeds?: number;
 };
 
 export type PaymentDifferences = {
