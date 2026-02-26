@@ -43,12 +43,16 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="container mx-auto p-5 sm:p-10">
-      <div className="mb-10 text-center">
-        <h1 className="mb-3 text-lg sm:text-xl lg:text-2xl">
-          &ldquo;Savvy Spender&rdquo; Bank Transaction Conversion List
+    <div className="container mx-auto px-4 py-10">
+      <div className="mb-10">
+        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+          Bank Conversion List
         </h1>
+        <p className="mt-3 text-muted-foreground leading-relaxed">
+          Philippine bank transaction conversion options and rates.
+        </p>
       </div>
+      <div className="h-px bg-border opacity-50 mb-10" />
       <div className="prose dark:prose-invert max-w-none">
         <ReactMarkdown>{cleanMarkdown(BANK_CONVERSION_LIST_MD)}</ReactMarkdown>
       </div>

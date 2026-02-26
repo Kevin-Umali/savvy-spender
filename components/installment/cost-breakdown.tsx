@@ -1,7 +1,10 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/client";
 import { AllInstallmentOption } from "@/interfaces";
+import CostPieChart from "@/components/charts/cost-pie-chart";
 
 interface CostBreakdownProps {
   calculatedData: AllInstallmentOption | undefined;
@@ -33,43 +36,51 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
           See exactly where your money goes — principal, interest, and fees.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Visual bar */}
-        <div className="space-y-2">
-          <div className="flex rounded-full overflow-hidden h-4">
-            <div
-              className="bg-primary transition-all"
-              style={{ width: `${principalWidth}%` }}
-              title={`Principal: ${formatCurrency(principal)}`}
-            />
-            <div
-              className="bg-orange-400 dark:bg-orange-500 transition-all"
-              style={{ width: `${interestWidth}%` }}
-              title={`Interest: ${formatCurrency(interest)}`}
-            />
-            {feesWidth > 0 && (
-              <div
-                className="bg-red-400 dark:bg-red-500 transition-all"
-                style={{ width: `${feesWidth}%` }}
-                title={`Fees: ${formatCurrency(totalFees)}`}
-              />
-            )}
-          </div>
-          <div className="flex flex-wrap gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded-full bg-primary" />
-              <span>Principal</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded-full bg-orange-400 dark:bg-orange-500" />
-              <span>Interest</span>
-            </div>
-            {totalFees > 0 && (
-              <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-red-400 dark:bg-red-500" />
-                <span>Fees</span>
+      <CardContent className="space-y-6">
+        {/* Chart and Bar side by side on desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pie Chart */}
+          <CostPieChart principal={principal} interest={interest} fees={totalFees} />
+
+          {/* Visual bar + legend */}
+          <div className="space-y-4 flex flex-col justify-center">
+            <div className="space-y-2">
+              <div className="flex rounded-full overflow-hidden h-4">
+                <div
+                  className="bg-primary transition-all"
+                  style={{ width: `${principalWidth}%` }}
+                  title={`Principal: ${formatCurrency(principal)}`}
+                />
+                <div
+                  className="bg-orange-400 dark:bg-orange-500 transition-all"
+                  style={{ width: `${interestWidth}%` }}
+                  title={`Interest: ${formatCurrency(interest)}`}
+                />
+                {feesWidth > 0 && (
+                  <div
+                    className="bg-red-400 dark:bg-red-500 transition-all"
+                    style={{ width: `${feesWidth}%` }}
+                    title={`Fees: ${formatCurrency(totalFees)}`}
+                  />
+                )}
               </div>
-            )}
+              <div className="flex flex-wrap gap-4 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <div className="h-3 w-3 rounded-full bg-primary" />
+                  <span>Principal ({principalWidth.toFixed(0)}%)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-3 w-3 rounded-full bg-orange-400 dark:bg-orange-500" />
+                  <span>Interest ({interestWidth.toFixed(0)}%)</span>
+                </div>
+                {totalFees > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-3 w-3 rounded-full bg-red-400 dark:bg-red-500" />
+                    <span>Fees ({feesWidth.toFixed(0)}%)</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

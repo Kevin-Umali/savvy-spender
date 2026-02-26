@@ -18,6 +18,7 @@ import { UpdateIcon } from "@radix-ui/react-icons";
 import { useToolCalculator } from "@/hooks/use-tool-calculator";
 import type { SalaryBreakdown } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
+import SalaryDonutChart from "@/components/charts/salary-donut-chart";
 
 interface FormState {
   grossSalary: string;
@@ -96,62 +97,89 @@ export default function SalaryCalculator() {
         )}
 
         {result && (
-          <div className="space-y-4" aria-label="Salary breakdown results">
-            <h4 className="text-sm font-semibold text-muted-foreground">Salary Breakdown</h4>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>Gross Monthly Salary</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(result.grossMonthly)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="pl-6 text-muted-foreground">SSS Contribution</TableCell>
-                  <TableCell className="text-right text-orange-600 dark:text-orange-400">
-                    -{formatCurrency(result.sss)}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="pl-6 text-muted-foreground">PhilHealth Contribution</TableCell>
-                  <TableCell className="text-right text-orange-600 dark:text-orange-400">
-                    -{formatCurrency(result.philHealth)}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="pl-6 text-muted-foreground">Pag-IBIG Contribution</TableCell>
-                  <TableCell className="text-right text-orange-600 dark:text-orange-400">
-                    -{formatCurrency(result.pagIbig)}
-                  </TableCell>
-                </TableRow>
-                <TableRow className="border-t-2">
-                  <TableCell className="font-medium">Total Contributions</TableCell>
-                  <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
-                    -{formatCurrency(result.totalContributions)}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Taxable Income</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(result.taxableIncome)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Withholding Tax</TableCell>
-                  <TableCell className="text-right font-medium text-red-600 dark:text-red-400">
-                    -{formatCurrency(result.withholdingTax)}
-                  </TableCell>
-                </TableRow>
-                <TableRow className="border-t-2 bg-primary/5">
-                  <TableCell className="font-bold text-primary">Net Take-Home Pay</TableCell>
-                  <TableCell className="text-right text-xl font-bold text-primary">
-                    {formatCurrency(result.netTakeHome)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+          <div className="space-y-6" aria-label="Salary breakdown results">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Gross Salary</p>
+                <p className="text-lg font-bold">{formatCurrency(result.grossMonthly)}</p>
+              </div>
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Total Deductions</p>
+                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                  -{formatCurrency(result.totalContributions + result.withholdingTax)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Net Take-Home</p>
+                <p className="text-xl font-bold text-primary">{formatCurrency(result.netTakeHome)}</p>
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="rounded-lg border p-4">
+              <h4 className="text-sm font-semibold mb-2">Where Your Salary Goes</h4>
+              <SalaryDonutChart data={result} />
+            </div>
+
+            {/* Detailed Table */}
+            <div>
+              <h4 className="text-sm font-semibold text-muted-foreground mb-3">Detailed Breakdown</h4>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Item</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Gross Monthly Salary</TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(result.grossMonthly)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="pl-6 text-muted-foreground">SSS Contribution</TableCell>
+                    <TableCell className="text-right text-orange-600 dark:text-orange-400">
+                      -{formatCurrency(result.sss)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="pl-6 text-muted-foreground">PhilHealth Contribution</TableCell>
+                    <TableCell className="text-right text-orange-600 dark:text-orange-400">
+                      -{formatCurrency(result.philHealth)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="pl-6 text-muted-foreground">Pag-IBIG Contribution</TableCell>
+                    <TableCell className="text-right text-orange-600 dark:text-orange-400">
+                      -{formatCurrency(result.pagIbig)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-2">
+                    <TableCell className="font-medium">Total Contributions</TableCell>
+                    <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
+                      -{formatCurrency(result.totalContributions)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Taxable Income</TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(result.taxableIncome)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Withholding Tax</TableCell>
+                    <TableCell className="text-right font-medium text-red-600 dark:text-red-400">
+                      -{formatCurrency(result.withholdingTax)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-2 bg-primary/5">
+                    <TableCell className="font-bold text-primary">Net Take-Home Pay</TableCell>
+                    <TableCell className="text-right text-xl font-bold text-primary">
+                      {formatCurrency(result.netTakeHome)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </CardContent>

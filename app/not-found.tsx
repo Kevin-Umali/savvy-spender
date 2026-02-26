@@ -2,22 +2,20 @@
 
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-
 export default function NotFound() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center py-5 sm:py-10">
-      <div className="p-6 text-center">
-        <Label className="mb-2 block text-2xl font-bold">Not Found</Label>
-        <Label className="text-md my-4 block">Could not find requested resource</Label>
-        <div className="mt-4 flex flex-col space-y-2">
-          <Button onClick={() => router.push("/")} className="w-full border px-4 py-2">
-            Return Home
-          </Button>
-        </div>
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
+      <div className="max-w-sm text-center space-y-4">
+        <h1 className="font-display italic font-light text-3xl">Not Found</h1>
+        <p className="text-sm text-muted-foreground">Could not find the requested page.</p>
+        <button
+          onClick={() => router.push("/")}
+          className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors py-2"
+        >
+          Go Home
+        </button>
       </div>
     </div>
   );
