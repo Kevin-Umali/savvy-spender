@@ -3,9 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { TOOL_REGISTRY, TOOL_CATEGORIES_LIST } from "@/constant/tool-registry";
 import {
   Search,
@@ -24,8 +21,9 @@ import {
   HandCoins,
   Shield,
   CircleDollarSign,
-  ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type ToolCategory = "all" | "loans" | "credit" | "income" | "planning";
 
@@ -63,23 +61,25 @@ export default function ToolsPage() {
   });
 
   return (
-    <main className="max-w-7xl mx-auto p-4 space-y-6">
-      {/* Page Header */}
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Financial Tools</h1>
-        <p className="text-muted-foreground max-w-xl">
-          20+ Philippine-focused financial calculators. Each tool has its own page with interactive charts and documentation.
+    <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="font-display italic font-light text-4xl sm:text-5xl tracking-tight">
+          Financial Tools
+        </h1>
+        <p className="mt-3 text-muted-foreground max-w-md leading-relaxed">
+          Philippine-focused calculators with interactive charts and documentation.
         </p>
       </div>
 
       {/* Search */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground opacity-40" />
         <Input
           placeholder="Search tools..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 h-9 text-sm"
         />
       </div>
 
@@ -89,54 +89,49 @@ export default function ToolsPage() {
           <button
             key={cat.value}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all border",
+              "font-mono-label text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-colors",
               activeCategory === cat.value
-                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground opacity-60 hover:opacity-100 hover:border-foreground/30"
             )}
             onClick={() => setActiveCategory(cat.value)}
           >
             {cat.label}
-            <Badge variant="secondary" className={cn(
-              "text-[10px] px-1.5 py-0",
-              activeCategory === cat.value && "bg-primary-foreground/20 text-primary-foreground"
-            )}>
-              {cat.count}
-            </Badge>
+            <span className="ml-1.5 opacity-50">{cat.count}</span>
           </button>
         ))}
       </div>
 
+      <div className="h-px bg-border opacity-50" />
+
       {/* Tool Grid */}
       {filteredTools.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <p>No tools match your search.</p>
+        <div className="py-16 text-center text-muted-foreground text-sm">
+          No tools match your search.
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {filteredTools.map((tool) => {
             const IconComponent = SLUG_ICONS[tool.slug] || TrendingUp;
             return (
               <Link key={tool.slug} href={`/tools/${tool.slug}`}>
-                <Card className="h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/40 group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                          <IconComponent className="h-4 w-4 text-primary" />
-                        </div>
-                        <CardTitle className="text-sm font-semibold group-hover:text-primary transition-colors">
-                          {tool.title}
-                        </CardTitle>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                <div className="group flex items-start gap-3 p-3 -mx-1 rounded-sm hover:bg-accent transition-colors">
+                  <IconComponent className="h-3.5 w-3.5 mt-[5px] shrink-0 text-muted-foreground opacity-40 group-hover:opacity-70 transition-opacity" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[13px] font-medium text-foreground opacity-75 group-hover:opacity-100 transition-opacity">
+                        {tool.title}
+                      </span>
+                      <ArrowUpRight className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity" />
                     </div>
-                    <CardDescription className="text-xs mt-2">{tool.description}</CardDescription>
-                    <Badge variant="outline" className="text-[10px] capitalize w-fit mt-2">
+                    <p className="text-[11px] text-muted-foreground opacity-60 group-hover:opacity-80 transition-opacity leading-relaxed">
+                      {tool.description}
+                    </p>
+                    <span className="font-mono-label text-[9px] uppercase tracking-[0.2em] text-muted-foreground opacity-30 mt-1 block">
                       {tool.categoryLabel}
-                    </Badge>
-                  </CardHeader>
-                </Card>
+                    </span>
+                  </div>
+                </div>
               </Link>
             );
           })}

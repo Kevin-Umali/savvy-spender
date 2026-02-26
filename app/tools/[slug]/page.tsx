@@ -2,10 +2,8 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, ArrowUpRight, BookOpen } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { getToolBySlug, getRelatedTools } from "@/constant/tool-registry";
 import ReactMarkdown from "react-markdown";
 import { cleanMarkdown } from "@/lib/client";
@@ -60,80 +58,83 @@ export default function ToolPage() {
 
   if (!tool || !ToolComponent) {
     return (
-      <main className="max-w-5xl mx-auto p-4 py-16 text-center space-y-4">
-        <h1 className="text-2xl font-bold">Tool Not Found</h1>
-        <p className="text-muted-foreground">The tool you&apos;re looking for doesn&apos;t exist.</p>
-        <Button asChild variant="outline">
-          <Link href="/tools">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to All Tools
-          </Link>
-        </Button>
+      <main className="max-w-5xl mx-auto px-4 py-20 text-center space-y-4">
+        <h1 className="font-display italic font-light text-3xl">Tool Not Found</h1>
+        <p className="text-muted-foreground text-sm">The tool you&apos;re looking for doesn&apos;t exist.</p>
+        <Link
+          href="/tools"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to All Tools
+        </Link>
       </main>
     );
   }
 
   return (
-    <main className="max-w-5xl mx-auto p-4 space-y-8">
+    <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/tools" className="hover:text-foreground transition-colors">Tools</Link>
+      <div className="font-mono-label flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
+        <Link href="/tools" className="hover:opacity-100 transition-opacity">Tools</Link>
         <span>/</span>
-        <span className="text-foreground">{tool.title}</span>
+        <span className="text-foreground opacity-70">{tool.title}</span>
       </div>
 
       {/* Header */}
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="outline" className="capitalize">{tool.categoryLabel}</Badge>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{tool.title}</h1>
-        <p className="text-muted-foreground max-w-2xl">{tool.longDescription}</p>
+      <div>
+        <span className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-50 mb-3 block">
+          {tool.categoryLabel}
+        </span>
+        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">{tool.title}</h1>
+        <p className="mt-3 text-muted-foreground max-w-2xl leading-relaxed">{tool.longDescription}</p>
       </div>
 
+      <div className="h-px bg-border opacity-50" />
+
       {/* Calculator */}
-      <div className="animate-fade-in">
+      <div className="landing-reveal">
         <ToolComponent />
       </div>
 
       {/* Documentation */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
-            <CardTitle>How This Tool Works</CardTitle>
-          </div>
-          <CardDescription>
-            Understand the calculations, formulas, and assumptions behind this tool.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="prose dark:prose-invert max-w-none prose-sm">
-            <ReactMarkdown>{cleanMarkdown(tool.docs)}</ReactMarkdown>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-muted-foreground opacity-50" />
+          <h2 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+            How This Tool Works
+          </h2>
+        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="prose dark:prose-invert max-w-none prose-sm">
+              <ReactMarkdown>{cleanMarkdown(tool.docs)}</ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Related Tools */}
       {relatedTools.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Related Tools</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <h2 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+            Related Tools
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {relatedTools.map((related) => (
               <Link key={related.slug} href={`/tools/${related.slug}`}>
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30 group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-sm font-semibold group-hover:text-primary transition-colors">
-                        {related.title}
-                      </CardTitle>
-                      <Badge variant="outline" className="text-[10px] capitalize shrink-0 ml-2">
-                        {related.categoryLabel}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-xs">{related.description}</CardDescription>
-                  </CardHeader>
-                </Card>
+                <div className="group p-4 rounded-sm border border-border hover:bg-accent transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[13px] font-medium text-foreground opacity-75 group-hover:opacity-100 transition-opacity">
+                      {related.title}
+                    </span>
+                    <ArrowUpRight className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground opacity-60 mt-1 leading-relaxed">{related.description}</p>
+                  <span className="font-mono-label text-[9px] uppercase tracking-[0.2em] text-muted-foreground opacity-30 mt-2 block">
+                    {related.categoryLabel}
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

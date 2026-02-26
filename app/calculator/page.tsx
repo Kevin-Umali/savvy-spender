@@ -72,18 +72,13 @@ export default function CalculatorPage() {
   return (
     <main className="max-w-5xl mx-auto p-4 space-y-6">
       {/* Page Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Calculator className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Installment Calculator</h1>
-            <p className="text-sm text-muted-foreground">
-              Compare balance conversion, credit-to-cash, and personal loan installment plans.
-            </p>
-          </div>
-        </div>
+      <div>
+        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+          Installment Calculator
+        </h1>
+        <p className="mt-2 text-muted-foreground leading-relaxed">
+          Compare balance conversion, credit-to-cash, and personal loan installment plans.
+        </p>
       </div>
 
       {hasCalculated && !isLoading && (
