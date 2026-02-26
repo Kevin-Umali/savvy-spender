@@ -28,9 +28,13 @@ export default function Home() {
       const calculatorType = (values.calculatorType ?? "balance-conversion") as CalculatorType;
       const config = CALCULATOR_CONFIG[calculatorType];
 
+      const installmentPlanList = values.customPlanList && values.customPlanList.length > 0
+        ? values.customPlanList
+        : config.installmentPlans;
+
       const response = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify({ ...values, installmentPlanList: config.installmentPlans }),
+        body: JSON.stringify({ ...values, installmentPlanList }),
       });
 
       if (!response.ok) {

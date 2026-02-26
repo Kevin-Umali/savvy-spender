@@ -8,7 +8,17 @@ export const CalculateFormSchema = z
       .number()
       .transform((value) => value / 100) // Convert percentage to decimal
       .refine((val) => !isNaN(val) && val >= 0 && val <= 1, "Interest rate must be a percentage between 0% and 100%"),
-    numInstallments: z.enum(["3", "6", "9", "12", "15", "18", "21", "24", "27", "30", "33", "36"]).default("3"),
+    numInstallments: z
+      .string()
+      .refine(
+        (val) => {
+          const num = parseInt(val);
+          return !isNaN(num) && num >= 1 && num <= 360;
+        },
+        "Must be between 1 and 360 months"
+      )
+      .default("3"),
+    customPlanList: z.array(z.string()).optional(),
     processingFee: z.coerce.number().min(0).optional(),
     installmentAmount: z.coerce.number().min(0),
     monthlyBudget: z.coerce.number().min(0).optional(),
