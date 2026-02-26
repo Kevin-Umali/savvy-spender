@@ -108,3 +108,20 @@
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes landing-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-reveal {
+  animation: landing-reveal 0.7s ease-out both;
+}
+
+.font-display {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+.font-mono-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
