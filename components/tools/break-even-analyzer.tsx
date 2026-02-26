@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,24 +14,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { calculateBreakEven, type BreakEvenResult } from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { BreakEvenResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
-export default function BreakEvenAnalyzer() {
-  const [cashPrice, setCashPrice] = useState("");
-  const [installmentPrice, setInstallmentPrice] = useState("");
-  const [monthlyRate, setMonthlyRate] = useState("");
-  const [processingFee, setProcessingFee] = useState("");
-  const [result, setResult] = useState<BreakEvenResult | null>(null);
+interface FormState {
+  cashPrice: string;
+  installmentPrice: string;
+  monthlyRate: string;
+  processingFee: string;
+  maxMonths: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  cashPrice: "",
+  installmentPrice: "",
+  monthlyRate: "",
+  processingFee: "",
+  maxMonths: "36",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function BreakEvenAnalyzer() {
+  const [form, dispatch] = useReducer(formReducer, initialState);
+  const { data: result, isLoading, error, calculate } = useToolCalculator<BreakEvenResult>("break-even");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cash = parseFloat(cashPrice);
-    const installment = parseFloat(installmentPrice);
-    const rate = parseFloat(monthlyRate);
-    const fee = parseFloat(processingFee) || 0;
+    const cash = parseFloat(form.cashPrice);
+    const installment = parseFloat(form.installmentPrice);
+    const rate = parseFloat(form.monthlyRate);
+    const fee = parseFloat(form.processingFee) || 0;
+    const maxMonths = parseInt(form.maxMonths) || 36;
     if (isNaN(cash) || isNaN(installment) || isNaN(rate)) return;
-    setResult(calculateBreakEven(cash, installment, rate / 100, fee));
+    await calculate({
+      cashPrice: cash,
+      installmentPriceZero: installment,
+      monthlyRate: rate / 100,
+      processingFee: fee,
+      maxMonths,
+    });
   };
 
   return (
@@ -40,6 +76,7 @@ export default function BreakEvenAnalyzer() {
         <CardTitle>Break-Even Analyzer</CardTitle>
         <CardDescription>
           Compare bank installment vs merchant 0% installment to find the break-even point.
+          The break-even month is when the bank installment total cost becomes cheaper than the merchant&apos;s 0% plan.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -53,10 +90,13 @@ export default function BreakEvenAnalyzer() {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 50000"
-                value={cashPrice}
-                onChange={(e) => setCashPrice(e.target.value)}
+                value={form.cashPrice}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "cashPrice", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                The cash/SRP price of the item.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="installment-price">Merchant 0% Installment Price</Label>
@@ -66,10 +106,13 @@ export default function BreakEvenAnalyzer() {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 55000"
-                value={installmentPrice}
-                onChange={(e) => setInstallmentPrice(e.target.value)}
+                value={form.installmentPrice}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "installmentPrice", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Total price under merchant&apos;s 0% installment plan (often higher than the cash price).
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="be-monthly-rate">Monthly Rate (%)</Label>
@@ -78,11 +121,15 @@ export default function BreakEvenAnalyzer() {
                 type="number"
                 step="0.01"
                 min="0"
+                max="100"
                 placeholder="e.g. 1.5"
-                value={monthlyRate}
-                onChange={(e) => setMonthlyRate(e.target.value)}
+                value={form.monthlyRate}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "monthlyRate", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                The bank&apos;s monthly add-on interest rate for credit card installments.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="be-processing-fee">Processing Fee</Label>
@@ -92,16 +139,50 @@ export default function BreakEvenAnalyzer() {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 500"
-                value={processingFee}
-                onChange={(e) => setProcessingFee(e.target.value)}
+                value={form.processingFee}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "processingFee", value: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground">
+                One-time processing or service fee charged by the bank (if any).
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="be-max-months">Max Months</Label>
+              <Input
+                id="be-max-months"
+                type="number"
+                step="1"
+                min="1"
+                max="60"
+                placeholder="36"
+                value={form.maxMonths}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "maxMonths", value: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Maximum number of months to compare (default: 36).
+              </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto">Calculate</Button>
+          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {result && (
-          <div className="space-y-4">
+          <div className="space-y-4" aria-label="Break-even analysis results">
             {/* Break-even summary */}
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-center">
               {result.breakEvenMonth !== null ? (
@@ -116,7 +197,7 @@ export default function BreakEvenAnalyzer() {
                 <>
                   <p className="text-sm text-muted-foreground">No Break-Even Found</p>
                   <p className="text-lg font-semibold">
-                    The merchant 0% installment is always cheaper within 36 months.
+                    The merchant 0% installment is always cheaper within the comparison period.
                   </p>
                 </>
               )}

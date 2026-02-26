@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -11,32 +11,73 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  calculateInHouseLoan,
-  type InHouseLoanResult,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { InHouseLoanResult } from "@/lib/calculators";
 import { formatCurrency, formatPercent } from "@/lib/client";
 
-export default function InHouseLoanCalculator() {
-  const [totalPrice, setTotalPrice] = useState("");
-  const [downPaymentPercent, setDownPaymentPercent] = useState("");
-  const [monthlyRate, setMonthlyRate] = useState("");
-  const [termMonths, setTermMonths] = useState("");
-  const [balloonPayment, setBalloonPayment] = useState("");
-  const [result, setResult] = useState<InHouseLoanResult | null>(null);
+interface FormState {
+  totalPrice: string;
+  downPaymentPercent: string;
+  monthlyRate: string;
+  termMonths: string;
+  balloonPayment: string;
+}
 
-  const handleCalculate = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  totalPrice: "",
+  downPaymentPercent: "",
+  monthlyRate: "",
+  termMonths: "",
+  balloonPayment: "",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function InHouseLoanCalculator() {
+  const [form, formDispatch] = useReducer(formReducer, initialState);
+  const setField = useCallback(
+    (field: keyof FormState, value: string) =>
+      formDispatch({ type: "SET_FIELD", field, value }),
+    []
+  );
+
+  const {
+    data: result,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<InHouseLoanResult>("in-house-loan");
+
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const price = parseFloat(totalPrice);
-    const dp = parseFloat(downPaymentPercent);
-    const rate = parseFloat(monthlyRate) / 100;
-    const term = parseInt(termMonths, 10);
-    const balloon = balloonPayment ? parseFloat(balloonPayment) : 0;
+    const price = parseFloat(form.totalPrice);
+    const dp = parseFloat(form.downPaymentPercent);
+    const rate = parseFloat(form.monthlyRate) / 100;
+    const term = parseInt(form.termMonths, 10);
+    const balloon = form.balloonPayment ? parseFloat(form.balloonPayment) : 0;
 
     if (isNaN(price) || isNaN(dp) || isNaN(rate) || isNaN(term)) return;
 
-    const res = calculateInHouseLoan(price, dp, rate, term, balloon);
-    setResult(res);
+    await calculate({
+      totalPrice: price,
+      downPaymentPercent: dp,
+      monthlyRate: rate,
+      months: term,
+      balloonPayment: balloon,
+    });
   };
 
   return (
@@ -57,12 +98,15 @@ export default function InHouseLoanCalculator() {
                 id="ih-price"
                 type="number"
                 placeholder="e.g. 2000000"
-                value={totalPrice}
-                onChange={(e) => setTotalPrice(e.target.value)}
+                value={form.totalPrice}
+                onChange={(e) => setField("totalPrice", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Full purchase price of the property or item
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ih-dp">Down Payment (%)</Label>
@@ -70,13 +114,16 @@ export default function InHouseLoanCalculator() {
                 id="ih-dp"
                 type="number"
                 placeholder="e.g. 20"
-                value={downPaymentPercent}
-                onChange={(e) => setDownPaymentPercent(e.target.value)}
+                value={form.downPaymentPercent}
+                onChange={(e) => setField("downPaymentPercent", e.target.value)}
                 required
-                min="0"
-                max="100"
-                step="any"
+                min={0}
+                max={100}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Percentage of the total price paid upfront
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ih-rate">Monthly Rate (%)</Label>
@@ -84,12 +131,16 @@ export default function InHouseLoanCalculator() {
                 id="ih-rate"
                 type="number"
                 placeholder="e.g. 1.25"
-                value={monthlyRate}
-                onChange={(e) => setMonthlyRate(e.target.value)}
+                value={form.monthlyRate}
+                onChange={(e) => setField("monthlyRate", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                max={100}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Monthly add-on (flat) interest rate charged by the developer
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ih-term">Term (months)</Label>
@@ -97,12 +148,16 @@ export default function InHouseLoanCalculator() {
                 id="ih-term"
                 type="number"
                 placeholder="e.g. 60"
-                value={termMonths}
-                onChange={(e) => setTermMonths(e.target.value)}
+                value={form.termMonths}
+                onChange={(e) => setField("termMonths", e.target.value)}
                 required
-                min="1"
-                step="1"
+                min={1}
+                max={360}
+                step={1}
               />
+              <p className="text-xs text-muted-foreground">
+                Number of monthly installments
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ih-balloon">Balloon Payment (optional)</Label>
@@ -110,18 +165,37 @@ export default function InHouseLoanCalculator() {
                 id="ih-balloon"
                 type="number"
                 placeholder="e.g. 100000"
-                value={balloonPayment}
-                onChange={(e) => setBalloonPayment(e.target.value)}
-                min="0"
-                step="any"
+                value={form.balloonPayment}
+                onChange={(e) => setField("balloonPayment", e.target.value)}
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Optional lump-sum payment due at end of term
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
         {result && (
-          <div className="mt-6">
+          <div className="mt-6" role="region" aria-label="In-house loan results">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Loan Breakdown</CardTitle>
@@ -139,7 +213,7 @@ export default function InHouseLoanCalculator() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        Down Payment ({formatPercent(parseFloat(downPaymentPercent))})
+                        Down Payment ({formatPercent(parseFloat(form.downPaymentPercent))})
                       </span>
                       <span className="font-medium">
                         {formatCurrency(result.downPayment)}

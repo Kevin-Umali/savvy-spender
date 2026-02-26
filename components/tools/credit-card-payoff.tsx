@@ -1,38 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { calculateCreditCardPayoff, type CreditCardPayoffResult } from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { CreditCardPayoffResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
-export default function CreditCardPayoff() {
-  const [balance, setBalance] = useState("");
-  const [annualRate, setAnnualRate] = useState("");
-  const [minPaymentPercent, setMinPaymentPercent] = useState("3");
-  const [minFloor, setMinFloor] = useState("500");
-  const [fixedPayment, setFixedPayment] = useState("");
-  const [result, setResult] = useState<CreditCardPayoffResult | null>(null);
+interface FormState {
+  balance: string;
+  annualRate: string;
+  minPaymentPercent: string;
+  minFloor: string;
+  fixedPayment: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  balance: "",
+  annualRate: "",
+  minPaymentPercent: "3",
+  minFloor: "500",
+  fixedPayment: "",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function CreditCardPayoff() {
+  const [form, dispatch] = useReducer(formReducer, initialState);
+  const { data: result, isLoading, error, calculate } = useToolCalculator<CreditCardPayoffResult>("credit-card-payoff");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const bal = parseFloat(balance);
-    const rate = parseFloat(annualRate);
-    const minPct = parseFloat(minPaymentPercent);
-    const floor = parseFloat(minFloor);
-    const fixed = parseFloat(fixedPayment);
+    const bal = parseFloat(form.balance);
+    const rate = parseFloat(form.annualRate);
+    const minPct = parseFloat(form.minPaymentPercent);
+    const floor = parseFloat(form.minFloor);
+    const fixed = parseFloat(form.fixedPayment);
     if (isNaN(bal) || isNaN(rate) || bal <= 0) return;
-    setResult(
-      calculateCreditCardPayoff(
-        bal,
-        rate / 100,
-        (isNaN(minPct) ? 3 : minPct) / 100,
-        isNaN(floor) ? 500 : floor,
-        isNaN(fixed) ? 0 : fixed
-      )
-    );
+    await calculate({
+      balance: bal,
+      annualRate: rate / 100,
+      minimumPaymentPercent: (isNaN(minPct) ? 3 : minPct) / 100,
+      minimumPaymentFloor: isNaN(floor) ? 500 : floor,
+      fixedPayment: isNaN(fixed) ? 0 : fixed,
+    });
   };
 
   return (
@@ -52,12 +78,15 @@ export default function CreditCardPayoff() {
                 id="cc-balance"
                 type="number"
                 step="0.01"
-                min="0"
+                min="1"
                 placeholder="e.g. 50000"
-                value={balance}
-                onChange={(e) => setBalance(e.target.value)}
+                value={form.balance}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "balance", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Your current outstanding credit card balance.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cc-annual-rate">Annual Interest Rate (%)</Label>
@@ -66,11 +95,15 @@ export default function CreditCardPayoff() {
                 type="number"
                 step="0.01"
                 min="0"
+                max="100"
                 placeholder="e.g. 24"
-                value={annualRate}
-                onChange={(e) => setAnnualRate(e.target.value)}
+                value={form.annualRate}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "annualRate", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                The annual interest rate on your credit card (typically 24-36% in PH).
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cc-min-pct">Minimum Payment (%)</Label>
@@ -79,22 +112,29 @@ export default function CreditCardPayoff() {
                 type="number"
                 step="0.1"
                 min="0"
+                max="100"
                 placeholder="3"
-                value={minPaymentPercent}
-                onChange={(e) => setMinPaymentPercent(e.target.value)}
+                value={form.minPaymentPercent}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "minPaymentPercent", value: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground">
+                Percentage of outstanding balance as minimum payment (typically 3%).
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cc-min-floor">Minimum Floor Amount</Label>
               <Input
                 id="cc-min-floor"
                 type="number"
-                step="0.01"
+                step="1"
                 min="0"
                 placeholder="500"
-                value={minFloor}
-                onChange={(e) => setMinFloor(e.target.value)}
+                value={form.minFloor}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "minFloor", value: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground">
+                Minimum payment floor amount (typically &#8369;500). You pay at least this much even if the percentage is lower.
+              </p>
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="cc-fixed">Fixed Monthly Payment</Label>
@@ -104,16 +144,34 @@ export default function CreditCardPayoff() {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 5000"
-                value={fixedPayment}
-                onChange={(e) => setFixedPayment(e.target.value)}
+                value={form.fixedPayment}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "fixedPayment", value: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground">
+                A fixed amount you plan to pay monthly to pay off faster. Leave blank to auto-calculate as 2x the minimum.
+              </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto">Calculate</Button>
+          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {result && (
-          <div className="space-y-4">
+          <div className="space-y-4" aria-label="Payoff comparison results">
             <h4 className="text-sm font-semibold text-muted-foreground">Payoff Comparison</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Minimum Payment */}

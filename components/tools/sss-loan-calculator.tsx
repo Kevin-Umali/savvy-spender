@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -11,25 +11,65 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { calculateSSSLoan, type SSSLoanResult } from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { SSSLoanResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
-export default function SSSLoanCalculator() {
-  const [loanAmount, setLoanAmount] = useState("");
-  const [annualRate, setAnnualRate] = useState("10");
-  const [termMonths, setTermMonths] = useState("24");
-  const [result, setResult] = useState<SSSLoanResult | null>(null);
+interface FormState {
+  loanAmount: string;
+  annualRate: string;
+  termMonths: string;
+}
 
-  const handleCalculate = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  loanAmount: "",
+  annualRate: "10",
+  termMonths: "24",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function SSSLoanCalculator() {
+  const [form, formDispatch] = useReducer(formReducer, initialState);
+  const setField = useCallback(
+    (field: keyof FormState, value: string) =>
+      formDispatch({ type: "SET_FIELD", field, value }),
+    []
+  );
+
+  const {
+    data: result,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<SSSLoanResult>("sss-loan");
+
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const amount = parseFloat(loanAmount);
-    const rate = parseFloat(annualRate) / 100;
-    const term = parseInt(termMonths, 10);
+    const amount = parseFloat(form.loanAmount);
+    const rate = parseFloat(form.annualRate) / 100;
+    const term = parseInt(form.termMonths, 10);
 
     if (isNaN(amount) || isNaN(rate) || isNaN(term)) return;
 
-    const res = calculateSSSLoan(amount, rate, term);
-    setResult(res);
+    await calculate({
+      loanAmount: amount,
+      annualRate: rate,
+      termMonths: term,
+    });
   };
 
   return (
@@ -50,12 +90,15 @@ export default function SSSLoanCalculator() {
                 id="sss-amount"
                 type="number"
                 placeholder="e.g. 20000"
-                value={loanAmount}
-                onChange={(e) => setLoanAmount(e.target.value)}
+                value={form.loanAmount}
+                onChange={(e) => setField("loanAmount", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                SSS salary loan amount (max depends on contributions)
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sss-rate">Annual Rate (%)</Label>
@@ -63,12 +106,16 @@ export default function SSSLoanCalculator() {
                 id="sss-rate"
                 type="number"
                 placeholder="10"
-                value={annualRate}
-                onChange={(e) => setAnnualRate(e.target.value)}
+                value={form.annualRate}
+                onChange={(e) => setField("annualRate", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                max={100}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                SSS charges 10% per annum on salary loans
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sss-term">Term (months)</Label>
@@ -76,19 +123,39 @@ export default function SSSLoanCalculator() {
                 id="sss-term"
                 type="number"
                 placeholder="24"
-                value={termMonths}
-                onChange={(e) => setTermMonths(e.target.value)}
+                value={form.termMonths}
+                onChange={(e) => setField("termMonths", e.target.value)}
                 required
-                min="1"
-                step="1"
+                min={1}
+                max={360}
+                step={1}
               />
+              <p className="text-xs text-muted-foreground">
+                Standard SSS salary loan term is 24 months
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
         {result && (
-          <div className="mt-6">
+          <div className="mt-6" role="region" aria-label="SSS loan results">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">SSS Loan Summary</CardTitle>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -19,32 +19,68 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  calculateAffordability,
-  type AffordabilityResult,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { AffordabilityResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
 const TERM_OPTIONS = [3, 6, 9, 12, 18, 24, 36];
 
-export default function AffordabilityCalculator() {
-  const [monthlyBudget, setMonthlyBudget] = useState("");
-  const [monthlyRate, setMonthlyRate] = useState("");
-  const [processingFee, setProcessingFee] = useState("");
-  const [results, setResults] = useState<AffordabilityResult[] | null>(null);
+interface FormState {
+  monthlyBudget: string;
+  monthlyRate: string;
+  processingFee: string;
+}
 
-  const handleCalculate = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  monthlyBudget: "",
+  monthlyRate: "",
+  processingFee: "",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function AffordabilityCalculator() {
+  const [form, formDispatch] = useReducer(formReducer, initialState);
+  const setField = useCallback(
+    (field: keyof FormState, value: string) =>
+      formDispatch({ type: "SET_FIELD", field, value }),
+    []
+  );
+
+  const {
+    data: results,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<AffordabilityResult[]>("affordability");
+
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const budget = parseFloat(monthlyBudget);
-    const rate = parseFloat(monthlyRate) / 100;
-    const fee = processingFee ? parseFloat(processingFee) : 0;
+    const budget = parseFloat(form.monthlyBudget);
+    const rate = parseFloat(form.monthlyRate) / 100;
+    const fee = form.processingFee ? parseFloat(form.processingFee) : 0;
 
     if (isNaN(budget) || isNaN(rate)) return;
 
-    const rows = TERM_OPTIONS.map((months) =>
-      calculateAffordability(budget, rate, months, fee)
-    );
-    setResults(rows);
+    await calculate({
+      monthlyBudget: budget,
+      monthlyRate: rate,
+      months: TERM_OPTIONS,
+      processingFee: fee || undefined,
+    });
   };
 
   return (
@@ -65,12 +101,15 @@ export default function AffordabilityCalculator() {
                 id="aff-budget"
                 type="number"
                 placeholder="e.g. 5000"
-                value={monthlyBudget}
-                onChange={(e) => setMonthlyBudget(e.target.value)}
+                value={form.monthlyBudget}
+                onChange={(e) => setField("monthlyBudget", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                The max you can pay each month toward installments
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="aff-rate">Monthly Interest Rate (%)</Label>
@@ -78,12 +117,16 @@ export default function AffordabilityCalculator() {
                 id="aff-rate"
                 type="number"
                 placeholder="e.g. 1.5"
-                value={monthlyRate}
-                onChange={(e) => setMonthlyRate(e.target.value)}
+                value={form.monthlyRate}
+                onChange={(e) => setField("monthlyRate", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                max={100}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Monthly add-on (flat) interest rate from the bank
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="aff-fee">Processing Fee (optional)</Label>
@@ -91,18 +134,37 @@ export default function AffordabilityCalculator() {
                 id="aff-fee"
                 type="number"
                 placeholder="e.g. 500"
-                value={processingFee}
-                onChange={(e) => setProcessingFee(e.target.value)}
-                min="0"
-                step="any"
+                value={form.processingFee}
+                onChange={(e) => setField("processingFee", e.target.value)}
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                One-time fee deducted from loan proceeds
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
         {results && (
-          <div className="mt-6">
+          <div className="mt-6" role="region" aria-label="Affordability results">
             <Table>
               <TableHeader>
                 <TableRow>

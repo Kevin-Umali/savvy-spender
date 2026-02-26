@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,33 +14,57 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  calculateIncomeTax,
-  calculateFreelancerTax,
-  type TaxResult,
-  type FreelancerTaxComparison,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { TaxResult, FreelancerTaxComparison } from "@/lib/calculators";
 import { formatCurrency, formatPercent } from "@/lib/client";
 
+interface FormState {
+  annualIncome: string;
+  isFreelancer: boolean;
+}
+
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "SET_FREELANCER"; value: boolean }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  annualIncome: "",
+  isFreelancer: false,
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "SET_FREELANCER":
+      return { ...state, isFreelancer: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+type TaxApiResult = TaxResult | FreelancerTaxComparison;
+
+function isFreelancerResult(result: TaxApiResult): result is FreelancerTaxComparison {
+  return "graduated" in result && "flatRate" in result && "recommended" in result;
+}
+
 export default function TaxCalculator() {
-  const [annualIncome, setAnnualIncome] = useState("");
-  const [isFreelancer, setIsFreelancer] = useState(false);
-  const [employedResult, setEmployedResult] = useState<TaxResult | null>(null);
-  const [freelancerResult, setFreelancerResult] = useState<FreelancerTaxComparison | null>(null);
+  const [form, dispatch] = useReducer(formReducer, initialState);
+  const { data: result, isLoading, error, calculate } = useToolCalculator<TaxApiResult>("tax");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const income = parseFloat(annualIncome);
+    const income = parseFloat(form.annualIncome);
     if (isNaN(income) || income <= 0) return;
-
-    if (isFreelancer) {
-      setFreelancerResult(calculateFreelancerTax(income));
-      setEmployedResult(null);
-    } else {
-      setEmployedResult(calculateIncomeTax(income));
-      setFreelancerResult(null);
-    }
+    await calculate({ annualIncome: income, isFreelancer: form.isFreelancer });
   };
+
+  const employedResult = result && !isFreelancerResult(result) ? result : null;
+  const freelancerResult = result && isFreelancerResult(result) ? result : null;
 
   return (
     <Card>
@@ -61,19 +85,23 @@ export default function TaxCalculator() {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 500000"
-                value={annualIncome}
-                onChange={(e) => setAnnualIncome(e.target.value)}
+                value={form.annualIncome}
+                onChange={(e) => dispatch({ type: "SET_FIELD", field: "annualIncome", value: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Your total annual gross income before taxes and deductions under the TRAIN law (Tax Reform for Acceleration and Inclusion).
+              </p>
             </div>
             <div className="space-y-2">
-              <Label>Employment Type</Label>
-              <div className="flex items-center gap-4 h-9">
+              <Label htmlFor="employment-type">Employment Type</Label>
+              <div className="flex items-center gap-4 h-9" id="employment-type">
                 <button
                   type="button"
-                  onClick={() => setIsFreelancer(false)}
+                  onClick={() => dispatch({ type: "SET_FREELANCER", value: false })}
+                  aria-label="Select employed tax computation"
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    !isFreelancer
+                    !form.isFreelancer
                       ? "bg-primary text-primary-foreground shadow"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   }`}
@@ -82,9 +110,10 @@ export default function TaxCalculator() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsFreelancer(true)}
+                  onClick={() => dispatch({ type: "SET_FREELANCER", value: true })}
+                  aria-label="Select freelancer tax computation with 8% flat rate option"
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    isFreelancer
+                    form.isFreelancer
                       ? "bg-primary text-primary-foreground shadow"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   }`}
@@ -92,14 +121,34 @@ export default function TaxCalculator() {
                   Self-Employed / Freelancer
                 </button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                {form.isFreelancer
+                  ? "Freelancers can choose between graduated rates or the 8% flat rate on gross income exceeding ₱250,000."
+                  : "Employed individuals are taxed using the graduated TRAIN law brackets."}
+              </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto">Calculate</Button>
+          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Employed Result */}
         {employedResult && (
-          <div className="space-y-4">
+          <div className="space-y-4" aria-label="Income tax breakdown results">
             <h4 className="text-sm font-semibold text-muted-foreground">Income Tax Breakdown</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="rounded-lg border p-3">
@@ -142,7 +191,7 @@ export default function TaxCalculator() {
 
         {/* Freelancer Result */}
         {freelancerResult && (
-          <div className="space-y-4">
+          <div className="space-y-4" aria-label="Freelancer tax comparison results">
             <h4 className="text-sm font-semibold text-muted-foreground">Tax Comparison</h4>
             <Table>
               <TableHeader>

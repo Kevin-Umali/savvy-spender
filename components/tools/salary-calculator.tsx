@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { calculateSalary, type SalaryBreakdown } from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { SalaryBreakdown } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
-export default function SalaryCalculator() {
-  const [grossSalary, setGrossSalary] = useState("");
-  const [result, setResult] = useState<SalaryBreakdown | null>(null);
+interface FormState {
+  grossSalary: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  grossSalary: "",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function SalaryCalculator() {
+  const [form, dispatch] = useReducer(formReducer, initialState);
+  const { data: result, isLoading, error, calculate } = useToolCalculator<SalaryBreakdown>("salary");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const salary = parseFloat(grossSalary);
+    const salary = parseFloat(form.grossSalary);
     if (isNaN(salary) || salary <= 0) return;
-    setResult(calculateSalary(salary));
+    await calculate({ grossMonthly: salary });
   };
 
   return (
@@ -45,16 +69,34 @@ export default function SalaryCalculator() {
               step="0.01"
               min="0"
               placeholder="e.g. 35000"
-              value={grossSalary}
-              onChange={(e) => setGrossSalary(e.target.value)}
+              value={form.grossSalary}
+              onChange={(e) => dispatch({ type: "SET_FIELD", field: "grossSalary", value: e.target.value })}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Based on 2024 PH contribution tables and TRAIN law tax brackets.
+            </p>
           </div>
-          <Button type="submit" className="w-full sm:w-auto">Calculate</Button>
+          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {result && (
-          <div className="space-y-4">
+          <div className="space-y-4" aria-label="Salary breakdown results">
             <h4 className="text-sm font-semibold text-muted-foreground">Salary Breakdown</h4>
             <Table>
               <TableHeader>

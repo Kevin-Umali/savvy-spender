@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -19,29 +19,63 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  calculateSavingsGoal,
-  type SavingsGoalResult,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { SavingsGoalResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
+interface FormState {
+  targetAmount: string;
+  months: string;
+  annualRate: string;
+}
+
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  targetAmount: "",
+  months: "",
+  annualRate: "0",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
 export default function SavingsGoalCalculator() {
-  const [targetAmount, setTargetAmount] = useState("");
-  const [months, setMonths] = useState("");
-  const [annualRate, setAnnualRate] = useState("0");
-  const [results, setResults] = useState<SavingsGoalResult | null>(null);
+  const [form, dispatch] = useReducer(formReducer, initialState);
+  const {
+    data: results,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<SavingsGoalResult>("savings-goal");
 
-  const handleCalculate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = parseFloat(targetAmount);
-    const m = parseInt(months);
-    const rate = parseFloat(annualRate) || 0;
+  const handleCalculate = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      const target = parseFloat(form.targetAmount);
+      const m = parseInt(form.months);
+      const rate = parseFloat(form.annualRate) || 0;
 
-    if (isNaN(target) || isNaN(m) || target <= 0 || m <= 0) return;
+      if (isNaN(target) || isNaN(m) || target <= 0 || m <= 0) return;
 
-    const result = calculateSavingsGoal(target, m, rate / 100);
-    setResults(result);
-  };
+      await calculate({
+        targetAmount: target,
+        months: m,
+        annualRate: rate / 100,
+      });
+    },
+    [form, calculate]
+  );
 
   return (
     <Card>
@@ -61,12 +95,21 @@ export default function SavingsGoalCalculator() {
                 id="sg-target"
                 type="number"
                 placeholder="e.g. 100000"
-                value={targetAmount}
-                onChange={(e) => setTargetAmount(e.target.value)}
+                value={form.targetAmount}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "targetAmount",
+                    value: e.target.value,
+                  })
+                }
                 required
-                min="0"
-                step="any"
+                min="0.01"
+                step="0.01"
               />
+              <p className="text-xs text-muted-foreground">
+                Your financial goal amount
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sg-months">Months to Reach Goal</Label>
@@ -74,12 +117,22 @@ export default function SavingsGoalCalculator() {
                 id="sg-months"
                 type="number"
                 placeholder="e.g. 24"
-                value={months}
-                onChange={(e) => setMonths(e.target.value)}
+                value={form.months}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "months",
+                    value: e.target.value,
+                  })
+                }
                 required
                 min="1"
+                max="600"
                 step="1"
               />
+              <p className="text-xs text-muted-foreground">
+                Number of months to reach your goal
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sg-rate">Annual Interest Rate (%)</Label>
@@ -87,18 +140,45 @@ export default function SavingsGoalCalculator() {
                 id="sg-rate"
                 type="number"
                 placeholder="e.g. 4"
-                value={annualRate}
-                onChange={(e) => setAnnualRate(e.target.value)}
+                value={form.annualRate}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "annualRate",
+                    value: e.target.value,
+                  })
+                }
                 min="0"
-                step="any"
+                max="100"
+                step="0.01"
               />
+              <p className="text-xs text-muted-foreground">
+                Expected annual return on savings (e.g., high-yield savings or
+                money market)
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {results && (
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4" aria-label="Savings goal results">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-md border p-3">
                 <p className="text-sm text-muted-foreground">

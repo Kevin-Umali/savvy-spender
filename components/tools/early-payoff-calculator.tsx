@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -11,32 +11,73 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  calculateEarlyPayoff,
-  type EarlyPayoffResult,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { EarlyPayoffResult } from "@/lib/calculators";
 import { formatCurrency } from "@/lib/client";
 
-export default function EarlyPayoffCalculator() {
-  const [principal, setPrincipal] = useState("");
-  const [monthlyRate, setMonthlyRate] = useState("");
-  const [originalTerm, setOriginalTerm] = useState("");
-  const [extraPayment, setExtraPayment] = useState("");
-  const [processingFee, setProcessingFee] = useState("");
-  const [result, setResult] = useState<EarlyPayoffResult | null>(null);
+interface FormState {
+  principal: string;
+  monthlyRate: string;
+  originalTerm: string;
+  extraPayment: string;
+  processingFee: string;
+}
 
-  const handleCalculate = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  principal: "",
+  monthlyRate: "",
+  originalTerm: "",
+  extraPayment: "",
+  processingFee: "",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function EarlyPayoffCalculator() {
+  const [form, formDispatch] = useReducer(formReducer, initialState);
+  const setField = useCallback(
+    (field: keyof FormState, value: string) =>
+      formDispatch({ type: "SET_FIELD", field, value }),
+    []
+  );
+
+  const {
+    data: result,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<EarlyPayoffResult>("early-payoff");
+
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const p = parseFloat(principal);
-    const rate = parseFloat(monthlyRate) / 100;
-    const term = parseInt(originalTerm, 10);
-    const extra = parseFloat(extraPayment);
-    const fee = processingFee ? parseFloat(processingFee) : 0;
+    const p = parseFloat(form.principal);
+    const rate = parseFloat(form.monthlyRate) / 100;
+    const term = parseInt(form.originalTerm, 10);
+    const extra = parseFloat(form.extraPayment);
+    const fee = form.processingFee ? parseFloat(form.processingFee) : 0;
 
     if (isNaN(p) || isNaN(rate) || isNaN(term) || isNaN(extra)) return;
 
-    const res = calculateEarlyPayoff(p, rate, term, extra, fee);
-    setResult(res);
+    await calculate({
+      principal: p,
+      monthlyRate: rate,
+      originalMonths: term,
+      extraPayment: extra,
+      processingFee: fee,
+    });
   };
 
   return (
@@ -57,12 +98,15 @@ export default function EarlyPayoffCalculator() {
                 id="ep-principal"
                 type="number"
                 placeholder="e.g. 100000"
-                value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
+                value={form.principal}
+                onChange={(e) => setField("principal", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Original loan amount before interest
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ep-rate">Monthly Rate (%)</Label>
@@ -70,12 +114,16 @@ export default function EarlyPayoffCalculator() {
                 id="ep-rate"
                 type="number"
                 placeholder="e.g. 1.5"
-                value={monthlyRate}
-                onChange={(e) => setMonthlyRate(e.target.value)}
+                value={form.monthlyRate}
+                onChange={(e) => setField("monthlyRate", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                max={100}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Monthly add-on (flat) interest rate on the loan
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ep-term">Original Term (months)</Label>
@@ -83,12 +131,16 @@ export default function EarlyPayoffCalculator() {
                 id="ep-term"
                 type="number"
                 placeholder="e.g. 24"
-                value={originalTerm}
-                onChange={(e) => setOriginalTerm(e.target.value)}
+                value={form.originalTerm}
+                onChange={(e) => setField("originalTerm", e.target.value)}
                 required
-                min="1"
-                step="1"
+                min={1}
+                max={360}
+                step={1}
               />
+              <p className="text-xs text-muted-foreground">
+                Number of months in the original loan agreement
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ep-extra">Extra Monthly Payment</Label>
@@ -96,12 +148,16 @@ export default function EarlyPayoffCalculator() {
                 id="ep-extra"
                 type="number"
                 placeholder="e.g. 2000"
-                value={extraPayment}
-                onChange={(e) => setExtraPayment(e.target.value)}
+                value={form.extraPayment}
+                onChange={(e) => setField("extraPayment", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Additional amount you plan to pay each month on top of the
+                regular installment
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ep-fee">Processing Fee (optional)</Label>
@@ -109,18 +165,41 @@ export default function EarlyPayoffCalculator() {
                 id="ep-fee"
                 type="number"
                 placeholder="e.g. 500"
-                value={processingFee}
-                onChange={(e) => setProcessingFee(e.target.value)}
-                min="0"
-                step="any"
+                value={form.processingFee}
+                onChange={(e) => setField("processingFee", e.target.value)}
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                One-time fee included in the total loan cost
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
         {result && (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            role="region"
+            aria-label="Early payoff results"
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Original Schedule</CardTitle>

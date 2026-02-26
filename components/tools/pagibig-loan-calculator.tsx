@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -11,26 +11,61 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  calculatePagIBIGLoan,
-  type PagIBIGLoanResult,
-} from "@/lib/calculators";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { useToolCalculator } from "@/hooks/use-tool-calculator";
+import type { PagIBIGLoanResult } from "@/lib/calculators";
 import { formatCurrency, formatPercent } from "@/lib/client";
 
-export default function PagIBIGLoanCalculator() {
-  const [loanAmount, setLoanAmount] = useState("");
-  const [termYears, setTermYears] = useState("30");
-  const [result, setResult] = useState<PagIBIGLoanResult | null>(null);
+interface FormState {
+  loanAmount: string;
+  termYears: string;
+}
 
-  const handleCalculate = (e: React.FormEvent) => {
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: string }
+  | { type: "RESET" };
+
+const initialState: FormState = {
+  loanAmount: "",
+  termYears: "30",
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return initialState;
+  }
+}
+
+export default function PagIBIGLoanCalculator() {
+  const [form, formDispatch] = useReducer(formReducer, initialState);
+  const setField = useCallback(
+    (field: keyof FormState, value: string) =>
+      formDispatch({ type: "SET_FIELD", field, value }),
+    []
+  );
+
+  const {
+    data: result,
+    isLoading,
+    error,
+    calculate,
+  } = useToolCalculator<PagIBIGLoanResult>("pagibig-loan");
+
+  const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const amount = parseFloat(loanAmount);
-    const years = parseInt(termYears, 10);
+    const amount = parseFloat(form.loanAmount);
+    const years = parseInt(form.termYears, 10);
 
     if (isNaN(amount) || isNaN(years)) return;
 
-    const res = calculatePagIBIGLoan(amount, years);
-    setResult(res);
+    await calculate({
+      loanAmount: amount,
+      termYears: years,
+    });
   };
 
   return (
@@ -51,12 +86,15 @@ export default function PagIBIGLoanCalculator() {
                 id="pag-amount"
                 type="number"
                 placeholder="e.g. 1000000"
-                value={loanAmount}
-                onChange={(e) => setLoanAmount(e.target.value)}
+                value={form.loanAmount}
+                onChange={(e) => setField("loanAmount", e.target.value)}
                 required
-                min="0"
-                step="any"
+                min={0}
+                step={0.01}
               />
+              <p className="text-xs text-muted-foreground">
+                Total Pag-IBIG housing loan amount you wish to borrow
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="pag-term">Term (years)</Label>
@@ -64,20 +102,39 @@ export default function PagIBIGLoanCalculator() {
                 id="pag-term"
                 type="number"
                 placeholder="30"
-                value={termYears}
-                onChange={(e) => setTermYears(e.target.value)}
+                value={form.termYears}
+                onChange={(e) => setField("termYears", e.target.value)}
                 required
-                min="1"
-                max="30"
-                step="1"
+                min={1}
+                max={30}
+                step={1}
               />
+              <p className="text-xs text-muted-foreground">
+                Loan repayment period in years (max 30 years)
+              </p>
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
+                Calculating...
+              </>
+            ) : (
+              "Calculate"
+            )}
+          </Button>
         </form>
 
         {result && (
-          <div className="mt-6">
+          <div className="mt-6" role="region" aria-label="Pag-IBIG loan results">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">
@@ -145,6 +202,9 @@ export default function PagIBIGLoanCalculator() {
                         {formatCurrency(result.mri)}
                       </span>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Mortgage Redemption Insurance — protects the lender if borrower passes away
+                    </p>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
                         Fire Insurance (annual)
@@ -153,6 +213,9 @@ export default function PagIBIGLoanCalculator() {
                         {formatCurrency(result.fireInsurance)}
                       </span>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Required annual coverage for the property
+                    </p>
                   </div>
                 </div>
               </CardContent>
