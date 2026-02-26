@@ -1,19 +1,23 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { CalculateForm, CalculateFormSchema } from "@/schema";
 import { CALCULATOR_TYPES, CALCULATOR_CONFIG, DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "@/constant";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/client";
 import { InfoCircledIcon, ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
 import type { CalculatorType } from "@/constant";
+
+type MonthInputMode = "preset" | "custom" | "range" | "quick";
 
 interface CardInstallmentFormProps {
   onSubmit: (values: CalculateForm) => void;
@@ -31,6 +35,20 @@ const InfoTip: React.FC<{ content: string }> = ({ content }) => (
   </Tooltip>
 );
 
+const QUICK_PRESETS = [
+  { label: "Short Term", description: "3–6 months", months: ["3", "6"] },
+  { label: "Mid Term", description: "9–18 months", months: ["9", "12", "15", "18"] },
+  { label: "Long Term", description: "24–36 months", months: ["24", "27", "30", "33", "36"] },
+  { label: "All Terms", description: "3–36 months", months: ["3", "6", "9", "12", "15", "18", "21", "24", "27", "30", "33", "36"] },
+];
+
+const MONTH_MODE_TABS: Array<{ value: MonthInputMode; label: string; description: string }> = [
+  { value: "preset", label: "Preset", description: "Choose from standard terms" },
+  { value: "custom", label: "Custom", description: "Enter any month value" },
+  { value: "range", label: "Range", description: "Generate a custom range" },
+  { value: "quick", label: "Quick Fill", description: "Use preset groups" },
+];
+
 const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isLoading = false }) => {
   const form = useForm<CalculateForm>({
     resolver: zodResolver(CalculateFormSchema),
@@ -44,6 +62,14 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
       monthlyBudget: 0,
     },
   });
+
+  const [monthMode, setMonthMode] = useState<MonthInputMode>("preset");
+  const [customMonth, setCustomMonth] = useState<string>("");
+  const [rangeStart, setRangeStart] = useState(3);
+  const [rangeEnd, setRangeEnd] = useState(36);
+  const [rangeStep, setRangeStep] = useState(3);
+  const [selectedComparison, setSelectedComparison] = useState<string[]>([]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const calculatorType = form.watch("calculatorType") as CalculatorType;
   const amount = form.watch("amount");
@@ -61,15 +87,52 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
     return amount - estimatedDST - processingFee;
   }, [calculatorType, amount, estimatedDST, processingFee]);
 
+  // Generate range months
+  const rangeMonths = useMemo(() => {
+    const months: string[] = [];
+    for (let i = rangeStart; i <= rangeEnd; i += rangeStep) {
+      months.push(String(i));
+    }
+    return months;
+  }, [rangeStart, rangeEnd, rangeStep]);
+
+  // Compute the plan list based on mode + advanced comparison
+  const computePlanList = useCallback((): string[] => {
+    let basePlans: string[];
+    switch (monthMode) {
+      case "custom": {
+        const month = customMonth || form.getValues("numInstallments");
+        basePlans = Array.from(new Set([...config.installmentPlans, month])).sort((a, b) => +a - +b);
+        break;
+      }
+      case "range":
+        basePlans = rangeMonths;
+        break;
+      case "quick":
+      case "preset":
+      default:
+        basePlans = config.installmentPlans;
+        break;
+    }
+
+    // If advanced comparison months are selected, use those instead
+    if (showAdvanced && selectedComparison.length > 0) {
+      const selected = form.getValues("numInstallments");
+      return Array.from(new Set([...selectedComparison, selected])).sort((a, b) => +a - +b);
+    }
+
+    return basePlans;
+  }, [monthMode, customMonth, config.installmentPlans, rangeMonths, showAdvanced, selectedComparison, form]);
+
   useEffect(() => {
     const currentPlan = form.getValues("numInstallments");
-    if (!config.installmentPlans.includes(currentPlan)) {
-      form.setValue("numInstallments", config.installmentPlans[0] as CalculateForm["numInstallments"]);
+    if (monthMode === "preset" && !config.installmentPlans.includes(currentPlan)) {
+      form.setValue("numInstallments", config.installmentPlans[0]);
     }
     if (!config.showInstallmentAmount) {
       form.setValue("installmentAmount", 0);
     }
-  }, [calculatorType, config, form]);
+  }, [calculatorType, config, form, monthMode]);
 
   const handleReset = () => {
     form.reset({
@@ -81,6 +144,32 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
       installmentAmount: 0,
       monthlyBudget: 0,
     });
+    setMonthMode("preset");
+    setCustomMonth("");
+    setRangeStart(3);
+    setRangeEnd(36);
+    setRangeStep(3);
+    setSelectedComparison([]);
+    setShowAdvanced(false);
+  };
+
+  const handleFormSubmit = (values: CalculateForm) => {
+    const planList = computePlanList();
+    onSubmit({ ...values, customPlanList: planList });
+  };
+
+  const handleQuickPreset = (months: string[]) => {
+    setSelectedComparison(months);
+    setShowAdvanced(true);
+    if (months.length > 0) {
+      form.setValue("numInstallments", months[0]);
+    }
+  };
+
+  const toggleComparisonMonth = (month: string) => {
+    setSelectedComparison((prev) =>
+      prev.includes(month) ? prev.filter((m) => m !== month) : [...prev, month].sort((a, b) => +a - +b)
+    );
   };
 
   return (
@@ -122,7 +211,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
           </fieldset>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
               <fieldset disabled={isLoading} className="space-y-4">
                 {/* Amount Field */}
                 <FormField
@@ -175,37 +264,261 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                   )}
                 />
 
-                {/* Number of Installments */}
-                <FormField
-                  name="numInstallments"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Number of Installments (Months)
-                        <InfoTip content="Choose how many months to spread your payments. Longer terms mean lower monthly payments but higher total interest. The calculator will also show all other terms for comparison." />
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select installment term" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {config.installmentPlans.map((num) => (
-                            <SelectItem key={num} value={num}>
-                              {num} months
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        The calculator will also show all other available terms for comparison.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
+                {/* Number of Installments - Enhanced */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">
+                    Number of Installments (Months)
+                    <InfoTip content="Choose how many months to spread your payments. Use Preset for standard terms, Custom to type any month, Range to generate a series, or Quick Fill for common groupings." />
+                  </Label>
+
+                  {/* Mode Tabs */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {MONTH_MODE_TABS.map((tab) => (
+                      <button
+                        key={tab.value}
+                        type="button"
+                        disabled={isLoading}
+                        className={cn(
+                          "rounded-md px-3 py-1.5 text-xs font-medium transition-all border",
+                          monthMode === tab.value
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                            : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+                        )}
+                        onClick={() => setMonthMode(tab.value)}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Preset Mode */}
+                  {monthMode === "preset" && (
+                    <FormField
+                      name="numInstallments"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select installment term" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {config.installmentPlans.map((num) => (
+                                <SelectItem key={num} value={num}>
+                                  {num} months
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Choose from standard bank installment terms.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
+
+                  {/* Custom Mode */}
+                  {monthMode === "custom" && (
+                    <div className="space-y-2">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={360}
+                        placeholder="Enter number of months (1–360)"
+                        value={customMonth}
+                        onChange={(e) => {
+                          setCustomMonth(e.target.value);
+                          if (e.target.value) {
+                            form.setValue("numInstallments", e.target.value);
+                          }
+                        }}
+                        disabled={isLoading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Type any month value. The comparison table will include this along with standard terms.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Range Mode */}
+                  {monthMode === "range" && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Start</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={360}
+                            value={rangeStart}
+                            onChange={(e) => setRangeStart(Math.max(1, +e.target.value))}
+                            disabled={isLoading}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">End</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={360}
+                            value={rangeEnd}
+                            onChange={(e) => setRangeEnd(Math.max(1, +e.target.value))}
+                            disabled={isLoading}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Step</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={60}
+                            value={rangeStep}
+                            onChange={(e) => setRangeStep(Math.max(1, +e.target.value))}
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+                      {rangeMonths.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {rangeMonths.map((m) => (
+                            <Badge
+                              key={m}
+                              variant="secondary"
+                              className={cn(
+                                "cursor-pointer text-xs",
+                                form.getValues("numInstallments") === m && "bg-primary text-primary-foreground"
+                              )}
+                              onClick={() => form.setValue("numInstallments", m)}
+                            >
+                              {m}mo
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Generated {rangeMonths.length} terms. Click a badge to select it as your primary term.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Quick Fill Mode */}
+                  {monthMode === "quick" && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {QUICK_PRESETS.map((preset) => (
+                          <button
+                            key={preset.label}
+                            type="button"
+                            disabled={isLoading}
+                            className={cn(
+                              "rounded-lg border-2 px-3 py-2 text-left transition-all",
+                              JSON.stringify(selectedComparison) === JSON.stringify(preset.months)
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-border hover:border-primary/40 hover:bg-muted/50"
+                            )}
+                            onClick={() => handleQuickPreset(preset.months)}
+                          >
+                            <span className="block text-xs font-semibold">{preset.label}</span>
+                            <span className="block text-[10px] text-muted-foreground">{preset.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                      {selectedComparison.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedComparison.map((m) => (
+                            <Badge
+                              key={m}
+                              variant="secondary"
+                              className={cn(
+                                "cursor-pointer text-xs",
+                                form.getValues("numInstallments") === m && "bg-primary text-primary-foreground"
+                              )}
+                              onClick={() => form.setValue("numInstallments", m)}
+                            >
+                              {m}mo
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Select a preset to populate comparison terms. Click a badge to set your primary term.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Advanced: Customize Comparison Plans */}
+                  <div className="border rounded-lg">
+                    <button
+                      type="button"
+                      className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => setShowAdvanced(!showAdvanced)}
+                    >
+                      <span>Customize Comparison Plans</span>
+                      <span className="text-[10px]">{showAdvanced ? "Hide" : "Show"}</span>
+                    </button>
+                    {showAdvanced && (
+                      <div className="px-3 pb-3 space-y-2 border-t pt-2">
+                        <p className="text-[10px] text-muted-foreground">
+                          Check which months to include in the comparison table:
+                        </p>
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "15", "18", "21", "24", "27", "30", "33", "36", "42", "48", "60"].map((m) => (
+                            <label
+                              key={m}
+                              className="flex items-center gap-1.5 text-xs cursor-pointer"
+                            >
+                              <Checkbox
+                                checked={selectedComparison.includes(m)}
+                                onCheckedChange={() => toggleComparisonMonth(m)}
+                                disabled={isLoading}
+                              />
+                              {m}mo
+                            </label>
+                          ))}
+                        </div>
+                        <div className="flex gap-2 items-end">
+                          <div className="flex-1">
+                            <Label className="text-[10px] text-muted-foreground">Add custom month</Label>
+                            <Input
+                              type="number"
+                              min={1}
+                              max={360}
+                              placeholder="e.g., 45"
+                              className="h-7 text-xs"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  const val = (e.target as HTMLInputElement).value;
+                                  if (val && +val >= 1 && +val <= 360 && !selectedComparison.includes(val)) {
+                                    setSelectedComparison((prev) => [...prev, val].sort((a, b) => +a - +b));
+                                  }
+                                  (e.target as HTMLInputElement).value = "";
+                                }
+                              }}
+                              disabled={isLoading}
+                            />
+                          </div>
+                          {selectedComparison.length > 0 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7"
+                              onClick={() => setSelectedComparison([])}
+                            >
+                              Clear all
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Processing Fee */}

@@ -11,6 +11,7 @@ import {
   ReaderIcon,
   ListBulletIcon,
   InputIcon,
+  MixerHorizontalIcon,
 } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { useState } from "react";
@@ -36,6 +37,7 @@ const Navbar: React.FC = () => {
       {/* Middle navigation links hidden on mobile */}
       <div className="hidden md:flex-grow md:flex md:items-center md:justify-center space-x-4">
         <Link href="/">Calculator</Link>
+        <Link href="/tools">Financial Tools</Link>
         <Link href="/docs">Documentation</Link>
         <Link href="/bank-conversion-list">Bank Conversion List</Link>
         <Link
@@ -87,6 +89,10 @@ const Navbar: React.FC = () => {
                 <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
                   <InputIcon className="mr-2 h-4 w-4" />
                   <Link href="/">Calculator</Link>
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
+                  <MixerHorizontalIcon className="mr-2 h-4 w-4" />
+                  <Link href="/tools">Financial Tools</Link>
                 </Button>
                 <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
                   <ReaderIcon className="mr-2 h-4 w-4" />
