@@ -11,11 +11,42 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import {
   calculateRemittance,
   type RemittanceResult,
 } from "@/lib/calculators";
-import { formatCurrency } from "@/lib/client";
+
+const CURRENCY_OPTIONS = [
+  { code: "USD", label: "USD - US Dollar", symbol: "$" },
+  { code: "EUR", label: "EUR - Euro", symbol: "\u20ac" },
+  { code: "GBP", label: "GBP - British Pound", symbol: "\u00a3" },
+  { code: "SGD", label: "SGD - Singapore Dollar", symbol: "S$" },
+  { code: "AED", label: "AED - UAE Dirham", symbol: "AED" },
+  { code: "SAR", label: "SAR - Saudi Riyal", symbol: "SAR" },
+  { code: "JPY", label: "JPY - Japanese Yen", symbol: "\u00a5" },
+  { code: "KRW", label: "KRW - Korean Won", symbol: "\u20a9" },
+  { code: "AUD", label: "AUD - Australian Dollar", symbol: "A$" },
+  { code: "CAD", label: "CAD - Canadian Dollar", symbol: "C$" },
+  { code: "HKD", label: "HKD - Hong Kong Dollar", symbol: "HK$" },
+  { code: "TWD", label: "TWD - Taiwan Dollar", symbol: "NT$" },
+  { code: "PHP", label: "PHP - Philippine Peso", symbol: "\u20b1" },
+];
+
+const RECEIVE_CURRENCIES = [
+  { code: "PHP", label: "PHP - Philippine Peso", symbol: "\u20b1" },
+  { code: "USD", label: "USD - US Dollar", symbol: "$" },
+  { code: "EUR", label: "EUR - Euro", symbol: "\u20ac" },
+  { code: "GBP", label: "GBP - British Pound", symbol: "\u00a3" },
+  { code: "SGD", label: "SGD - Singapore Dollar", symbol: "S$" },
+  { code: "JPY", label: "JPY - Japanese Yen", symbol: "\u00a5" },
+];
+
+const formatAmount = (amount: number, currency: string): string => {
+  const cur = [...CURRENCY_OPTIONS, ...RECEIVE_CURRENCIES].find((c) => c.code === currency);
+  const symbol = cur?.symbol || currency;
+  return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
 export default function RemittanceCalculator() {
   const [sendAmount, setSendAmount] = useState("");
@@ -49,14 +80,50 @@ export default function RemittanceCalculator() {
         <CardTitle>Remittance Calculator</CardTitle>
         <CardDescription>
           Calculate how much your recipient will receive after exchange rates and
-          service fees.
+          service fees. Supports multiple currencies for OFW remittances.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleCalculate} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Send Currency */}
             <div className="space-y-2">
-              <Label htmlFor="rem-amount">Send Amount</Label>
+              <Label htmlFor="rem-send-currency">Send Currency</Label>
+              <Select value={sendCurrency} onValueChange={setSendCurrency}>
+                <SelectTrigger id="rem-send-currency">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCY_OPTIONS.map((cur) => (
+                    <SelectItem key={cur.code} value={cur.code}>
+                      {cur.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Receive Currency */}
+            <div className="space-y-2">
+              <Label htmlFor="rem-receive-currency">Receive Currency</Label>
+              <Select value={receiveCurrency} onValueChange={setReceiveCurrency}>
+                <SelectTrigger id="rem-receive-currency">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RECEIVE_CURRENCIES.map((cur) => (
+                    <SelectItem key={cur.code} value={cur.code}>
+                      {cur.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="rem-amount">Send Amount ({sendCurrency})</Label>
               <Input
                 id="rem-amount"
                 type="number"
@@ -95,82 +162,69 @@ export default function RemittanceCalculator() {
                 step="any"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="rem-send-currency">Send Currency</Label>
-              <Input
-                id="rem-send-currency"
-                type="text"
-                placeholder="e.g. USD"
-                value={sendCurrency}
-                onChange={(e) => setSendCurrency(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="rem-receive-currency">Receive Currency</Label>
-              <Input
-                id="rem-receive-currency"
-                type="text"
-                placeholder="e.g. PHP"
-                value={receiveCurrency}
-                onChange={(e) => setReceiveCurrency(e.target.value)}
-              />
-            </div>
           </div>
           <Button type="submit">Calculate</Button>
         </form>
 
         {results && (
           <div className="mt-6 space-y-4">
-            <div className="rounded-lg border bg-primary/5 p-6 text-center">
+            {/* Big result */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Recipient Receives
               </p>
               <p className="text-3xl font-bold text-primary">
-                {formatCurrency(results.receiveAmount)}{" "}
-                <span className="text-lg font-medium">
-                  {results.receiveCurrency}
-                </span>
+                {formatAmount(results.receiveAmount, results.receiveCurrency)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                in {results.receiveCurrency}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-md border p-3">
-                <p className="text-sm text-muted-foreground">Send Amount</p>
+            {/* Details */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Send Amount</p>
                 <p className="text-lg font-semibold">
-                  {results.sendAmount.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  {results.sendCurrency}
+                  {formatAmount(results.sendAmount, results.sendCurrency)}
                 </p>
               </div>
-              <div className="rounded-md border p-3">
-                <p className="text-sm text-muted-foreground">Service Fee</p>
-                <p className="text-lg font-semibold">
-                  {results.fee.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  {results.sendCurrency}
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Service Fee</p>
+                <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                  {formatAmount(results.fee, results.sendCurrency)}
                 </p>
               </div>
-              <div className="rounded-md border p-3">
-                <p className="text-sm text-muted-foreground">Total Cost</p>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Total Cost (You Pay)</p>
                 <p className="text-lg font-semibold">
-                  {results.totalCost.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  {results.sendCurrency}
+                  {formatAmount(results.totalCost, results.sendCurrency)}
                 </p>
               </div>
-              <div className="rounded-md border p-3">
-                <p className="text-sm text-muted-foreground">Effective Rate</p>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Effective Rate</p>
                 <p className="text-lg font-semibold">
-                  {results.effectiveRate.toFixed(4)}
+                  {results.effectiveRate.toFixed(4)} {results.receiveCurrency}/{results.sendCurrency}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  vs {results.exchangeRate.toFixed(4)} market rate
                 </p>
               </div>
             </div>
+
+            {/* Fee Impact */}
+            {results.fee > 0 && (
+              <div className="rounded-lg border border-dashed p-3 text-center">
+                <p className="text-xs text-muted-foreground">Fee Impact</p>
+                <p className="text-sm font-medium">
+                  The service fee reduces your effective rate from{" "}
+                  <span className="text-primary font-semibold">{results.exchangeRate.toFixed(4)}</span>
+                  {" "}to{" "}
+                  <span className="text-orange-600 dark:text-orange-400 font-semibold">{results.effectiveRate.toFixed(4)}</span>
+                  {" "}({((1 - results.effectiveRate / results.exchangeRate) * 100).toFixed(2)}% loss)
+                </p>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

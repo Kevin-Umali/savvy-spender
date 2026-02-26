@@ -2,119 +2,120 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  GitHubLogoIcon,
-  MoonIcon,
-  SunIcon,
-  HamburgerMenuIcon,
-  GlobeIcon,
-  ReaderIcon,
-  ListBulletIcon,
-  InputIcon,
-  MixerHorizontalIcon,
-} from "@radix-ui/react-icons";
+import { usePathname } from "next/navigation";
+import { Moon, Sun, Menu, Calculator, Wrench, BookOpen, Building2, Github } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
+const NAV_LINKS = [
+  { href: "/calculator", label: "Calculator", icon: Calculator },
+  { href: "/tools", label: "Tools", icon: Wrench },
+  { href: "/docs", label: "Docs", icon: BookOpen },
+  { href: "/bank-conversion-list", label: "Banks", icon: Building2 },
+];
+
 const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
-
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   const toggleColorMode = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
-    <nav className="flex w-full items-center justify-between p-4 shadow-sm">
-      <Link href="/">
-        <Image src="/android-chrome-512x512.png" alt="Logo" width={50} height={50} />
-      </Link>
-
-      {/* Middle navigation links hidden on mobile */}
-      <div className="hidden md:flex-grow md:flex md:items-center md:justify-center space-x-4">
-        <Link href="/">Calculator</Link>
-        <Link href="/tools">Financial Tools</Link>
-        <Link href="/docs">Documentation</Link>
-        <Link href="/bank-conversion-list">Bank Conversion List</Link>
-        <Link
-          href="https://apply.cc-pl.unionbankph.com/PLCC/StartApplication?media=4892822405&scode=DCMMEMRCE1&utm_source=DCMMEMRCE1&utm_medium=MGM&utm_campaign=DCMMEMRCE1"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Union Bank Referral Link
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/android-chrome-512x512.png" alt="Savvy Spender" width={32} height={32} />
+          <span className="font-semibold hidden sm:inline">Savvy Spender</span>
         </Link>
-      </div>
 
-      <div className="flex items-center space-x-2">
-        <Link
-          href="https://github.com/Kevin-Umali/savvy-spender"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub repository"
-        >
-          <GitHubLogoIcon className="h-6 w-6" />
-        </Link>
-        <Button
-          variant="ghost"
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-          className="rounded-md p-2"
-          onClick={toggleColorMode}
-        >
-          {theme === "light" ? (
-            <MoonIcon className="h-6 w-6" aria-hidden="true" />
-          ) : (
-            <SunIcon className="h-6 w-6" aria-hidden="true" />
-          )}
-        </Button>
+        {/* Desktop navigation */}
+        <div className="hidden md:flex items-center gap-1">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
 
-        <div className="md:hidden">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button aria-label="Open menu" className="p-2">
-                <HamburgerMenuIcon className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Navigation</SheetTitle>
-                <SheetDescription>
-                  Browse the calculator, documentation, and bank conversion resources.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="grid gap-3 py-3">
-                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
-                  <InputIcon className="mr-2 h-4 w-4" />
-                  <Link href="/">Calculator</Link>
+        <div className="flex items-center gap-1">
+          <Link
+            href="https://github.com/Kevin-Umali/savvy-spender"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub repository"
+          >
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Github className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            onClick={toggleColorMode}
+          >
+            {theme === "light" ? (
+              <Moon className="h-4 w-4" />
+            ) : (
+              <Sun className="h-4 w-4" />
+            )}
+          </Button>
+
+          {/* Mobile menu */}
+          <div className="md:hidden">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Open menu">
+                  <Menu className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
-                  <MixerHorizontalIcon className="mr-2 h-4 w-4" />
-                  <Link href="/tools">Financial Tools</Link>
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
-                  <ReaderIcon className="mr-2 h-4 w-4" />
-                  <Link href="/docs">Documentation</Link>
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
-                  <ListBulletIcon className="mr-2 h-4 w-4" />
-                  <Link href="/bank-conversion-list">Bank Conversion List</Link>
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => setOpen(!open)}>
-                  <GlobeIcon className="mr-2 h-4 w-4" />
-                  <Link
-                    href="https://apply.cc-pl.unionbankph.com/PLCC/StartApplication?media=4892822405&scode=DCMMEMRCE1&utm_source=DCMMEMRCE1&utm_medium=MGM&utm_campaign=DCMMEMRCE1"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Union Bank Referral Link
-                  </Link>
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Navigation</SheetTitle>
+                  <SheetDescription>
+                    Browse calculators, financial tools, and documentation.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="grid gap-1 py-4">
+                  {NAV_LINKS.map((link) => (
+                    <Button
+                      key={link.href}
+                      variant="ghost"
+                      className={cn(
+                        "justify-start",
+                        (pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))) &&
+                          "text-primary bg-primary/10"
+                      )}
+                      onClick={() => setOpen(false)}
+                      asChild
+                    >
+                      <Link href={link.href}>
+                        <link.icon className="mr-2 h-4 w-4" />
+                        {link.label}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </nav>

@@ -1,14 +1,10 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "@/components/ui/sonner";
-import { Inter as FontSans } from "next/font/google";
-
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-
-const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -18,36 +14,40 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Savvy Spender - Bank Calculator",
+  title: {
+    default: "Savvy Spender - Philippine Financial Calculator",
+    template: "%s | Savvy Spender",
+  },
   description:
-    "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
+    "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and plan your retirement with interactive charts.",
   keywords: [
-    "Payment Calculator",
+    "Philippine Financial Calculator",
     "Installment Calculator",
-    "0% Interest Calculator",
-    "Financial Calculator",
-    "Payment Comparison",
-    "Balance Conversion",
+    "Salary Calculator Philippines",
+    "Loan Calculator PH",
+    "Tax Calculator TRAIN Law",
     "Balance Conversion Calculator",
-    "Credit-to-Cash",
     "Credit-to-Cash Calculator",
-    "Loan",
-    "Loan Calculator",
+    "SSS Loan Calculator",
+    "Pag-IBIG Loan Calculator",
+    "Investment Calculator",
+    "Retirement Calculator",
+    "Debt Planner",
   ],
   metadataBase: new URL("https://www.savvyspender.info/"),
-  applicationName: "Savvy Spender Bank Calculator",
+  applicationName: "Savvy Spender",
   openGraph: {
     type: "website",
     url: "https://www.savvyspender.info/",
-    title: "Savvy Spender - Bank Calculator",
+    title: "Savvy Spender - Philippine Financial Calculator",
     description:
-      "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
+      "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and more.",
   },
   twitter: {
     site: "https://www.savvyspender.info/",
-    title: "Savvy Spender - Bank Calculator",
+    title: "Savvy Spender - Philippine Financial Calculator",
     description:
-      "Calculate your payment options with Savvy Spender's Balance Conversion, Credit-to-Cash or Loan Calculator. Compare full payment, installment, and 0% interest plans.",
+      "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and more.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: {
@@ -62,7 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased")}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           {children}
