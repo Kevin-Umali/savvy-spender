@@ -40,23 +40,23 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <Label className="text-xs text-muted-foreground">Months</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Months</Label>
               <p className="text-sm font-semibold">{calculatedData.selected.months}</p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Simple Interest</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Simple Interest</Label>
               <p className="text-sm font-semibold">{formatPercent(calculatedData.selected.simpleInterest)}</p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Factor Rate</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Factor Rate</Label>
               <p className="text-sm font-semibold">{calculatedData.selected.factorRate}</p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Effective Interest Rate PA</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Effective Interest Rate PA</Label>
               <p className="text-sm font-semibold">{formatPercent(calculatedData.selected.eirPA)}</p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Monthly Payment</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Monthly Payment</Label>
               <p
                 className={`text-sm font-semibold ${
                   hasBudget
@@ -77,13 +77,13 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
               </p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Total Interest</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Interest</Label>
               <p className="text-sm font-semibold text-orange-600 dark:text-orange-400">
                 {formatCurrency(calculatedData.selected.interest)}
               </p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Total Payment (w/ fees)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Payment (w/ fees)</Label>
               <p className="text-sm font-bold text-primary">{formatCurrency(calculatedData.selected.totalPayment)}</p>
             </div>
           </div>
@@ -100,14 +100,14 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label className="text-xs text-muted-foreground">Documentary Stamp Tax</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Documentary Stamp Tax</Label>
                 <p className="text-sm font-semibold">
                   {calculatedData.dst > 0 ? formatCurrency(calculatedData.dst) : "Exempt (≤ ₱250K)"}
                 </p>
               </div>
               {calculatedData.netProceeds !== undefined && (
                 <div>
-                  <Label className="text-xs text-muted-foreground">Estimated Net Proceeds</Label>
+                  <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Estimated Net Proceeds</Label>
                   <p className="text-sm font-bold text-primary">{formatCurrency(calculatedData.netProceeds)}</p>
                 </div>
               )}
@@ -131,13 +131,13 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Suggested Principal</Label>
+                  <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Suggested Principal</Label>
                   <p className="text-sm font-semibold">
                     {formatCurrency(calculatedData.selected.suggestedPrincipal.suggested)}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Total With Interest</Label>
+                  <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total With Interest</Label>
                   <p className="text-sm font-semibold">
                     {formatCurrency(calculatedData.selected.suggestedPrincipal.totalPayment)}
                   </p>
@@ -157,13 +157,13 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label className="text-xs text-muted-foreground">
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
                   {isPersonalLoan ? "Loan Amount" : "Cash Price (Full Payment)"}
                 </Label>
                 <p className="text-sm font-semibold">{formatCurrency(paymentDifferences.totalFullPayment)}</p>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Total With Interest + Fees</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total With Interest + Fees</Label>
                 <p className="text-sm font-bold text-primary">
                   {formatCurrency(paymentDifferences.totalInstallmentWithInterest)}
                 </p>
@@ -172,7 +172,7 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
                 paymentDifferences.totalInstallmentWithZeroPercent !== undefined &&
                 paymentDifferences.totalInstallmentWithZeroPercent > 0 && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">0% Merchant Installment</Label>
+                    <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">0% Merchant Installment</Label>
                     <p className="text-sm font-semibold">
                       {formatCurrency(paymentDifferences.totalInstallmentWithZeroPercent)}
                     </p>

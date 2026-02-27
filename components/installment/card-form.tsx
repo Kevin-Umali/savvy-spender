@@ -185,7 +185,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
         <CardContent>
           {/* Calculator Type Selector */}
           <fieldset disabled={isLoading} className="mb-6">
-            <Label className="mb-2 block text-sm font-medium">
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60 mb-3 block">
               Calculator Type
               <InfoTip content="Choose the type of financial product you want to calculate. Each type has different fees, fields, and terms." />
             </Label>
@@ -196,15 +196,15 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                   type="button"
                   disabled={isLoading}
                   className={cn(
-                    "rounded-lg border-2 px-4 py-3 text-left transition-all disabled:opacity-60",
+                    "rounded-sm border px-4 py-3 text-left transition-colors disabled:opacity-60",
                     calculatorType === type.value
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border hover:border-primary/40 hover:bg-muted/50"
+                      ? "border-foreground bg-accent"
+                      : "border-border hover:bg-accent"
                   )}
                   onClick={() => form.setValue("calculatorType", type.value)}
                 >
-                  <span className="block text-sm font-semibold">{type.label}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{type.description}</span>
+                  <span className="block text-sm font-medium">{type.label}</span>
+                  <span className="block text-[11px] text-muted-foreground mt-0.5">{type.description}</span>
                 </button>
               ))}
             </div>
@@ -279,10 +279,10 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                         type="button"
                         disabled={isLoading}
                         className={cn(
-                          "rounded-md px-3 py-1.5 text-xs font-medium transition-all border",
+                          "font-mono-label text-[10px] uppercase tracking-[0.15em] rounded-sm px-3 py-1.5 transition-colors border",
                           monthMode === tab.value
-                            ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                            : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+                            ? "border-foreground text-foreground"
+                            : "border-border text-muted-foreground opacity-60 hover:opacity-100"
                         )}
                         onClick={() => setMonthMode(tab.value)}
                       >
@@ -415,14 +415,14 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                             type="button"
                             disabled={isLoading}
                             className={cn(
-                              "rounded-lg border-2 px-3 py-2 text-left transition-all",
+                              "rounded-sm border px-3 py-2 text-left transition-colors",
                               JSON.stringify(selectedComparison) === JSON.stringify(preset.months)
-                                ? "border-primary bg-primary/5 shadow-sm"
-                                : "border-border hover:border-primary/40 hover:bg-muted/50"
+                                ? "border-foreground bg-accent"
+                                : "border-border hover:bg-accent"
                             )}
                             onClick={() => handleQuickPreset(preset.months)}
                           >
-                            <span className="block text-xs font-semibold">{preset.label}</span>
+                            <span className="block text-xs font-medium">{preset.label}</span>
                             <span className="block text-[10px] text-muted-foreground">{preset.description}</span>
                           </button>
                         ))}
@@ -595,8 +595,8 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                 {/* DST Preview for Personal Loans */}
                 {config.showDST && amount > 0 && (
                   <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
-                    <Label className="text-sm font-semibold">
-                      Loan Fee Breakdown (Estimate)
+                    <Label className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
+                      Loan Fee Breakdown
                       <InfoTip content="These fees are deducted from your loan amount before disbursement. You receive the net proceeds but pay interest on the full loan amount." />
                     </Label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
