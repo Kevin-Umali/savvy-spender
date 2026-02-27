@@ -87,16 +87,16 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
         {/* Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="rounded-lg border p-3">
-            <Label className="text-xs text-muted-foreground">Principal</Label>
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Principal</Label>
             <p className="text-lg font-semibold">{formatCurrency(principal)}</p>
           </div>
           <div className="rounded-lg border p-3">
-            <Label className="text-xs text-muted-foreground">Total Interest ({interestPercent}% of principal)</Label>
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Interest ({interestPercent}% of principal)</Label>
             <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">{formatCurrency(interest)}</p>
           </div>
           {totalFees > 0 && (
             <div className="rounded-lg border p-3">
-              <Label className="text-xs text-muted-foreground">
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
                 Fees ({feesPercent}% of principal)
                 {isPersonalLoan && calculatedData.dst ? ` — incl. DST ${formatCurrency(calculatedData.dst)}` : ""}
               </Label>
@@ -104,7 +104,7 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
             </div>
           )}
           <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-            <Label className="text-xs text-muted-foreground">Total Amount Payable</Label>
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Amount Payable</Label>
             <p className="text-lg font-bold text-primary">{formatCurrency(totalPayment)}</p>
           </div>
         </div>
@@ -112,7 +112,7 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
         {/* Net proceeds for personal loan */}
         {isPersonalLoan && calculatedData.netProceeds !== undefined && (
           <div className="rounded-lg border border-dashed p-3 text-center">
-            <Label className="text-xs text-muted-foreground">You receive (Net Proceeds)</Label>
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">You receive (Net Proceeds)</Label>
             <p className="text-xl font-bold text-primary">{formatCurrency(calculatedData.netProceeds)}</p>
             <p className="text-xs text-muted-foreground mt-1">
               But you pay back {formatCurrency(totalPayment)} — that&apos;s {formatCurrency(totalPayment - calculatedData.netProceeds)} more than you received.
