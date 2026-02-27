@@ -82,14 +82,14 @@ export default function CalculatorPage() {
       </div>
 
       {hasCalculated && !isLoading && (
-        <div className="border-l-2 border-green-500/40 dark:border-green-400/25 pl-6">
-          <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-green-600/70 dark:text-green-400/50 mb-1">
-            Results Ready
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Compare different installment options below to find the plan that fits your budget.
-          </p>
-        </div>
+        <Alert className="border-green-200 text-green-800 bg-green-50 dark:border-green-200 dark:bg-green-100 dark:text-green-800 [&>svg]:text-green-800">
+          <CheckCircledIcon className="h-4 w-4" />
+          <AlertTitle>Ready to Explore Your Options</AlertTitle>
+          <AlertDescription>
+            Select a plan that best fits your financial goals. Compare different installment options to find your ideal
+            plan.
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Installment Form */}
