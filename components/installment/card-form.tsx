@@ -219,7 +219,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                         {config.amountLabel}
                         <InfoTip
                           content={
@@ -246,7 +246,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                         Monthly Add-On Interest Rate (%)
                         <InfoTip content="This is the monthly add-on (flat) rate. In the Philippines, interest is charged on the ORIGINAL principal every month, not on the declining balance. The BSP caps this at 1% per month for credit card installments. The true cost (EIR) is roughly 1.8x–2.0x this rate." />
                       </FormLabel>
@@ -266,7 +266,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
 
                 {/* Number of Installments - Enhanced */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium">
+                  <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                     Number of Installments (Months)
                     <InfoTip content="Choose how many months to spread your payments. Use Preset for standard terms, Custom to type any month, Range to generate a series, or Quick Fill for common groupings." />
                   </Label>
@@ -483,7 +483,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                         </div>
                         <div className="flex gap-2 items-end">
                           <div className="flex-1">
-                            <Label className="text-[10px] text-muted-foreground">Add custom month</Label>
+                            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Add custom month</Label>
                             <Input
                               type="number"
                               min={1}
@@ -527,9 +527,9 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                           {config.processingFeeLabel}
-                          <Label className="ml-1 text-gray-500 text-xs">(Optional)</Label>
+                          <span className="ml-1 text-muted-foreground normal-case font-sans text-[10px]">(Optional)</span>
                           <InfoTip
                             content={
                               calculatorType === "personal-loan"
@@ -554,9 +554,9 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                       control={form.control}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
+                          <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                             0% Installment Amount
-                            <Label className="ml-1 text-gray-500 text-xs">(Optional)</Label>
+                            <span className="ml-1 text-muted-foreground normal-case font-sans text-[10px]">(Optional)</span>
                             <InfoTip content="If the merchant offers a 0% interest installment plan, enter the TOTAL price under that plan here. It may be higher than the cash price. The calculator will compare this against bank conversion and suggest the best option." />
                           </FormLabel>
                           <FormControl>
@@ -577,9 +577,9 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                           Monthly Budget
-                          <Label className="ml-1 text-gray-500 text-xs">(Optional)</Label>
+                          <span className="ml-1 text-muted-foreground normal-case font-sans text-[10px]">(Optional)</span>
                           <InfoTip content="Enter the maximum amount you can comfortably pay each month. Plans within budget will be highlighted green; plans exceeding it will be red." />
                         </FormLabel>
                         <FormControl>
@@ -624,7 +624,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <Button className="flex-1" type="submit" disabled={isLoading}>
+                <Button className="flex-1 font-mono-label uppercase tracking-[0.1em]" type="submit" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -634,7 +634,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
                     "Calculate"
                   )}
                 </Button>
-                <Button type="button" variant="outline" onClick={handleReset} disabled={isLoading}>
+                <Button type="button" variant="outline" className="font-mono-label uppercase tracking-[0.1em]" onClick={handleReset} disabled={isLoading}>
                   <ReloadIcon className="mr-2 h-4 w-4" />
                   Reset
                 </Button>

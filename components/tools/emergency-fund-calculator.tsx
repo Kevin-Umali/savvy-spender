@@ -59,7 +59,7 @@ export default function EmergencyFundCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="ef-expenses">Monthly Expenses</Label>
+              <Label htmlFor="ef-expenses" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Expenses</Label>
               <Input
                 id="ef-expenses"
                 type="number"
@@ -72,7 +72,7 @@ export default function EmergencyFundCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ef-months">Target Months of Coverage</Label>
+              <Label htmlFor="ef-months" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Target Months of Coverage</Label>
               <Input
                 id="ef-months"
                 type="number"
@@ -84,7 +84,7 @@ export default function EmergencyFundCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ef-current">Current Savings</Label>
+              <Label htmlFor="ef-current" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Current Savings</Label>
               <Input
                 id="ef-current"
                 type="number"
@@ -96,7 +96,7 @@ export default function EmergencyFundCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ef-capacity">Monthly Savings Capacity</Label>
+              <Label htmlFor="ef-capacity" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Savings Capacity</Label>
               <Input
                 id="ef-capacity"
                 type="number"
@@ -108,7 +108,7 @@ export default function EmergencyFundCalculator() {
               />
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]">Calculate</Button>
         </form>
 
         {results && (

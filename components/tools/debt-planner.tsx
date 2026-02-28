@@ -140,7 +140,7 @@ export default function DebtPlanner() {
                 className="grid grid-cols-1 gap-3 rounded-md border p-3 sm:grid-cols-5"
               >
                 <div className="space-y-2">
-                  <Label htmlFor={`debt-name-${debt.id}`}>Debt Name</Label>
+                  <Label htmlFor={`debt-name-${debt.id}`} className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Debt Name</Label>
                   <Input
                     id={`debt-name-${debt.id}`}
                     type="text"
@@ -161,7 +161,7 @@ export default function DebtPlanner() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={`debt-balance-${debt.id}`}>Balance</Label>
+                  <Label htmlFor={`debt-balance-${debt.id}`} className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Balance</Label>
                   <Input
                     id={`debt-balance-${debt.id}`}
                     type="number"
@@ -184,7 +184,7 @@ export default function DebtPlanner() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={`debt-rate-${debt.id}`}>
+                  <Label htmlFor={`debt-rate-${debt.id}`} className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                     Monthly Rate (%)
                   </Label>
                   <Input
@@ -210,7 +210,7 @@ export default function DebtPlanner() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={`debt-min-${debt.id}`}>Min. Payment</Label>
+                  <Label htmlFor={`debt-min-${debt.id}`} className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Min. Payment</Label>
                   <Input
                     id={`debt-min-${debt.id}`}
                     type="number"
@@ -261,7 +261,7 @@ export default function DebtPlanner() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="dp-extra">Extra Monthly Payment</Label>
+              <Label htmlFor="dp-extra" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Extra Monthly Payment</Label>
               <Input
                 id="dp-extra"
                 type="number"
@@ -282,7 +282,7 @@ export default function DebtPlanner() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dp-method">Payoff Method</Label>
+              <Label htmlFor="dp-method" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Payoff Method</Label>
               <div id="dp-method" className="flex gap-2">
                 <Button
                   type="button"
@@ -314,7 +314,7 @@ export default function DebtPlanner() {
             </div>
           </div>
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="font-mono-label uppercase tracking-[0.1em]">
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

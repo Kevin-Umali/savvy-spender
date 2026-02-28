@@ -72,7 +72,7 @@ export default function RetirementCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="ret-age">Current Age</Label>
+              <Label htmlFor="ret-age" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Current Age</Label>
               <Input
                 id="ret-age"
                 type="number"
@@ -86,7 +86,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-retire-age">Retirement Age</Label>
+              <Label htmlFor="ret-retire-age" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Retirement Age</Label>
               <Input
                 id="ret-retire-age"
                 type="number"
@@ -100,7 +100,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-current">Current Savings</Label>
+              <Label htmlFor="ret-current" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Current Savings</Label>
               <Input
                 id="ret-current"
                 type="number"
@@ -112,7 +112,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-monthly">Monthly Savings</Label>
+              <Label htmlFor="ret-monthly" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Savings</Label>
               <Input
                 id="ret-monthly"
                 type="number"
@@ -124,7 +124,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-return">Expected Annual Return (%)</Label>
+              <Label htmlFor="ret-return" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Expected Annual Return (%)</Label>
               <Input
                 id="ret-return"
                 type="number"
@@ -137,7 +137,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-expenses">Monthly Expenses in Retirement</Label>
+              <Label htmlFor="ret-expenses" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Expenses in Retirement</Label>
               <Input
                 id="ret-expenses"
                 type="number"
@@ -150,7 +150,7 @@ export default function RetirementCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ret-duration">Retirement Duration (years)</Label>
+              <Label htmlFor="ret-duration" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Retirement Duration (years)</Label>
               <Input
                 id="ret-duration"
                 type="number"
@@ -162,7 +162,7 @@ export default function RetirementCalculator() {
               />
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]">Calculate</Button>
         </form>
 
         {results && (

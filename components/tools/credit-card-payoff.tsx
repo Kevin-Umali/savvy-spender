@@ -73,7 +73,7 @@ export default function CreditCardPayoff() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cc-balance">Outstanding Balance</Label>
+              <Label htmlFor="cc-balance" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Outstanding Balance</Label>
               <Input
                 id="cc-balance"
                 type="number"
@@ -89,7 +89,7 @@ export default function CreditCardPayoff() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cc-annual-rate">Annual Interest Rate (%)</Label>
+              <Label htmlFor="cc-annual-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Annual Interest Rate (%)</Label>
               <Input
                 id="cc-annual-rate"
                 type="number"
@@ -106,7 +106,7 @@ export default function CreditCardPayoff() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cc-min-pct">Minimum Payment (%)</Label>
+              <Label htmlFor="cc-min-pct" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Minimum Payment (%)</Label>
               <Input
                 id="cc-min-pct"
                 type="number"
@@ -122,7 +122,7 @@ export default function CreditCardPayoff() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cc-min-floor">Minimum Floor Amount</Label>
+              <Label htmlFor="cc-min-floor" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Minimum Floor Amount</Label>
               <Input
                 id="cc-min-floor"
                 type="number"
@@ -137,7 +137,7 @@ export default function CreditCardPayoff() {
               </p>
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="cc-fixed">Fixed Monthly Payment</Label>
+              <Label htmlFor="cc-fixed" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Fixed Monthly Payment</Label>
               <Input
                 id="cc-fixed"
                 type="number"
@@ -152,7 +152,7 @@ export default function CreditCardPayoff() {
               </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

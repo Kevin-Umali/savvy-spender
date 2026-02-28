@@ -81,7 +81,7 @@ export default function PagIBIGLoanCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="pag-amount">Loan Amount</Label>
+              <Label htmlFor="pag-amount" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Loan Amount</Label>
               <Input
                 id="pag-amount"
                 type="number"
@@ -97,7 +97,7 @@ export default function PagIBIGLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pag-term">Term (years)</Label>
+              <Label htmlFor="pag-term" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Term (years)</Label>
               <Input
                 id="pag-term"
                 type="number"
@@ -121,7 +121,7 @@ export default function PagIBIGLoanCalculator() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="font-mono-label uppercase tracking-[0.1em]">
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

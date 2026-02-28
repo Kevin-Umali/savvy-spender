@@ -67,7 +67,7 @@ export default function InvestmentCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             <div className="space-y-2">
-              <Label htmlFor="inv-initial">Initial Investment</Label>
+              <Label htmlFor="inv-initial" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Initial Investment</Label>
               <Input
                 id="inv-initial"
                 type="number"
@@ -79,7 +79,7 @@ export default function InvestmentCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="inv-monthly">Monthly Contribution</Label>
+              <Label htmlFor="inv-monthly" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Contribution</Label>
               <Input
                 id="inv-monthly"
                 type="number"
@@ -91,7 +91,7 @@ export default function InvestmentCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="inv-years">Investment Period (years)</Label>
+              <Label htmlFor="inv-years" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Investment Period (years)</Label>
               <Input
                 id="inv-years"
                 type="number"
@@ -105,7 +105,7 @@ export default function InvestmentCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="inv-return">Expected Annual Return (%)</Label>
+              <Label htmlFor="inv-return" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Expected Annual Return (%)</Label>
               <Input
                 id="inv-return"
                 type="number"
@@ -118,7 +118,7 @@ export default function InvestmentCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="inv-tax">Withholding Tax (%)</Label>
+              <Label htmlFor="inv-tax" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Withholding Tax (%)</Label>
               <Input
                 id="inv-tax"
                 type="number"
@@ -131,7 +131,7 @@ export default function InvestmentCalculator() {
               />
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]">Calculate</Button>
         </form>
 
         {results && (

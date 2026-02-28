@@ -77,7 +77,7 @@ export default function CarLoanCalculator() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="vehicle-price">Vehicle Price</Label>
+              <Label htmlFor="vehicle-price" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Vehicle Price</Label>
               <Input
                 id="vehicle-price"
                 type="number"
@@ -93,7 +93,7 @@ export default function CarLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cl-down-payment">Down Payment (%)</Label>
+              <Label htmlFor="cl-down-payment" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Down Payment (%)</Label>
               <Input
                 id="cl-down-payment"
                 type="number"
@@ -110,7 +110,7 @@ export default function CarLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cl-monthly-rate">Monthly Rate (%)</Label>
+              <Label htmlFor="cl-monthly-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Rate (%)</Label>
               <Input
                 id="cl-monthly-rate"
                 type="number"
@@ -127,7 +127,7 @@ export default function CarLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cl-term">Term (Months)</Label>
+              <Label htmlFor="cl-term" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Term (Months)</Label>
               <Input
                 id="cl-term"
                 type="number"
@@ -144,7 +144,7 @@ export default function CarLoanCalculator() {
               </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

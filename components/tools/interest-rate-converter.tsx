@@ -58,7 +58,7 @@ export default function InterestRateConverter() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="flat-rate">Flat Monthly Rate (%)</Label>
+              <Label htmlFor="flat-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Flat Monthly Rate (%)</Label>
               <Input
                 id="flat-rate"
                 type="number"
@@ -75,7 +75,7 @@ export default function InterestRateConverter() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="term-months">Term (Months)</Label>
+              <Label htmlFor="term-months" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Term (Months)</Label>
               <Input
                 id="term-months"
                 type="number"
@@ -92,7 +92,7 @@ export default function InterestRateConverter() {
               </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -115,33 +115,33 @@ export default function InterestRateConverter() {
             <h4 className="text-sm font-semibold text-muted-foreground">Conversion Results</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Flat Rate (Monthly)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">Flat Rate (Monthly)</Label>
                 <p className="text-lg font-semibold">{formatPercent(result.flatRateMonthly.toFixed(2))}</p>
               </div>
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Flat Rate (Annual)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">Flat Rate (Annual)</Label>
                 <p className="text-lg font-semibold">{formatPercent(result.flatRateAnnual.toFixed(2))}</p>
               </div>
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Total Interest %</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">Total Interest %</Label>
                 <p className="text-lg font-semibold">{formatPercent(result.totalInterestPercent.toFixed(2))}</p>
               </div>
               <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <Label className="text-xs text-muted-foreground">EIR (Monthly)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">EIR (Monthly)</Label>
                 <p className="text-lg font-bold text-primary">{formatPercent(result.eirMonthly.toFixed(4))}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Effective Interest Rate per month, accounting for diminishing principal.
                 </p>
               </div>
               <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <Label className="text-xs text-muted-foreground">EIR (Annual)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">EIR (Annual)</Label>
                 <p className="text-lg font-bold text-primary">{formatPercent(result.eirAnnual.toFixed(2))}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   The true annual cost of the loan, comparable across products.
                 </p>
               </div>
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Factor Rate</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-xs text-muted-foreground">Factor Rate</Label>
                 <p className="text-lg font-semibold">{result.factorRate.toFixed(6)}</p>
               </div>
             </div>

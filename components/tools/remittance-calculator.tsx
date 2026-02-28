@@ -88,7 +88,7 @@ export default function RemittanceCalculator() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Send Currency */}
             <div className="space-y-2">
-              <Label htmlFor="rem-send-currency">Send Currency</Label>
+              <Label htmlFor="rem-send-currency" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Send Currency</Label>
               <Select value={sendCurrency} onValueChange={setSendCurrency}>
                 <SelectTrigger id="rem-send-currency">
                   <SelectValue placeholder="Select currency" />
@@ -105,7 +105,7 @@ export default function RemittanceCalculator() {
 
             {/* Receive Currency */}
             <div className="space-y-2">
-              <Label htmlFor="rem-receive-currency">Receive Currency</Label>
+              <Label htmlFor="rem-receive-currency" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Receive Currency</Label>
               <Select value={receiveCurrency} onValueChange={setReceiveCurrency}>
                 <SelectTrigger id="rem-receive-currency">
                   <SelectValue placeholder="Select currency" />
@@ -123,7 +123,7 @@ export default function RemittanceCalculator() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="rem-amount">Send Amount ({sendCurrency})</Label>
+              <Label htmlFor="rem-amount" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Send Amount ({sendCurrency})</Label>
               <Input
                 id="rem-amount"
                 type="number"
@@ -136,7 +136,7 @@ export default function RemittanceCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="rem-rate">
+              <Label htmlFor="rem-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">
                 Exchange Rate ({receiveCurrency} per {sendCurrency})
               </Label>
               <Input
@@ -151,7 +151,7 @@ export default function RemittanceCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="rem-fee">Service Fee ({sendCurrency})</Label>
+              <Label htmlFor="rem-fee" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Service Fee ({sendCurrency})</Label>
               <Input
                 id="rem-fee"
                 type="number"
@@ -163,7 +163,7 @@ export default function RemittanceCalculator() {
               />
             </div>
           </div>
-          <Button type="submit">Calculate</Button>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]">Calculate</Button>
         </form>
 
         {results && (

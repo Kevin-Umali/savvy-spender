@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, BookOpen } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { getToolBySlug, getRelatedTools } from "@/constant/tool-registry";
 import ReactMarkdown from "react-markdown";
 import { cleanMarkdown } from "@/lib/client";
@@ -98,20 +97,16 @@ export default function ToolPage() {
       </div>
 
       {/* Documentation */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-muted-foreground opacity-50" />
           <h2 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
             How This Tool Works
           </h2>
         </div>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="prose dark:prose-invert max-w-none prose-sm">
-              <ReactMarkdown>{cleanMarkdown(tool.docs)}</ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="prose dark:prose-invert max-w-none prose-sm border-l-2 border-border pl-6">
+          <ReactMarkdown>{cleanMarkdown(tool.docs)}</ReactMarkdown>
+        </div>
       </div>
 
       {/* Related Tools */}
