@@ -116,7 +116,7 @@ export default function LoanComparison() {
       <CardContent>
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="lc-amount">Loan Amount</Label>
+            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-amount">Loan Amount</Label>
             <Input
               id="lc-amount"
               type="number"
@@ -136,7 +136,7 @@ export default function LoanComparison() {
             <div className="space-y-3 rounded-lg border p-4">
               <h4 className="font-medium">Bank A</h4>
               <div className="space-y-2">
-                <Label htmlFor="lc-a-name">Name</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-a-name">Name</Label>
                 <Input
                   id="lc-a-name"
                   type="text"
@@ -149,7 +149,7 @@ export default function LoanComparison() {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lc-a-rate">Monthly Rate (%)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-a-rate">Monthly Rate (%)</Label>
                 <Input
                   id="lc-a-rate"
                   type="number"
@@ -166,7 +166,7 @@ export default function LoanComparison() {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lc-a-fee">Processing Fee</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-a-fee">Processing Fee</Label>
                 <Input
                   id="lc-a-fee"
                   type="number"
@@ -185,7 +185,7 @@ export default function LoanComparison() {
             <div className="space-y-3 rounded-lg border p-4">
               <h4 className="font-medium">Bank B</h4>
               <div className="space-y-2">
-                <Label htmlFor="lc-b-name">Name</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-b-name">Name</Label>
                 <Input
                   id="lc-b-name"
                   type="text"
@@ -198,7 +198,7 @@ export default function LoanComparison() {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lc-b-rate">Monthly Rate (%)</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-b-rate">Monthly Rate (%)</Label>
                 <Input
                   id="lc-b-rate"
                   type="number"
@@ -215,7 +215,7 @@ export default function LoanComparison() {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lc-b-fee">Processing Fee</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="lc-b-fee">Processing Fee</Label>
                 <Input
                   id="lc-b-fee"
                   type="number"
@@ -238,7 +238,7 @@ export default function LoanComparison() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

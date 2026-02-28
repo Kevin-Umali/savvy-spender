@@ -96,7 +96,7 @@ export default function AffordabilityCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="aff-budget">Monthly Budget</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="aff-budget">Monthly Budget</Label>
               <Input
                 id="aff-budget"
                 type="number"
@@ -112,7 +112,7 @@ export default function AffordabilityCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="aff-rate">Monthly Interest Rate (%)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="aff-rate">Monthly Interest Rate (%)</Label>
               <Input
                 id="aff-rate"
                 type="number"
@@ -129,7 +129,7 @@ export default function AffordabilityCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="aff-fee">Processing Fee (optional)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="aff-fee">Processing Fee (optional)</Label>
               <Input
                 id="aff-fee"
                 type="number"
@@ -151,7 +151,7 @@ export default function AffordabilityCalculator() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

@@ -90,7 +90,7 @@ export default function SavingsGoalCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="sg-target">Target Amount</Label>
+              <Label htmlFor="sg-target" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Target Amount</Label>
               <Input
                 id="sg-target"
                 type="number"
@@ -112,7 +112,7 @@ export default function SavingsGoalCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sg-months">Months to Reach Goal</Label>
+              <Label htmlFor="sg-months" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Months to Reach Goal</Label>
               <Input
                 id="sg-months"
                 type="number"
@@ -135,7 +135,7 @@ export default function SavingsGoalCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sg-rate">Annual Interest Rate (%)</Label>
+              <Label htmlFor="sg-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Annual Interest Rate (%)</Label>
               <Input
                 id="sg-rate"
                 type="number"
@@ -159,7 +159,7 @@ export default function SavingsGoalCalculator() {
             </div>
           </div>
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="font-mono-label uppercase tracking-[0.1em]">
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

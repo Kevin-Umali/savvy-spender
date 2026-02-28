@@ -93,7 +93,7 @@ export default function InHouseLoanCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="ih-price">Total Price</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ih-price">Total Price</Label>
               <Input
                 id="ih-price"
                 type="number"
@@ -109,7 +109,7 @@ export default function InHouseLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ih-dp">Down Payment (%)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ih-dp">Down Payment (%)</Label>
               <Input
                 id="ih-dp"
                 type="number"
@@ -126,7 +126,7 @@ export default function InHouseLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ih-rate">Monthly Rate (%)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ih-rate">Monthly Rate (%)</Label>
               <Input
                 id="ih-rate"
                 type="number"
@@ -143,7 +143,7 @@ export default function InHouseLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ih-term">Term (months)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ih-term">Term (months)</Label>
               <Input
                 id="ih-term"
                 type="number"
@@ -160,7 +160,7 @@ export default function InHouseLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ih-balloon">Balloon Payment (optional)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ih-balloon">Balloon Payment (optional)</Label>
               <Input
                 id="ih-balloon"
                 type="number"
@@ -182,7 +182,7 @@ export default function InHouseLoanCalculator() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

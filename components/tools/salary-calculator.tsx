@@ -63,7 +63,7 @@ export default function SalaryCalculator() {
       <CardContent className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="max-w-sm space-y-2">
-            <Label htmlFor="gross-salary">Gross Monthly Salary</Label>
+            <Label htmlFor="gross-salary" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Gross Monthly Salary</Label>
             <Input
               id="gross-salary"
               type="number"
@@ -78,7 +78,7 @@ export default function SalaryCalculator() {
               Based on 2024 PH contribution tables and TRAIN law tax brackets.
             </p>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

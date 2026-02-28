@@ -85,7 +85,7 @@ export default function SSSLoanCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="sss-amount">Loan Amount</Label>
+              <Label htmlFor="sss-amount" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Loan Amount</Label>
               <Input
                 id="sss-amount"
                 type="number"
@@ -101,7 +101,7 @@ export default function SSSLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sss-rate">Annual Rate (%)</Label>
+              <Label htmlFor="sss-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Annual Rate (%)</Label>
               <Input
                 id="sss-rate"
                 type="number"
@@ -118,7 +118,7 @@ export default function SSSLoanCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sss-term">Term (months)</Label>
+              <Label htmlFor="sss-term" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Term (months)</Label>
               <Input
                 id="sss-term"
                 type="number"
@@ -142,7 +142,7 @@ export default function SSSLoanCalculator() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="font-mono-label uppercase tracking-[0.1em]">
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

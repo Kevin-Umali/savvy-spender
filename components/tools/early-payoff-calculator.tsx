@@ -93,7 +93,7 @@ export default function EarlyPayoffCalculator() {
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="ep-principal">Principal</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ep-principal">Principal</Label>
               <Input
                 id="ep-principal"
                 type="number"
@@ -109,7 +109,7 @@ export default function EarlyPayoffCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ep-rate">Monthly Rate (%)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ep-rate">Monthly Rate (%)</Label>
               <Input
                 id="ep-rate"
                 type="number"
@@ -126,7 +126,7 @@ export default function EarlyPayoffCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ep-term">Original Term (months)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ep-term">Original Term (months)</Label>
               <Input
                 id="ep-term"
                 type="number"
@@ -143,7 +143,7 @@ export default function EarlyPayoffCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ep-extra">Extra Monthly Payment</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ep-extra">Extra Monthly Payment</Label>
               <Input
                 id="ep-extra"
                 type="number"
@@ -160,7 +160,7 @@ export default function EarlyPayoffCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ep-fee">Processing Fee (optional)</Label>
+              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em]" htmlFor="ep-fee">Processing Fee (optional)</Label>
               <Input
                 id="ep-fee"
                 type="number"
@@ -182,7 +182,7 @@ export default function EarlyPayoffCalculator() {
             </Alert>
           )}
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" className="font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />

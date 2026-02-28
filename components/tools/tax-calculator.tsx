@@ -78,7 +78,7 @@ export default function TaxCalculator() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="annual-income">Annual Income</Label>
+              <Label htmlFor="annual-income" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Annual Income</Label>
               <Input
                 id="annual-income"
                 type="number"
@@ -94,7 +94,7 @@ export default function TaxCalculator() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="employment-type">Employment Type</Label>
+              <Label htmlFor="employment-type" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Employment Type</Label>
               <div className="flex items-center gap-4 h-9" id="employment-type">
                 <button
                   type="button"
@@ -128,7 +128,7 @@ export default function TaxCalculator() {
               </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -152,23 +152,23 @@ export default function TaxCalculator() {
             <h4 className="text-sm font-semibold text-muted-foreground">Income Tax Breakdown</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Tax Bracket</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Tax Bracket</Label>
                 <p className="text-sm font-semibold mt-1">{employedResult.bracket}</p>
               </div>
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Annual Tax Due</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Annual Tax Due</Label>
                 <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
                   {formatCurrency(employedResult.taxDue)}
                 </p>
               </div>
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Effective Tax Rate</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Effective Tax Rate</Label>
                 <p className="text-lg font-semibold">
                   {formatPercent(employedResult.effectiveTaxRate.toFixed(2))}
                 </p>
               </div>
               <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <Label className="text-xs text-muted-foreground">After-Tax Annual Income</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">After-Tax Annual Income</Label>
                 <p className="text-lg font-bold text-primary">
                   {formatCurrency(employedResult.afterTaxAnnual)}
                 </p>
@@ -176,11 +176,11 @@ export default function TaxCalculator() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="rounded-lg border p-3">
-                <Label className="text-xs text-muted-foreground">Monthly Tax</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Monthly Tax</Label>
                 <p className="text-lg font-semibold">{formatCurrency(employedResult.monthlyTax)}</p>
               </div>
               <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <Label className="text-xs text-muted-foreground">Monthly After-Tax Income</Label>
+                <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Monthly After-Tax Income</Label>
                 <p className="text-lg font-bold text-primary">
                   {formatCurrency(employedResult.afterTaxMonthly)}
                 </p>

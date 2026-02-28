@@ -83,7 +83,7 @@ export default function BreakEvenAnalyzer() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cash-price">Cash Price</Label>
+              <Label htmlFor="cash-price" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Cash Price</Label>
               <Input
                 id="cash-price"
                 type="number"
@@ -99,7 +99,7 @@ export default function BreakEvenAnalyzer() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="installment-price">Merchant 0% Installment Price</Label>
+              <Label htmlFor="installment-price" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Merchant 0% Installment Price</Label>
               <Input
                 id="installment-price"
                 type="number"
@@ -115,7 +115,7 @@ export default function BreakEvenAnalyzer() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="be-monthly-rate">Monthly Rate (%)</Label>
+              <Label htmlFor="be-monthly-rate" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Monthly Rate (%)</Label>
               <Input
                 id="be-monthly-rate"
                 type="number"
@@ -132,7 +132,7 @@ export default function BreakEvenAnalyzer() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="be-processing-fee">Processing Fee</Label>
+              <Label htmlFor="be-processing-fee" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Processing Fee</Label>
               <Input
                 id="be-processing-fee"
                 type="number"
@@ -147,7 +147,7 @@ export default function BreakEvenAnalyzer() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="be-max-months">Max Months</Label>
+              <Label htmlFor="be-max-months" className="font-mono-label text-[10px] uppercase tracking-[0.15em]">Max Months</Label>
               <Input
                 id="be-max-months"
                 type="number"
@@ -163,7 +163,7 @@ export default function BreakEvenAnalyzer() {
               </p>
             </div>
           </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+          <Button type="submit" className="w-full sm:w-auto font-mono-label uppercase tracking-[0.1em]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <UpdateIcon className="mr-2 h-4 w-4 animate-spin" />
