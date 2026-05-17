@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun, Menu, Calculator, Wrench, BookOpen, Building2, Github } from "lucide-react";
+import { Moon, Sun, Menu, Calculator, BookOpen, Building2, Github } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,6 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 
 const NAV_LINKS = [
   { href: "/calculator", label: "Calculator", icon: Calculator },
-  { href: "/tools", label: "Tools", icon: Wrench },
   { href: "/docs", label: "Docs", icon: BookOpen },
   { href: "/bank-conversion-list", label: "Banks", icon: Building2 },
 ];
@@ -93,7 +92,7 @@ const Navbar: React.FC = () => {
                 <SheetHeader>
                   <SheetTitle className="font-display italic font-light text-xl">Navigate</SheetTitle>
                   <SheetDescription>
-                    Calculators, tools, and documentation.
+                    Calculator, banks, and documentation.
                   </SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-1 py-4">

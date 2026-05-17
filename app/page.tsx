@@ -1,177 +1,198 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowUpRight,
+  BookOpen,
+  Building2,
   Calculator,
   PiggyBank,
-  TrendingUp,
-  CreditCard,
-  ArrowUpRight,
-  Wallet,
   Receipt,
-  Building2,
-  Car,
-  Landmark,
-  HandCoins,
-  Target,
-  Banknote,
-  CircleDollarSign,
-  Scale,
-  BadgePercent,
-  Shield,
-  BookOpen,
-  LayoutGrid,
+  TrendingUp,
 } from "lucide-react";
 
-interface Tool {
+interface LiveTool {
+  status: "live";
   icon: LucideIcon;
   title: string;
-  slug: string;
+  href: string;
   desc: string;
+  meta: string;
 }
 
-const CATEGORIES: { name: string; tools: Tool[] }[] = [
+interface PlaceholderTool {
+  status: "soon";
+  icon: LucideIcon;
+  title: string;
+  desc: string;
+  eta: string;
+}
+
+type Tool = LiveTool | PlaceholderTool;
+
+const TOOLS: Tool[] = [
   {
-    name: "Loans",
-    tools: [
-      { icon: Wallet, title: "Affordability", slug: "affordability", desc: "How much can you borrow?" },
-      { icon: Scale, title: "Loan Comparison", slug: "loan-comparison", desc: "Compare two bank offers" },
-      { icon: TrendingUp, title: "Early Payoff", slug: "early-payoff", desc: "Save with extra payments" },
-      { icon: Building2, title: "In-House Loan", slug: "in-house-loan", desc: "Developer financing" },
-      { icon: Landmark, title: "SSS Loan", slug: "sss-loan", desc: "SSS salary loan" },
-      { icon: Landmark, title: "Pag-IBIG Loan", slug: "pagibig-loan", desc: "Pag-IBIG housing loan" },
-      { icon: Car, title: "Car Loan", slug: "car-loan", desc: "Auto financing" },
-    ],
+    status: "live",
+    icon: Calculator,
+    title: "Installment Calculator",
+    href: "/calculator",
+    desc: "Compare balance conversion, credit-to-cash, and personal loan plans across multiple terms.",
+    meta: "3 modes · 7+ terms · EIR / amortization",
   },
   {
-    name: "Credit & Rates",
-    tools: [
-      { icon: BadgePercent, title: "Rate Converter", slug: "rate-converter", desc: "Flat to effective rate" },
-      { icon: TrendingUp, title: "Break-Even", slug: "break-even", desc: "Bank vs merchant 0%" },
-      { icon: CreditCard, title: "Credit Card Payoff", slug: "credit-card-payoff", desc: "Pay off faster" },
-    ],
+    status: "soon",
+    icon: Receipt,
+    title: "Salary Calculator",
+    desc: "Compute net take-home pay with PH withholding tax, SSS, PhilHealth, and Pag-IBIG.",
+    eta: "Planned",
   },
   {
-    name: "Income & Tax",
-    tools: [
-      { icon: Banknote, title: "Salary Calculator", slug: "salary", desc: "Net take-home pay" },
-      { icon: Receipt, title: "Tax Calculator", slug: "tax", desc: "TRAIN law tax" },
-    ],
+    status: "soon",
+    icon: TrendingUp,
+    title: "Loan Comparison",
+    desc: "Stack two loan offers side by side and see the true cost of each.",
+    eta: "Planned",
   },
   {
-    name: "Planning & Savings",
-    tools: [
-      { icon: Target, title: "Debt Planner", slug: "debt-planner", desc: "Snowball / Avalanche" },
-      { icon: PiggyBank, title: "Savings Goal", slug: "savings-goal", desc: "Reach your target" },
-      { icon: HandCoins, title: "Retirement", slug: "retirement", desc: "Are you on track?" },
-      { icon: Shield, title: "Emergency Fund", slug: "emergency-fund", desc: "Build your safety net" },
-      { icon: CircleDollarSign, title: "Remittance", slug: "remittance", desc: "OFW currency convert" },
-      { icon: TrendingUp, title: "Investment", slug: "investment", desc: "Project growth" },
-    ],
+    status: "soon",
+    icon: PiggyBank,
+    title: "Investment Planner",
+    desc: "Project compounded growth and the effect of regular contributions.",
+    eta: "Planned",
   },
+];
+
+const SECONDARY_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/bank-conversion-list", label: "Bank Conversion List", icon: Building2 },
+  { href: "/docs", label: "Documentation", icon: BookOpen },
 ];
 
 export default function LandingPage() {
   return (
     <main>
-      <header className="container mx-auto px-4 pt-20 sm:pt-28 pb-14 landing-reveal">
+      {/* Hero */}
+      <header className="container mx-auto px-4 pt-20 sm:pt-28 pb-12 landing-reveal">
+        <p className="font-mono-label text-[10px] uppercase tracking-[0.3em] text-muted-foreground opacity-60 mb-4">
+          Philippine Personal Finance
+        </p>
         <h1 className="font-display italic font-light text-5xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight">
           Savvy Spender
         </h1>
-        <p className="mt-6 text-muted-foreground max-w-sm leading-relaxed">
-          Philippine financial calculators.
-          <br />
-          Free, open source, no&nbsp;sign&#8209;up.
+        <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
+          Calmly check the math before you sign. One focused installment calculator today, more useful tools on the way.
         </p>
+        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Link
+            href="/calculator"
+            className="inline-flex items-center gap-1.5 text-sm font-medium border-b border-foreground/30 hover:border-foreground transition-colors pb-0.5"
+          >
+            Open the calculator
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+          <span className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-50">
+            Free · No sign-up · Open source
+          </span>
+        </div>
       </header>
 
       <Rule />
 
-      <section
-        className="container mx-auto px-4 py-12 landing-reveal"
-        style={{ animationDelay: "80ms" }}
-      >
-        <Link href="/calculator" className="group block max-w-2xl">
-          <div className="border-l-2 border-amber-500/40 dark:border-amber-400/25 pl-6 sm:pl-8">
-            <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-amber-600/60 dark:text-amber-400/40 mb-3">
-              Featured
-            </p>
-            <h2 className="font-display italic font-light text-2xl sm:text-3xl">
-              Installment Calculator
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground max-w-md leading-relaxed">
-              Compare balance conversion, credit-to-cash, and personal loan
-              installment plans side by side.
-            </p>
-            <span className="inline-flex items-center gap-1.5 mt-5 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-              Open calculator
-              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-          </div>
-        </Link>
-      </section>
-
-      <Rule />
-
-      <section className="container mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-12">
-          {CATEGORIES.map((cat, i) => (
-            <div
-              key={cat.name}
-              className="landing-reveal"
-              style={{ animationDelay: `${160 + i * 80}ms` }}
-            >
-              <h2 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 pb-3 border-b border-border">
-                {cat.name}
-              </h2>
-              <ul className="mt-3 space-y-0.5">
-                {cat.tools.map((tool) => (
-                  <li key={tool.slug}>
-                    <Link
-                      href={`/tools/${tool.slug}`}
-                      className="group flex items-start gap-2.5 py-2 -mx-2 px-2 rounded-sm hover:bg-accent transition-colors"
-                    >
-                      <tool.icon className="h-3.5 w-3.5 mt-[3px] shrink-0 text-muted-foreground opacity-40 group-hover:opacity-70 transition-opacity" />
-                      <div className="min-w-0">
-                        <span className="text-[13px] font-medium text-foreground opacity-75 group-hover:opacity-100 transition-opacity">
-                          {tool.title}
-                        </span>
-                        <p className="text-[11px] text-muted-foreground opacity-70 group-hover:opacity-100 transition-opacity leading-relaxed">
-                          {tool.desc}
-                        </p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      {/* Tools grid */}
+      <section className="container mx-auto px-4 py-12 sm:py-16">
+        <div className="flex items-baseline justify-between mb-6 flex-wrap gap-3">
+          <h2 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+            Tools
+          </h2>
+          <p className="text-[11px] text-muted-foreground">
+            <span className="tabular-nums">1</span> live ·{" "}
+            <span className="tabular-nums">{TOOLS.filter((t) => t.status === "soon").length}</span> in progress
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {TOOLS.map((tool, i) => (
+            <ToolCard key={tool.title} tool={tool} delay={i * 60} />
           ))}
         </div>
       </section>
 
       <Rule />
 
+      {/* Secondary nav */}
       <nav
-        className="container mx-auto px-4 py-10 landing-reveal"
-        style={{ animationDelay: "520ms" }}
+        className="container mx-auto px-4 py-10 landing-reveal flex flex-wrap gap-x-8 gap-y-3"
+        style={{ animationDelay: "320ms" }}
       >
-        <div className="flex flex-wrap gap-x-8 gap-y-3">
-          {[
-            { href: "/tools", label: "All Tools", icon: LayoutGrid },
-            { href: "/bank-conversion-list", label: "Bank Conversion List", icon: Receipt },
-            { href: "/docs", label: "Docs", icon: BookOpen },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-mono-label inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-50 hover:opacity-100 transition-opacity"
-            >
-              <link.icon className="h-3 w-3" />
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        {SECONDARY_LINKS.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="font-mono-label inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60 hover:opacity-100 hover:text-foreground transition-all"
+          >
+            <link.icon className="h-3 w-3" />
+            {link.label}
+          </Link>
+        ))}
       </nav>
     </main>
+  );
+}
+
+function ToolCard({ tool, delay }: { tool: Tool; delay: number }) {
+  const Icon = tool.icon;
+  const isLive = tool.status === "live";
+
+  const inner = (
+    <div
+      className={[
+        "h-full rounded-sm border p-5 transition-colors relative",
+        isLive
+          ? "border-border hover:border-foreground/40 group-hover:bg-accent/30"
+          : "border-dashed border-border opacity-60",
+      ].join(" ")}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <Icon
+          className={[
+            "h-5 w-5 transition-opacity",
+            isLive ? "text-foreground/70 group-hover:text-foreground" : "text-muted-foreground/50",
+          ].join(" ")}
+        />
+        {isLive ? (
+          <span className="font-mono-label text-[9px] uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+            ● Live
+          </span>
+        ) : (
+          <span className="font-mono-label text-[9px] uppercase tracking-[0.18em] text-muted-foreground/70">
+            {tool.eta}
+          </span>
+        )}
+      </div>
+      <h3 className="font-display italic font-light text-xl tracking-tight leading-tight">{tool.title}</h3>
+      <p className="mt-2 text-[12px] text-muted-foreground leading-relaxed">{tool.desc}</p>
+      {isLive && (
+        <div className="mt-4 flex items-center justify-between">
+          <span className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
+            {tool.meta}
+          </span>
+          <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+        </div>
+      )}
+    </div>
+  );
+
+  const className = "group block h-full landing-reveal";
+  const style = { animationDelay: `${100 + delay}ms` };
+
+  if (isLive) {
+    return (
+      <Link href={tool.href} className={className} style={style}>
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <div className={className} style={style} aria-disabled="true">
+      {inner}
+    </div>
   );
 }
 

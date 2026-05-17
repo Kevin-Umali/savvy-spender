@@ -7,19 +7,19 @@ const Footer: React.FC = () => {
         <div className="h-px bg-border opacity-50" />
       </div>
       <div className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm">
           {/* About */}
           <div>
             <h3 className="font-display italic font-light text-lg mb-3">Savvy Spender</h3>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              Free, open-source financial calculators built for Filipino consumers.
+              A focused installment calculator built for Filipino consumers. More tools coming soon.
             </p>
           </div>
 
-          {/* Calculators */}
+          {/* Explore */}
           <div>
             <h3 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
-              Calculators
+              Explore
             </h3>
             <ul className="space-y-1.5 text-xs">
               <li>
@@ -28,45 +28,16 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/tools/salary" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Salary Calculator
-                </Link>
-              </li>
-              <li>
-                <Link href="/tools/tax" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Tax Calculator
-                </Link>
-              </li>
-              <li>
-                <Link href="/tools/investment" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Investment Calculator
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
-              Resources
-            </h3>
-            <ul className="space-y-1.5 text-xs">
-              <li>
-                <Link href="/tools" className="text-muted-foreground hover:text-foreground transition-colors">
-                  All Tools
-                </Link>
-              </li>
-              <li>
-                <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Documentation
-                </Link>
-              </li>
-              <li>
                 <Link
                   href="/bank-conversion-list"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Bank Conversion List
+                </Link>
+              </li>
+              <li>
+                <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Documentation
                 </Link>
               </li>
             </ul>
