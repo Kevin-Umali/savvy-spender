@@ -5,8 +5,9 @@ import {
   BookOpen,
   Building2,
   Calculator,
+  Globe,
   PiggyBank,
-  Receipt,
+  Scale,
   TrendingUp,
 } from "lucide-react";
 
@@ -39,24 +40,33 @@ const TOOLS: Tool[] = [
     meta: "3 modes · 7+ terms · EIR / amortization",
   },
   {
-    status: "soon",
-    icon: Receipt,
-    title: "Salary Calculator",
-    desc: "Compute net take-home pay with PH withholding tax, SSS, PhilHealth, and Pag-IBIG.",
-    eta: "Planned",
+    status: "live",
+    icon: Globe,
+    title: "Card FX Comparison",
+    href: "/fx-compare",
+    desc: "Find the cheapest PH credit card for foreign transactions. Compare bank markups and simulate PHP costs.",
+    meta: "15+ cards · live FX rates · 3 API fallbacks",
+  },
+  {
+    status: "live",
+    icon: Scale,
+    title: "Loan Comparison",
+    href: "/loan-compare",
+    desc: "Compare in-house financing, bank auto loan, and credit-to-cash side by side with full cost breakdown.",
+    meta: "3 financing types · EIR · monthly + total cost",
   },
   {
     status: "soon",
     icon: TrendingUp,
-    title: "Loan Comparison",
-    desc: "Stack two loan offers side by side and see the true cost of each.",
+    title: "Investment Planner",
+    desc: "Project compounded growth and the effect of regular contributions.",
     eta: "Planned",
   },
   {
     status: "soon",
     icon: PiggyBank,
-    title: "Investment Planner",
-    desc: "Project compounded growth and the effect of regular contributions.",
+    title: "Salary Calculator",
+    desc: "Compute net take-home pay with PH withholding tax, SSS, PhilHealth, and Pag-IBIG.",
     eta: "Planned",
   },
 ];
@@ -78,7 +88,7 @@ export default function LandingPage() {
           Savvy Spender
         </h1>
         <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
-          Calmly check the math before you sign. One focused installment calculator today, more useful tools on the way.
+          Calmly check the math before you sign. Installment calculator, card FX comparison, and loan comparison — with more on the way.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
           <Link
@@ -107,7 +117,7 @@ export default function LandingPage() {
             <span className="tabular-nums">{TOOLS.filter((t) => t.status === "soon").length}</span> in progress
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {TOOLS.map((tool, i) => (
             <ToolCard key={tool.title} tool={tool} delay={i * 60} />
           ))}
