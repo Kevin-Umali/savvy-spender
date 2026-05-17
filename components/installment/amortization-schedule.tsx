@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -5,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/client";
 import { InstallmentOption } from "@/interfaces";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import { cn } from "@/lib/utils";
 
 interface AmortizationScheduleProps {
   selected: InstallmentOption | undefined;
@@ -22,7 +25,7 @@ interface AmortizationRow {
 }
 
 const AmortizationSchedule: React.FC<AmortizationScheduleProps> = ({ selected, principal, monthlyRate }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const schedule = useMemo(() => {
     if (!selected) return [];
@@ -53,54 +56,78 @@ const AmortizationSchedule: React.FC<AmortizationScheduleProps> = ({ selected, p
   if (!selected || schedule.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        <div className="flex items-center justify-between">
+    <Card className="border-border">
+      <CardHeader
+        className="cursor-pointer pb-3"
+        onClick={() => setIsExpanded(!isExpanded)}
+        role="button"
+        aria-expanded={isExpanded}
+      >
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <CardTitle>Amortization Schedule</CardTitle>
-            <CardDescription>Month-by-month payment breakdown for {+selected.months} months.</CardDescription>
+            <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+              Schedule
+            </p>
+            <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+              Month-by-Month
+            </CardTitle>
+            <CardDescription className="text-[12px] mt-1">
+              <span className="tabular-nums">{+selected.months}</span>{" "}
+              month{+selected.months === 1 ? "" : "s"} · constant payments via add-on (flat) rate.
+            </CardDescription>
           </div>
-          <Button variant="ghost" size="sm">
-            {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
+          <Button variant="ghost" size="icon" aria-label={isExpanded ? "Collapse schedule" : "Expand schedule"}>
+            {isExpanded ? <ChevronUpIcon className="h-4 w-4" /> : <ChevronDownIcon className="h-4 w-4" />}
           </Button>
         </div>
       </CardHeader>
 
       {isExpanded && (
         <CardContent>
-          <p className="text-xs text-muted-foreground mb-3">
-            Using the add-on (flat) rate method, both the principal and interest portions are constant each month. The
-            bank charges interest on the original full principal for every month — your balance does not &quot;diminish&quot; for
-            interest calculation purposes.
-          </p>
-          <div className="overflow-x-auto -mx-6 px-6">
+          <div className="max-h-[480px] overflow-y-auto -mx-6 px-6 border-t">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-card z-10">
                 <TableRow>
-                  <TableHead className="w-16">Month</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Principal</TableHead>
-                  <TableHead>Interest</TableHead>
-                  <TableHead>Balance</TableHead>
-                  <TableHead>Total Paid</TableHead>
+                  <TableHead className={cn("font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60 w-[64px]")}>
+                    Month
+                  </TableHead>
+                  <TableHead className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
+                    Payment
+                  </TableHead>
+                  <TableHead className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
+                    Principal
+                  </TableHead>
+                  <TableHead className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
+                    Interest
+                  </TableHead>
+                  <TableHead className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
+                    Balance
+                  </TableHead>
+                  <TableHead className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
+                    Total Paid
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {schedule.map((row) => (
                   <TableRow key={row.month}>
-                    <TableCell className="font-medium">{row.month}</TableCell>
-                    <TableCell>{formatCurrency(row.payment)}</TableCell>
-                    <TableCell>{formatCurrency(row.principalPortion)}</TableCell>
-                    <TableCell className="text-orange-600 dark:text-orange-400">
+                    <TableCell className="font-medium tabular-nums">{row.month}</TableCell>
+                    <TableCell className="tabular-nums">{formatCurrency(row.payment)}</TableCell>
+                    <TableCell className="tabular-nums">{formatCurrency(row.principalPortion)}</TableCell>
+                    <TableCell className="tabular-nums text-orange-600 dark:text-orange-400">
                       {formatCurrency(row.interestPortion)}
                     </TableCell>
-                    <TableCell>{formatCurrency(row.remainingBalance)}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatCurrency(row.totalPaidSoFar)}</TableCell>
+                    <TableCell className="tabular-nums">{formatCurrency(row.remainingBalance)}</TableCell>
+                    <TableCell className="tabular-nums text-muted-foreground">{formatCurrency(row.totalPaidSoFar)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
+          <p className="text-[11px] text-muted-foreground/80 mt-3 leading-relaxed">
+            Under the add-on (flat) method, principal and interest portions are constant. Interest is charged on the
+            original principal every month — your balance does not diminish for interest calculation purposes.
+          </p>
         </CardContent>
       )}
     </Card>

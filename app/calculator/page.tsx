@@ -11,9 +11,6 @@ import CardSelectedPlan from "@/components/installment/selected-plan";
 import OtherPlanTable from "@/components/installment/other-plan-table";
 import CostBreakdown from "@/components/installment/cost-breakdown";
 import AmortizationSchedule from "@/components/installment/amortization-schedule";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircledIcon } from "@radix-ui/react-icons";
-import { Calculator } from "lucide-react";
 import type { CalculatorType } from "@/constant";
 
 export default function CalculatorPage() {
@@ -58,7 +55,7 @@ export default function CalculatorPage() {
       });
 
       setHasCalculated(true);
-    } catch (error) {
+    } catch {
       toast.error("Error fetching data");
     } finally {
       setIsLoading(false);
@@ -70,50 +67,73 @@ export default function CalculatorPage() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto p-4 space-y-6">
+    <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       {/* Page Header */}
-      <div>
-        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+      <div className="mb-8 max-w-3xl">
+        <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-2">
+          Tool
+        </p>
+        <h1 className="font-display italic font-light text-3xl sm:text-4xl lg:text-5xl tracking-tight">
           Installment Calculator
         </h1>
-        <p className="mt-2 text-muted-foreground leading-relaxed">
-          Compare balance conversion, credit-to-cash, and personal loan installment plans.
+        <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
+          Compare balance conversion, credit-to-cash, and personal loan installment plans across multiple terms.
         </p>
       </div>
 
-      {hasCalculated && !isLoading && (
-        <Alert className="border-green-200 text-green-800 bg-green-50 dark:border-green-200 dark:bg-green-100 dark:text-green-800 [&>svg]:text-green-800">
-          <CheckCircledIcon className="h-4 w-4" />
-          <AlertTitle>Ready to Explore Your Options</AlertTitle>
-          <AlertDescription>
-            Select a plan that best fits your financial goals. Compare different installment options to find your ideal
-            plan.
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="grid lg:grid-cols-[380px_1fr] gap-6 lg:gap-10">
+        {/* Form column — sticky on desktop */}
+        <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-2 -mr-2">
+          <CardInstallmentForm onSubmit={onSubmit} isLoading={isLoading} />
+        </aside>
 
-      {/* Installment Form */}
-      <CardInstallmentForm onSubmit={onSubmit} isLoading={isLoading} />
-
-      {/* Selected Installment Plan and Difference */}
-      <CardSelectedPlan calculatedData={calculatedData} paymentDifferences={paymentDifferences} isLoading={isLoading} />
-
-      {/* Cost Breakdown */}
-      {(hasCalculated || isLoading) && (
-        <CostBreakdown calculatedData={calculatedData} amount={formValues.amount} />
-      )}
-
-      {/* Table of Other Installment Plan */}
-      <OtherPlanTable calculatedData={calculatedData} budget={calculatedData?.monthlyBudget} isLoading={isLoading} />
-
-      {/* Amortization Schedule */}
-      {hasCalculated && (
-        <AmortizationSchedule
-          selected={calculatedData?.selected}
-          principal={formValues.amount}
-          monthlyRate={formValues.monthlyRate}
-        />
-      )}
+        {/* Results column */}
+        <section className="space-y-6 min-w-0">
+          {!hasCalculated && !isLoading ? (
+            <EmptyState />
+          ) : (
+            <>
+              <CardSelectedPlan
+                calculatedData={calculatedData}
+                paymentDifferences={paymentDifferences}
+                isLoading={isLoading}
+              />
+              <OtherPlanTable
+                calculatedData={calculatedData}
+                budget={calculatedData?.monthlyBudget}
+                isLoading={isLoading}
+              />
+              {(hasCalculated || isLoading) && (
+                <CostBreakdown calculatedData={calculatedData} amount={formValues.amount} />
+              )}
+              {hasCalculated && (
+                <AmortizationSchedule
+                  selected={calculatedData?.selected}
+                  principal={formValues.amount}
+                  monthlyRate={formValues.monthlyRate}
+                />
+              )}
+            </>
+          )}
+        </section>
+      </div>
     </main>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="border border-dashed rounded-md p-10 text-center">
+      <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
+        No calculation yet
+      </p>
+      <h2 className="font-display italic font-light text-xl sm:text-2xl mb-2">
+        Enter your details to begin
+      </h2>
+      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+        Fill out the form on the left and hit calculate to compare installment terms, monthly payments,
+        effective interest, and the full amortization schedule.
+      </p>
+    </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/client";
 import { AllInstallmentOption } from "@/interfaces";
 import CostPieChart from "@/components/charts/cost-pie-chart";
+import { cn } from "@/lib/utils";
 
 interface CostBreakdownProps {
   calculatedData: AllInstallmentOption | undefined;
@@ -16,11 +16,9 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
 
   const principal = amount;
   const interest = +calculatedData.selected.interest;
-  const totalFees = (calculatedData.dst ?? 0) + (calculatedData.selected.processingFee ? +calculatedData.selected.processingFee : 0);
+  const totalFees =
+    (calculatedData.dst ?? 0) + (calculatedData.selected.processingFee ? +calculatedData.selected.processingFee : 0);
   const totalPayment = +calculatedData.selected.totalPayment;
-
-  const interestPercent = principal > 0 ? ((interest / principal) * 100).toFixed(1) : "0";
-  const feesPercent = principal > 0 ? ((totalFees / principal) * 100).toFixed(1) : "0";
 
   const principalWidth = totalPayment > 0 ? (principal / totalPayment) * 100 : 0;
   const interestWidth = totalPayment > 0 ? (interest / totalPayment) * 100 : 0;
@@ -29,93 +27,93 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
   const isPersonalLoan = calculatedData.calculatorType === "personal-loan";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Cost Breakdown</CardTitle>
-        <CardDescription>
-          See exactly where your money goes — principal, interest, and fees.
+    <Card className="border-border">
+      <CardHeader className="pb-3">
+        <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+          Where it goes
+        </p>
+        <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+          Cost Breakdown
+        </CardTitle>
+        <CardDescription className="text-[12px]">
+          Principal, interest, and fees as a share of total payable.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Chart and Bar side by side on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Pie Chart */}
+      <CardContent className="space-y-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 items-center">
           <CostPieChart principal={principal} interest={interest} fees={totalFees} />
 
-          {/* Visual bar + legend */}
-          <div className="space-y-4 flex flex-col justify-center">
-            <div className="space-y-2">
-              <div className="flex rounded-full overflow-hidden h-4">
+          <div className="space-y-3">
+            <div className="flex rounded-sm overflow-hidden h-3 border">
+              <div
+                className="bg-foreground/85 transition-all"
+                style={{ width: `${principalWidth}%` }}
+                title={`Principal: ${formatCurrency(principal)}`}
+              />
+              <div
+                className="bg-orange-500/80 transition-all"
+                style={{ width: `${interestWidth}%` }}
+                title={`Interest: ${formatCurrency(interest)}`}
+              />
+              {feesWidth > 0 && (
                 <div
-                  className="bg-primary transition-all"
-                  style={{ width: `${principalWidth}%` }}
-                  title={`Principal: ${formatCurrency(principal)}`}
+                  className="bg-red-500/80 transition-all"
+                  style={{ width: `${feesWidth}%` }}
+                  title={`Fees: ${formatCurrency(totalFees)}`}
                 />
-                <div
-                  className="bg-orange-400 dark:bg-orange-500 transition-all"
-                  style={{ width: `${interestWidth}%` }}
-                  title={`Interest: ${formatCurrency(interest)}`}
-                />
-                {feesWidth > 0 && (
-                  <div
-                    className="bg-red-400 dark:bg-red-500 transition-all"
-                    style={{ width: `${feesWidth}%` }}
-                    title={`Fees: ${formatCurrency(totalFees)}`}
-                  />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-4 text-xs">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-primary" />
-                  <span>Principal ({principalWidth.toFixed(0)}%)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-orange-400 dark:bg-orange-500" />
-                  <span>Interest ({interestWidth.toFixed(0)}%)</span>
-                </div>
-                {totalFees > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-3 w-3 rounded-full bg-red-400 dark:bg-red-500" />
-                    <span>Fees ({feesWidth.toFixed(0)}%)</span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-          </div>
-        </div>
 
-        {/* Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="rounded-lg border p-3">
-            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Principal</Label>
-            <p className="text-lg font-semibold">{formatCurrency(principal)}</p>
-          </div>
-          <div className="rounded-lg border p-3">
-            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Interest ({interestPercent}% of principal)</Label>
-            <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">{formatCurrency(interest)}</p>
-          </div>
-          {totalFees > 0 && (
-            <div className="rounded-lg border p-3">
-              <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
-                Fees ({feesPercent}% of principal)
-                {isPersonalLoan && calculatedData.dst ? ` — incl. DST ${formatCurrency(calculatedData.dst)}` : ""}
-              </Label>
-              <p className="text-lg font-semibold text-red-600 dark:text-red-400">{formatCurrency(totalFees)}</p>
-            </div>
-          )}
-          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">Total Amount Payable</Label>
-            <p className="text-lg font-bold text-primary">{formatCurrency(totalPayment)}</p>
+            <dl className="space-y-2.5">
+              <Row
+                tone="primary"
+                label="Principal"
+                value={formatCurrency(principal)}
+                pct={principalWidth}
+              />
+              <Row
+                tone="warning"
+                label="Interest"
+                value={formatCurrency(interest)}
+                pct={interestWidth}
+              />
+              {totalFees > 0 && (
+                <Row
+                  tone="danger"
+                  label={isPersonalLoan && calculatedData.dst ? `Fees (incl. DST ${formatCurrency(calculatedData.dst)})` : "Fees"}
+                  value={formatCurrency(totalFees)}
+                  pct={feesWidth}
+                />
+              )}
+              <Row
+                tone="total"
+                label="Total payable"
+                value={formatCurrency(totalPayment)}
+                pct={100}
+                isTotal
+              />
+            </dl>
           </div>
         </div>
 
         {/* Net proceeds for personal loan */}
         {isPersonalLoan && calculatedData.netProceeds !== undefined && (
-          <div className="rounded-lg border border-dashed p-3 text-center">
-            <Label className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">You receive (Net Proceeds)</Label>
-            <p className="text-xl font-bold text-primary">{formatCurrency(calculatedData.netProceeds)}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              But you pay back {formatCurrency(totalPayment)} — that&apos;s {formatCurrency(totalPayment - calculatedData.netProceeds)} more than you received.
+          <div className="rounded-sm border bg-muted/30 px-4 py-3 flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <p className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
+                You receive
+              </p>
+              <p className="font-display italic font-light text-2xl tabular-nums">
+                {formatCurrency(calculatedData.netProceeds)}
+              </p>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-xs text-right">
+              But pay back{" "}
+              <span className="tabular-nums font-medium text-foreground">{formatCurrency(totalPayment)}</span> — a{" "}
+              <span className="tabular-nums font-medium text-foreground">
+                {formatCurrency(totalPayment - calculatedData.netProceeds)}
+              </span>{" "}
+              difference.
             </p>
           </div>
         )}
@@ -123,5 +121,36 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
     </Card>
   );
 };
+
+const TONE_DOT: Record<string, string> = {
+  primary: "bg-foreground/85",
+  warning: "bg-orange-500/80",
+  danger: "bg-red-500/80",
+  total: "border border-foreground/30",
+};
+
+const Row: React.FC<{
+  tone: "primary" | "warning" | "danger" | "total";
+  label: string;
+  value: string;
+  pct: number;
+  isTotal?: boolean;
+}> = ({ tone, label, value, pct, isTotal }) => (
+  <div
+    className={cn(
+      "flex items-baseline justify-between gap-3",
+      isTotal && "border-t pt-2.5 mt-1"
+    )}
+  >
+    <div className="flex items-center gap-2 min-w-0">
+      <span className={cn("h-2 w-2 rounded-full shrink-0", TONE_DOT[tone])} />
+      <span className={cn("text-[12px]", isTotal ? "font-medium" : "text-muted-foreground")}>{label}</span>
+    </div>
+    <div className="flex items-baseline gap-2 tabular-nums">
+      <span className="text-[11px] text-muted-foreground/70">{pct.toFixed(0)}%</span>
+      <span className={cn(isTotal ? "font-semibold text-base" : "text-sm")}>{value}</span>
+    </div>
+  </div>
+);
 
 export default CostBreakdown;
