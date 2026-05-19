@@ -73,7 +73,7 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
     return (
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="font-display italic font-light text-xl tracking-tight">Compare Terms</CardTitle>
+          <CardTitle className="font-display font-light text-xl tracking-tight">Compare Terms</CardTitle>
           <CardDescription>All installment terms side by side.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,7 +98,7 @@ const OtherPlanTable: React.FC<OtherPlanTableProps> = ({ calculatedData, budget 
             <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
               Comparison
             </p>
-            <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+            <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
               All Terms Side by Side
             </CardTitle>
           </div>

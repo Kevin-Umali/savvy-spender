@@ -24,6 +24,8 @@ export interface CardFxEntry {
  * card reviews. Last reviewed: 2026. Rates may change — always verify with your
  * card issuer before travelling.
  */
+export const CARD_FX_DATA_REVIEWED = "May 2026";
+
 export const CARD_FX_DATA: CardFxEntry[] = [
   // ── BDO Unibank ──────────────────────────────────────────────────
   {

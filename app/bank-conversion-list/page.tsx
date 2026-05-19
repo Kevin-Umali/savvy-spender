@@ -46,7 +46,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-display italic font-light text-xl tracking-tight mb-3">
+    <h2 className="font-display font-light text-xl tracking-tight mb-3">
       {children}
     </h2>
   );
@@ -98,6 +98,12 @@ function DocSection({ children }: { children: React.ReactNode }) {
   return <div className="space-y-1 pb-10">{children}</div>;
 }
 
+function SourceNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] text-muted-foreground/60 mt-1 leading-relaxed">{children}</p>
+  );
+}
+
 export default function Page() {
   return (
     <div className="container mx-auto px-4 py-10 max-w-4xl">
@@ -105,7 +111,7 @@ export default function Page() {
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
           Reference
         </p>
-        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+        <h1 className="font-display font-extralight text-3xl sm:text-4xl tracking-[-0.03em]">
           Financial Products List
         </h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -141,6 +147,7 @@ export default function Page() {
         <Body>
           Promo rates (as low as 0.49%) are typically invite-only or limited-time.
         </Body>
+        <SourceNote>Sources: BSP Circular No. 1098 (2020), No. 1165 (2023), and bank-published fee schedules. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
@@ -162,6 +169,7 @@ export default function Page() {
           ]}
         />
         <Body>Processing fees typically range from ₱250–₱500 per availment.</Body>
+        <SourceNote>Sources: Bank-published fee schedules and cardholder agreements. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
@@ -186,6 +194,7 @@ export default function Page() {
             ["PNB", "ZAPP", "24 months", "Varies"],
           ]}
         />
+        <SourceNote>Sources: Bank-published fee schedules and merchant partner programs. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />
@@ -209,6 +218,7 @@ export default function Page() {
             ["Tonik", "~1.79%–3.46%", "Varies", "6–24 months", "None", "₱250K"],
           ]}
         />
+        <SourceNote>Sources: Bank-published rate tables and BSP Circular No. 1098. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />
@@ -236,6 +246,7 @@ export default function Page() {
           Effective interest rate is higher than the stated 10% p.a. because interest is computed
           on the full original principal, not on the declining balance.
         </Body>
+        <SourceNote>Source: SSS.gov.ph official rate schedule. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
@@ -271,6 +282,7 @@ export default function Page() {
             ["Amortization Formula", "PMT = P × [r(1+r)^n] / [(1+r)^n − 1] (declining balance)"],
           ]}
         />
+        <SourceNote>Source: HDMF (Pag-IBIG Fund) official rate table. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />
@@ -292,9 +304,10 @@ export default function Page() {
             ["Metrobank", "0.5%–1.2% flat", "20–30%", "12–60 months", "~1.5% of loan"],
             ["Security Bank", "Personalized", "20–30%", "12–60 months", "~1.5% of loan"],
             ["UnionBank", "Personalized", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["In-house (dealers)", "1.0%–2.0% flat", "20–40%", "12–60 months", "Included"],
+            ["In-house (dealers)", "1.5%–2.5% flat", "20–40%", "12–60 months", "Included"],
           ]}
         />
+        <SourceNote>Sources: Bank-published rates and dealer financing disclosures. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
@@ -316,6 +329,7 @@ export default function Page() {
             ["Security Bank", "5.75%–7.75% p.a.", "20 years", "Varies"],
           ]}
         />
+        <SourceNote>Sources: Bank-published mortgage rate tables. As of 2026.</SourceNote>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />

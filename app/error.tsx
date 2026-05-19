@@ -13,7 +13,7 @@ const ErrorComponent: React.FC<ErrorProps> = ({ error, reset }) => {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="max-w-sm text-center space-y-4">
-        <h1 className="font-display italic font-light text-3xl">Something went wrong</h1>
+        <h1 className="font-display font-light text-3xl">Something went wrong</h1>
         <p className="text-sm text-muted-foreground">{error.message}</p>
         <div className="flex flex-col gap-2 pt-2">
           <button

@@ -145,7 +145,7 @@ export default function LoanComparePage() {
           <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-2">
             Tool
           </p>
-          <h1 className="font-display italic font-light text-3xl sm:text-4xl lg:text-5xl tracking-tight">
+          <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em]">
             Loan Comparison
           </h1>
           <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -161,7 +161,7 @@ export default function LoanComparePage() {
                 <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
                   Inputs
                 </p>
-                <CardTitle className="font-display italic font-light text-xl tracking-tight">
+                <CardTitle className="font-display font-light text-xl tracking-tight">
                   Configure your scenario
                 </CardTitle>
               </CardHeader>
@@ -287,7 +287,7 @@ function OptionPanel({ ftype, opt, isLoading, onChange, onToggleAdvanced }: Opti
   return (
     <div className="rounded-sm border p-3 space-y-3">
       <div>
-        <p className="font-display italic font-light text-base">{ftype.label}</p>
+        <p className="font-display font-light text-base">{ftype.label}</p>
         <p className="text-[11px] text-muted-foreground mt-0.5">{ftype.rateRange}</p>
       </div>
 
@@ -432,7 +432,7 @@ function ResultCard({
           <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
             Financing
           </p>
-          <h2 className="font-display italic font-light text-lg mt-0.5">{label}</h2>
+          <h2 className="font-display font-light text-lg mt-0.5">{label}</h2>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {isLowestMonthly && <WinBadge tone="monthly">Lowest /mo</WinBadge>}
@@ -513,7 +513,7 @@ function ComparisonTable({
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
           Full Breakdown
         </p>
-        <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+        <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
           Side-by-Side Comparison
         </CardTitle>
         <p className="text-[11px] text-muted-foreground">
@@ -586,7 +586,7 @@ function Stat({
       <p className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">{label}</p>
       <p
         className={cn(
-          "mt-1.5 font-display italic font-light text-2xl tabular-nums tracking-tight",
+          "mt-1.5 font-display font-light text-2xl tabular-nums tracking-tight",
           accent === "warning" && "text-orange-600 dark:text-orange-400"
         )}
       >
@@ -616,7 +616,7 @@ function EmptyState() {
       <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
         No comparison yet
       </p>
-      <h2 className="font-display italic font-light text-xl sm:text-2xl mb-2">
+      <h2 className="font-display font-light text-xl sm:text-2xl mb-2">
         Configure your options and compare
       </h2>
       <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">

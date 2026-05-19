@@ -1,30 +1,32 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Savvy Spender - Payment Calculator Documentation",
+  title: "Savvy Spender - Documentation",
   description:
-    "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+    "How each calculator works — inputs, formulas, and what the results mean. Covers the Installment Calculator, Card FX Comparison, and Loan Comparison tools.",
   keywords: [
     "Payment Calculator Documentation",
-    "Calculating Payments",
-    "Payment Calculation Explained",
-    "Payment Comparison Documentation",
-    "Financial Calculations",
+    "Installment Calculator Documentation",
+    "Card FX Comparison Documentation",
+    "Loan Comparison Documentation",
+    "Balance Conversion Calculator",
+    "Credit-to-Cash Calculator",
+    "Financial Calculations Philippines",
   ],
-  metadataBase: new URL("https://www.savvyspendercalculator.com/"),
-  applicationName: "Savvy Spender Calculator",
+  metadataBase: new URL("https://www.savvyspender.info/"),
+  applicationName: "Savvy Spender",
   openGraph: {
     type: "website",
-    url: "https://www.savvyspendercalculator.com/",
-    title: "Savvy Spender - Payment Calculator Documentation",
+    url: "https://www.savvyspender.info/docs",
+    title: "Savvy Spender - Documentation",
     description:
-      "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+      "How each calculator works — inputs, formulas, and what the results mean.",
   },
   twitter: {
-    site: "https://www.savvyspendercalculator.com/",
-    title: "Savvy Spender - Payment Calculator Documentation",
+    site: "https://www.savvyspender.info/",
+    title: "Savvy Spender - Documentation",
     description:
-      "Learn how payment calculations work with Savvy Spender's Payment Calculator Documentation. Understand the details behind calculating payments and comparing options.",
+      "How each calculator works — inputs, formulas, and what the results mean.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: { telephone: false },
@@ -40,7 +42,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-display italic font-light text-xl tracking-tight mb-3">
+    <h2 className="font-display font-light text-xl tracking-tight mb-3">
       {children}
     </h2>
   );
@@ -85,7 +87,7 @@ export default function Page() {
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
           Reference
         </p>
-        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+        <h1 className="font-display font-extralight text-3xl sm:text-4xl tracking-[-0.03em]">
           Documentation
         </h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -94,9 +96,9 @@ export default function Page() {
       </div>
       <div className="h-px bg-border opacity-50 mb-10" />
 
-      {/* Installment & Credit Card */}
+      {/* ── Installment Calculator ─────────────────────────────────── */}
       <DocSection>
-        <SectionLabel>Installment &amp; Credit Card</SectionLabel>
+        <SectionLabel>Installment Calculator</SectionLabel>
         <SectionTitle>How Add-On Interest Works</SectionTitle>
         <Body>
           Philippine banks charge interest on the original principal for the entire term — not on
@@ -118,11 +120,12 @@ export default function Page() {
       <div className="h-px bg-border opacity-30 mb-10" />
 
       <DocSection>
-        <SectionLabel>Installment &amp; Credit Card</SectionLabel>
+        <SectionLabel>Installment Calculator</SectionLabel>
         <SectionTitle>Balance Conversion</SectionTitle>
         <Body>
-          Converts existing credit card purchases into fixed monthly installments. You choose a term
-          and the bank applies an add-on rate to your balance.
+          Converts existing credit card purchases or outstanding balances into fixed monthly
+          installments using the add-on interest method. You choose a term and the bank applies a
+          flat rate to your balance.
         </Body>
         <SubTitle>Inputs</SubTitle>
         <Body>
@@ -141,12 +144,21 @@ export default function Page() {
       <div className="h-px bg-border opacity-30 mb-10" />
 
       <DocSection>
-        <SectionLabel>Installment &amp; Credit Card</SectionLabel>
+        <SectionLabel>Installment Calculator</SectionLabel>
         <SectionTitle>Credit-to-Cash</SectionTitle>
         <Body>
           Converts available (unused) credit limit into cash deposited to your account. Known as
           Cash2Go (Metrobank), Ready Cash (Security Bank), YourCash (RCBC), or CashLite depending
           on the bank. The math is identical to Balance Conversion — only the context differs.
+        </Body>
+        <SubTitle>Inputs</SubTitle>
+        <Body>
+          Cash amount needed, monthly add-on rate (%), term, optional processing fee, optional
+          monthly budget.
+        </Body>
+        <SubTitle>Outputs</SubTitle>
+        <Body>
+          Monthly payment, total interest, factor rate, and effective interest rate (EIR).
         </Body>
         <Body>
           Typical rates: 0.49%–1.00% monthly add-on. Terms up to 60 months. Processing fee
@@ -157,7 +169,7 @@ export default function Page() {
       <div className="h-px bg-border opacity-30 mb-10" />
 
       <DocSection>
-        <SectionLabel>Installment &amp; Credit Card</SectionLabel>
+        <SectionLabel>Installment Calculator</SectionLabel>
         <SectionTitle>Personal Loan</SectionTitle>
         <Body>
           Standalone unsecured bank loans, separate from credit cards. The key difference is
@@ -176,342 +188,132 @@ export default function Page() {
 
       <div className="h-px bg-border opacity-50 mb-10" />
 
-      {/* Loan Calculators */}
+      {/* ── Card FX Comparison ────────────────────────────────────── */}
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>Affordability Calculator</SectionTitle>
+        <SectionLabel>Card FX Comparison</SectionLabel>
+        <SectionTitle>How Foreign Transaction Markups Work</SectionTitle>
         <Body>
-          Reverses the standard loan formula: instead of computing the payment from a loan amount,
-          it finds the maximum loan amount from a monthly budget.
+          When you pay in a foreign currency, your card issuer converts the amount to PHP using a
+          rate marked up above the interbank (wholesale) rate. The all-in cost combines two
+          charges: a bank-imposed forex conversion fee and a network cross-border assessment fee
+          added by Visa or Mastercard.
         </Body>
         <Formula>
-          <div>factor = 1 + (monthlyRate × months)</div>
-          <div>maxPrincipal = (monthlyBudget × months − fee) / factor</div>
+          <div>PHP Cost = Foreign Amount × PHP-per-unit × (1 + fxMarkup / 100)</div>
         </Formula>
         <Body>
-          Results appear across multiple terms simultaneously, showing how much more or less you can
-          borrow at each length.
+          Visa adds ~1% and Mastercard ~0.2–1% as their network assessment. Most banks bundle
+          these into a single quoted markup. Cards advertised as &quot;0% forex&quot; waive the
+          bank fee — the network assessment may still apply.
         </Body>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
 
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>Loan Comparison</SectionTitle>
+        <SectionLabel>Card FX Comparison</SectionLabel>
+        <SectionTitle>Live Reference Rate</SectionTitle>
         <Body>
-          Puts two bank loan offers side by side across the same set of terms. Compares monthly
-          payment, total interest, total cost including processing fee, savings between the two, and
-          winner at each term. Use this when you have competing offers and want to see the true
-          difference over time.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>Early Payoff Calculator</SectionTitle>
-        <Body>
-          Shows the effect of adding extra monthly payments on top of your regular installment. With
-          add-on interest, extra payments reduce the number of months remaining — which reduces total
-          interest paid.
+          The base PHP-per-unit rate is fetched live from open exchange rate APIs. Three sources
+          are tried in order, and the first successful response is used:
         </Body>
         <Formula>
-          <div>newMonthly = originalMonthly + extraPayment</div>
-          <div>newMonths = (principal + fee) / (newMonthly − principal × rate)</div>
-          <div>interestSaved = principal × rate × (originalMonths − newMonths)</div>
-        </Formula>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>In-House Loan Calculator</SectionTitle>
-        <Body>
-          For developer or dealer direct financing. Handles the distinct structure: a percentage
-          down payment, a loan amount on the remainder, flat-rate monthly payments, and an optional
-          balloon payment due at the end of term.
-        </Body>
-        <Body>
-          Common for real estate developers and vehicle dealers offering their own financing, often
-          with higher rates but more flexible credit requirements.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>SSS Salary Loan</SectionTitle>
-        <Body>
-          Computes SSS (Social Security System) salary loan amortization. The SSS charges 10% per
-          annum on the original principal (add-on / flat method), standard term is 24 months.
-        </Body>
-        <Formula>
-          <div>monthlyRate = 10% / 12</div>
-          <div>totalInterest = loanAmount × monthlyRate × termMonths</div>
-          <div>monthlyAmortization = (loanAmount + totalInterest) / termMonths</div>
+          <div>1. open.er-api.com — returns time_last_update_utc</div>
+          <div>2. api.frankfurter.app — returns date</div>
+          <div>3. cdn.jsdelivr.net/@fawazahmed0/currency-api — returns date</div>
         </Formula>
         <Body>
-          The effective rate is higher than 10% p.a. because interest is calculated on the full
-          principal throughout the term, not on the declining balance.
+          Rates are cached server-side for 1 hour (Next.js revalidation). The sidebar shows
+          which source responded and when the rate was last updated. This is a reference rate —
+          your actual billing rate may differ slightly from what your bank applies.
         </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>Pag-IBIG Housing Loan</SectionTitle>
-        <Body>
-          Unlike most Philippine installment products, Pag-IBIG housing loans use declining balance
-          amortization — you pay less interest over time as your principal is paid down.
-        </Body>
-        <Formula>
-          <div>PMT = P × [r(1+r)^n] / [(1+r)^n − 1]</div>
-          <div>where P = principal, r = monthly rate, n = total months</div>
-        </Formula>
-        <Body>
-          Additional monthly costs include MRI (Mortgage Redemption Insurance, ~0.25% of loan
-          annually) and fire insurance (~0.10% annually). Rates as of 2024: loans ≤ ₱750K start at
-          3% for the first 5 years; loans above ₱750K up to ₱6M are at 6.375% fixed.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Loans</SectionLabel>
-        <SectionTitle>Car Loan Calculator</SectionTitle>
-        <Body>
-          Philippine auto loans use add-on (flat) interest. All bank-financed vehicles require a
-          chattel mortgage registered with the LTO — typically 1–2% of the loan amount added to the
-          total cost.
-        </Body>
-        <Formula>
-          <div>loan = vehiclePrice − downPayment</div>
-          <div>interest = loan × rate × months</div>
-          <div>monthlyPayment = (loan + interest) / months</div>
-        </Formula>
-        <Body>Typical down payment: 20–30% of vehicle price.</Body>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />
 
-      {/* Credit & Rates */}
+      {/* ── Loan Comparison ───────────────────────────────────────── */}
       <DocSection>
-        <SectionLabel>Credit &amp; Rates</SectionLabel>
-        <SectionTitle>Interest Rate Converter</SectionTitle>
+        <SectionLabel>Loan Comparison</SectionLabel>
+        <SectionTitle>Three Financing Options</SectionTitle>
         <Body>
-          Converts between flat (add-on) rates and effective interest rates (EIR). Philippine banks
-          advertise add-on rates — the true cost is always higher.
+          The Loan Comparison tool puts three ways to finance a vehicle or asset side by side:
+          In-House Financing, Bank Auto Loan, and Credit-to-Cash. All three use the add-on
+          (flat-rate) interest method.
         </Body>
+        <Formula>
+          <div>Loan Amount = Asset Price − Down Payment</div>
+          <div>Total Interest = Loan × Monthly Rate × Term Months</div>
+          <div>Monthly Payment = (Loan + Total Interest + Fees) / Term Months</div>
+        </Formula>
         <Body>
-          Typical conversions: 0.99%/month flat ≈ 21–23% EIR p.a. — 1.25%/month flat ≈ 27–29%
-          EIR p.a. Outputs flat rate, total interest %, EIR monthly and annual, and factor rate.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Credit &amp; Rates</SectionLabel>
-        <SectionTitle>Break-Even Analyzer</SectionTitle>
-        <Body>
-          Finds the term at which a bank installment plan becomes cheaper than a merchant&apos;s 0%
-          plan. Merchant 0% plans typically have a marked-up total price. At shorter terms the bank
-          may cost less; as months increase, accumulated interest may push the bank plan past the
-          merchant price. A chart shows the exact crossover point.
+          The effective interest rate (EIR) is computed via Newton-Raphson to find the internal
+          rate of return that equates all cash flows to the loan amount received.
         </Body>
       </DocSection>
 
       <div className="h-px bg-border opacity-30 mb-10" />
 
       <DocSection>
-        <SectionLabel>Credit &amp; Rates</SectionLabel>
-        <SectionTitle>Credit Card Payoff</SectionTitle>
+        <SectionLabel>Loan Comparison</SectionLabel>
+        <SectionTitle>In-House Financing</SectionTitle>
         <Body>
-          Compares minimum payments vs. a fixed higher payment for clearing an existing credit card
-          balance. With minimum payments, as your balance drops your payment drops too — making it
-          very slow to clear. A fixed payment stays effective throughout.
+          Direct financing from a car dealer or real estate developer. No bank credit check is
+          required, making it accessible to buyers who don&apos;t qualify for bank loans. The
+          tradeoff is a significantly higher monthly rate (typically 1.5%–2.5% flat per month).
+        </Body>
+        <Body>
+          A down payment is required (typically 20–40%). The chattel mortgage is usually handled
+          by the dealer and bundled into the price rather than charged as a separate fee.
+        </Body>
+      </DocSection>
+
+      <div className="h-px bg-border opacity-30 mb-10" />
+
+      <DocSection>
+        <SectionLabel>Loan Comparison</SectionLabel>
+        <SectionTitle>Bank Auto Loan</SectionTitle>
+        <Body>
+          Secured loan from a bank, using the vehicle as collateral. Offers the lowest monthly
+          rate among the three options (typically 0.47%–0.98% flat per month), but requires a
+          credit check, comprehensive car insurance, and a chattel mortgage registered with the
+          LTO.
+        </Body>
+        <SubTitle>Additional Fees</SubTitle>
+        <Formula>
+          <div>Chattel Mortgage: registered with LTO, typically ~1–2% of loan amount</div>
+          <div>Processing Fee: typically ₱2,000–₱3,500 depending on bank</div>
+          <div>Total Cost = Down Payment + Loan + Total Interest + All Fees</div>
+        </Formula>
+      </DocSection>
+
+      <div className="h-px bg-border opacity-30 mb-10" />
+
+      <DocSection>
+        <SectionLabel>Loan Comparison</SectionLabel>
+        <SectionTitle>Credit-to-Cash for Vehicle Purchase</SectionTitle>
+        <Body>
+          Uses available credit card limit as the funding source instead of a traditional loan.
+          No down payment, no collateral, and no asset ownership transfer is involved — you
+          simply borrow against your existing credit line.
+        </Body>
+        <Body>
+          The BSP caps the monthly add-on rate at 1.00% for credit card installment programs.
+          Maximum amount is limited by your available credit limit, which may be less than the
+          full vehicle price.
         </Body>
         <Note>
-          Credit cards use declining balance interest (charged on remaining balance each month),
-          unlike installment loans which use add-on / flat rates. Typical PH credit card rate:
-          24–36% p.a.
+          Because there is no down payment, the full asset price becomes the loan amount — which
+          means total interest paid is higher than the bank loan option despite a similar stated
+          rate.
         </Note>
       </DocSection>
 
       <div className="h-px bg-border opacity-50 mb-10" />
 
-      {/* Income & Tax */}
-      <DocSection>
-        <SectionLabel>Income &amp; Tax</SectionLabel>
-        <SectionTitle>Salary Calculator</SectionTitle>
-        <Body>
-          Computes net monthly take-home pay after all mandatory deductions under 2024 Philippine
-          contribution tables and the TRAIN law.
-        </Body>
-        <SubTitle>Deduction order</SubTitle>
-        <Formula>
-          <div>1. SSS — 4.5% of MSC (max MSC ₱30,000)</div>
-          <div>2. PhilHealth — 2.5% of salary (floor ₱10K, ceiling ₱100K)</div>
-          <div>3. Pag-IBIG — 2% up to ₱10,000 base (max ₱200)</div>
-          <div>4. Taxable Income = Gross − Total Contributions</div>
-          <div>5. Withholding Tax — TRAIN law graduated brackets</div>
-        </Formula>
-        <SubTitle>TRAIN Law Brackets (Annual)</SubTitle>
-        <div className="border border-border rounded text-xs font-mono overflow-x-auto my-3">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-3 py-2 font-mono-label text-[10px] uppercase tracking-[0.1em]">Annual Income</th>
-                <th className="text-left px-3 py-2 font-mono-label text-[10px] uppercase tracking-[0.1em]">Tax</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-muted-foreground">
-              <tr><td className="px-3 py-1.5">≤ ₱250,000</td><td className="px-3 py-1.5">0% (exempt)</td></tr>
-              <tr><td className="px-3 py-1.5">₱250K–₱400K</td><td className="px-3 py-1.5">15% of excess over ₱250K</td></tr>
-              <tr><td className="px-3 py-1.5">₱400K–₱800K</td><td className="px-3 py-1.5">₱22,500 + 20% of excess</td></tr>
-              <tr><td className="px-3 py-1.5">₱800K–₱2M</td><td className="px-3 py-1.5">₱102,500 + 25% of excess</td></tr>
-              <tr><td className="px-3 py-1.5">₱2M–₱8M</td><td className="px-3 py-1.5">₱402,500 + 30% of excess</td></tr>
-              <tr><td className="px-3 py-1.5">Over ₱8M</td><td className="px-3 py-1.5">₱2,202,500 + 35% of excess</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Income &amp; Tax</SectionLabel>
-        <SectionTitle>Tax Calculator</SectionTitle>
-        <Body>
-          Computes income tax for both employed and self-employed / freelancers. Freelancers can
-          compare two methods: the standard graduated brackets, or the 8% flat rate on gross income
-          exceeding ₱250,000. The 8% flat rate is generally better for freelancers earning under
-          ~₱3M per year. The calculator compares both and recommends the lower option.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-50 mb-10" />
-
-      {/* Planning & Savings */}
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Debt Snowball / Avalanche Planner</SectionTitle>
-        <Body>
-          For managing multiple debts simultaneously. Compares two proven payoff strategies:
-          Snowball (smallest balance first — quick wins keep motivation high) and Avalanche (highest
-          interest rate first — saves the most money overall).
-        </Body>
-        <Body>
-          Enter each debt&apos;s name, balance, monthly rate, and minimum payment, plus your total
-          extra monthly payment capacity. Outputs: months to debt freedom, total interest paid,
-          payoff order, and a month-by-month schedule.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Savings Goal Calculator</SectionTitle>
-        <Body>
-          Calculates the monthly deposit needed to reach a savings target, with optional compound
-          interest.
-        </Body>
-        <Formula>
-          <div>With interest: PMT = Target × r / [(1+r)^n − 1]</div>
-          <div>Without interest: PMT = Target / months</div>
-        </Formula>
-        <Body>Shows milestones at 25%, 50%, 75%, and 100% of goal.</Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Retirement Calculator</SectionTitle>
-        <Body>
-          Projects whether your current savings rate will cover retirement expenses. Computes your
-          projected fund (current savings + contributions + returns) against the target fund needed
-          to fund monthly withdrawals throughout retirement (present value of annuity formula). If
-          there is a gap, shows how much additional monthly savings would close it.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Emergency Fund Calculator</SectionTitle>
-        <Body>
-          Determines your target emergency fund based on monthly expenses and risk profile, then
-          tracks your progress toward it.
-        </Body>
-        <div className="border border-border rounded text-xs font-mono overflow-x-auto my-3">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-3 py-2 font-mono-label text-[10px] uppercase tracking-[0.1em]">Situation</th>
-                <th className="text-left px-3 py-2 font-mono-label text-[10px] uppercase tracking-[0.1em]">Recommended</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-muted-foreground">
-              <tr><td className="px-3 py-1.5">Stable job, no dependents</td><td className="px-3 py-1.5">3 months</td></tr>
-              <tr><td className="px-3 py-1.5">Average risk</td><td className="px-3 py-1.5">6 months</td></tr>
-              <tr><td className="px-3 py-1.5">Self-employed / variable income</td><td className="px-3 py-1.5">9–12 months</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Remittance Calculator</SectionTitle>
-        <Body>
-          For OFWs sending money home. Shows the effective exchange rate — the combined impact of
-          the posted exchange rate and the transfer fee, expressed as a single comparable number.
-        </Body>
-        <Formula>
-          <div>receiveAmount = sendAmount × exchangeRate</div>
-          <div>effectiveRate = receiveAmount / (sendAmount + fee)</div>
-        </Formula>
-        <Body>
-          Use this to compare remittance services. A high exchange rate can be offset by a high fee,
-          and vice versa. The effective rate captures both.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-30 mb-10" />
-
-      <DocSection>
-        <SectionLabel>Planning &amp; Savings</SectionLabel>
-        <SectionTitle>Investment Returns Calculator</SectionTitle>
-        <Body>
-          Projects investment growth with compound returns and regular monthly contributions.
-          Applies the Philippine 20% final withholding tax on gains.
-        </Body>
-        <Formula>
-          <div>each month: balance = balance × (1 + monthlyRate) + contribution</div>
-        </Formula>
-        <Body>
-          Outputs: final portfolio value, total contributed, total returns, after-tax returns, and a
-          year-by-year breakdown.
-        </Body>
-      </DocSection>
-
-      <div className="h-px bg-border opacity-50 mb-10" />
-
       <p className="text-xs text-muted-foreground leading-relaxed">
-        All calculations are for reference purposes only. Rates, fees, contribution tables, and
-        regulatory requirements change over time. Always verify details directly with the relevant
-        government agency, bank, or financial institution before making any financial decision.
+        All calculations are for reference purposes only. Rates, fees, and regulatory requirements
+        change over time. Always verify details directly with the relevant bank or financial
+        institution before making any financial decision.
       </p>
     </div>
   );

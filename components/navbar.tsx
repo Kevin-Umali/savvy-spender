@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/android-chrome-512x512.png" alt="Savvy Spender" width={28} height={28} />
-          <span className="font-display italic font-light text-lg hidden sm:inline">Savvy Spender</span>
+          <span className="font-display font-light text-lg hidden sm:inline">Savvy Spender</span>
         </Link>
 
         {/* Desktop navigation */}
@@ -90,7 +90,7 @@ const Navbar: React.FC = () => {
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
-                  <SheetTitle className="font-display italic font-light text-xl">Navigate</SheetTitle>
+                  <SheetTitle className="font-display font-light text-xl">Navigate</SheetTitle>
                   <SheetDescription>
                     Calculator, banks, and documentation.
                   </SheetDescription>
