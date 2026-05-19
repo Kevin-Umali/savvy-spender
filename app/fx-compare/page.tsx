@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { CARD_FX_DATA, type CardFxEntry } from "@/constant/fx-data";
+import { CARD_FX_DATA, CARD_FX_DATA_REVIEWED, type CardFxEntry } from "@/constant/fx-data";
 import type { FxRatesResponse } from "@/app/api/fx-rates/route";
 
 /* ── Types ─────────────────────────────────────────────────────────── */
@@ -204,6 +204,9 @@ export default function FxComparePage() {
             <p>
               Visa adds a ~1% cross-border assessment and Mastercard ~0.2%, typically bundled into the bank&apos;s quoted markup.
               Always verify with your card issuer before travel.
+            </p>
+            <p className="border-t pt-2 text-[10px] opacity-60">
+              Bank markup data last reviewed: {CARD_FX_DATA_REVIEWED}. Sources: bank fee schedules, cardholder agreements, BSP filings.
             </p>
           </div>
         </aside>
