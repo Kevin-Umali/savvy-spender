@@ -127,7 +127,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
           <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
             Inputs
           </p>
-          <CardTitle className="font-display italic font-light text-xl tracking-tight">
+          <CardTitle className="font-display font-light text-xl tracking-tight">
             Configure your scenario
           </CardTitle>
         </CardHeader>

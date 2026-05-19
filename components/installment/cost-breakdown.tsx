@@ -32,7 +32,7 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
           Where it goes
         </p>
-        <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+        <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
           Cost Breakdown
         </CardTitle>
         <CardDescription className="text-[12px]">
@@ -103,7 +103,7 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ calculatedData, amount })
               <p className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
                 You receive
               </p>
-              <p className="font-display italic font-light text-2xl tabular-nums">
+              <p className="font-display font-light text-2xl tabular-nums">
                 {formatCurrency(calculatedData.netProceeds)}
               </p>
             </div>

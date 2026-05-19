@@ -68,7 +68,7 @@ const AmortizationSchedule: React.FC<AmortizationScheduleProps> = ({ selected, p
             <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
               Schedule
             </p>
-            <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+            <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
               Month-by-Month
             </CardTitle>
             <CardDescription className="text-[12px] mt-1">

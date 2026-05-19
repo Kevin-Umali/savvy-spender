@@ -100,7 +100,7 @@ export default function FxComparePage() {
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-2">
           Tool
         </p>
-        <h1 className="font-display italic font-light text-3xl sm:text-4xl lg:text-5xl tracking-tight">
+        <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em]">
           Card FX Comparison
         </h1>
         <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -117,7 +117,7 @@ export default function FxComparePage() {
               <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
                 Simulator
               </p>
-              <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+              <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
                 Amount & Currency
               </CardTitle>
             </CardHeader>
@@ -220,7 +220,7 @@ export default function FxComparePage() {
                   <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
                     Card Comparison
                   </p>
-                  <CardTitle className="font-display italic font-light text-xl tracking-tight mt-0.5">
+                  <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
                     {foreignAmount > 0 && phpPerUnit
                       ? `${selectedCurrency} ${foreignAmount.toLocaleString()} → PHP`
                       : "FX Markup by Issuer"}

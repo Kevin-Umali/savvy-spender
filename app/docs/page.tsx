@@ -42,7 +42,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-display italic font-light text-xl tracking-tight mb-3">
+    <h2 className="font-display font-light text-xl tracking-tight mb-3">
       {children}
     </h2>
   );
@@ -87,7 +87,7 @@ export default function Page() {
         <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-3">
           Reference
         </p>
-        <h1 className="font-display italic font-light text-3xl sm:text-4xl tracking-tight">
+        <h1 className="font-display font-extralight text-3xl sm:text-4xl tracking-[-0.03em]">
           Documentation
         </h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">

@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="max-w-sm text-center space-y-4">
-        <h1 className="font-display italic font-light text-3xl">Not Found</h1>
+        <h1 className="font-display font-light text-3xl">Not Found</h1>
         <p className="text-sm text-muted-foreground">Could not find the requested page.</p>
         <button
           onClick={() => router.push("/")}

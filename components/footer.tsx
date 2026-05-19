@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm">
           {/* About */}
           <div>
-            <h3 className="font-display italic font-light text-lg mb-3">Savvy Spender</h3>
+            <h3 className="font-display font-light text-lg mb-3">Savvy Spender</h3>
             <p className="text-muted-foreground text-xs leading-relaxed">
               A focused installment calculator built for Filipino consumers. More tools coming soon.
             </p>

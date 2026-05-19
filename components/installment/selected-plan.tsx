@@ -28,7 +28,7 @@ const StatBlock: React.FC<{
     </p>
     <p
       className={cn(
-        "mt-1.5 font-display italic font-light tabular-nums tracking-tight leading-none",
+        "mt-1.5 font-display font-light tabular-nums tracking-tight leading-none",
         size === "lg" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl",
         accent === "primary" && "text-foreground",
         accent === "warning" && "text-orange-600 dark:text-orange-400",
@@ -95,7 +95,7 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             Selected Plan
           </p>
           <p className="text-sm mt-0.5">
-            <span className="font-display italic font-light text-lg tabular-nums">{selected.months}</span>{" "}
+            <span className="font-display font-light text-lg tabular-nums">{selected.months}</span>{" "}
             <span className="text-muted-foreground">months</span>
             <span className="mx-2 text-muted-foreground/40">·</span>
             <span className="tabular-nums">{formatPercent(selected.simpleInterest)}</span>{" "}

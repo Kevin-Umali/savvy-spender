@@ -84,7 +84,7 @@ export default function LandingPage() {
         <p className="font-mono-label text-[10px] uppercase tracking-[0.3em] text-muted-foreground opacity-60 mb-4">
           Philippine Personal Finance
         </p>
-        <h1 className="font-display italic font-light text-5xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight">
+        <h1 className="font-display font-extralight text-5xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-[-0.04em]">
           Savvy Spender
         </h1>
         <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
@@ -176,7 +176,7 @@ function ToolCard({ tool, delay }: { tool: Tool; delay: number }) {
           </span>
         )}
       </div>
-      <h3 className="font-display italic font-light text-xl tracking-tight leading-tight">{tool.title}</h3>
+      <h3 className="font-display font-light text-xl tracking-tight leading-tight">{tool.title}</h3>
       <p className="mt-2 text-[12px] text-muted-foreground leading-relaxed">{tool.desc}</p>
       {isLive && (
         <div className="mt-4 flex items-center justify-between">
