@@ -1,17 +1,16 @@
 "use client";
 
-import { CALCULATOR_CONFIG } from "@/constant";
-import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
-import { CalculateForm } from "@/schema";
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 
-import CardInstallmentForm from "@/components/installment/card-form";
-import CardSelectedPlan from "@/components/installment/selected-plan";
-import OtherPlanTable from "@/components/installment/other-plan-table";
-import CostBreakdown from "@/components/installment/cost-breakdown";
-import AmortizationSchedule from "@/components/installment/amortization-schedule";
-import type { CalculatorType } from "@/constant";
+import CardInstallmentForm from "./_components/card-form";
+import CardSelectedPlan from "./_components/selected-plan";
+import OtherPlanTable from "./_components/other-plan-table";
+import CostBreakdown from "./_components/cost-breakdown";
+import AmortizationSchedule from "./_components/amortization-schedule";
+import { CALCULATOR_CONFIG, type CalculatorType } from "./_lib/config";
+import type { AllInstallmentOption, PaymentDifferences } from "./_lib/types";
+import type { CalculateForm } from "./_lib/schema";
 
 export default function CalculatorPage() {
   const [calculatedData, setCalculatedData] = useState<AllInstallmentOption>();

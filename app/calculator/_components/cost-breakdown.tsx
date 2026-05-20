@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/client";
-import { AllInstallmentOption } from "@/interfaces";
-import CostPieChart from "@/components/charts/cost-pie-chart";
+import { AllInstallmentOption } from "../_lib/types";
+import CostPieChart from "./cost-pie-chart";
 import { cn } from "@/lib/utils";
 
 interface CostBreakdownProps {
