@@ -1,5 +1,5 @@
-import { calculateInstallmentOption } from "@/lib/server";
-import { DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "@/constant";
+import { calculateInstallmentOption } from "@/app/calculator/_lib/calc";
+import { DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "@/app/calculator/_lib/config";
 import { NextRequest, NextResponse } from "next/server";
 
 interface InstallmentRequest {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { AllInstallmentOption, PaymentDifferences } from "@/interfaces";
+import { AllInstallmentOption, PaymentDifferences } from "../_lib/types";
 import { formatCurrency, formatPercent } from "@/lib/client";
 import { cn } from "@/lib/utils";
 

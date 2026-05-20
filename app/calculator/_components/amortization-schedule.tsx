@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/client";
-import { InstallmentOption } from "@/interfaces";
+import { InstallmentOption } from "../_lib/types";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 

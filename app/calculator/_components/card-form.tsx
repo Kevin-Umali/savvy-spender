@@ -9,12 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { CalculateForm, CalculateFormSchema } from "@/schema";
-import { CALCULATOR_TYPES, CALCULATOR_CONFIG, DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "@/constant";
+import { CalculateForm, CalculateFormSchema } from "../_lib/schema";
+import { CALCULATOR_TYPES, CALCULATOR_CONFIG, DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "../_lib/config";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/client";
 import { ChevronDownIcon, InfoCircledIcon, ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
-import type { CalculatorType } from "@/constant";
+import type { CalculatorType } from "../_lib/config";
 
 const PRESET_TERMS = ["3", "6", "9", "12", "18", "24", "36"];
 const PERSONAL_LOAN_TERMS = ["6", "12", "18", "24", "30", "36"];

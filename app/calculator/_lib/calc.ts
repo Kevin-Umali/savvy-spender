@@ -1,4 +1,4 @@
-import { InstallmentOption } from "@/interfaces";
+import { InstallmentOption } from "./types";
 
 export const calculateRate = (
   periods: number,
