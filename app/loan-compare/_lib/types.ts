@@ -1,106 +1,175 @@
-import type { DiscountAppliesTo, FinancingKey, PaymentType } from "./options";
+import type {
+  ComparisonScope,
+  DiscountAppliesTo,
+  DiscountType,
+  FeeTiming,
+  FinancingType,
+  MonthlyMode,
+  PaymentTiming,
+  Priority,
+  ValueMode,
+} from "./options";
+
+// ── Inputs ─────────────────────────────────────────────────────────
+
+export interface FeeItem {
+  id: string;
+  name: string;
+  amount: number;
+  timing: FeeTiming;
+  includedInMonthly: boolean; // already baked into the quoted monthly payment
+  includedInUpfront: boolean; // already baked into the down payment / cash out
+  waived: boolean; // free / waived — adds ₱0 to totals
+  waivedAmount: number; // original value, shown for reference only
+  notes: string;
+}
+
+export interface InsuranceInput {
+  mode: ValueMode;
+  comprehensive: number;
+  ctpl: number;
+  actsOfNature: number;
+  provider: string;
+  recurringYearly: boolean; // false = first-year only
+  requiredByLender: boolean;
+}
+
+export interface RegistrationInput {
+  mode: ValueMode;
+  ltoRegistration: number;
+  plateFee: number;
+  ctpl: number;
+  otherLto: number;
+  includedInDealerPackage: boolean;
+}
+
+export interface FinancingOption {
+  id: string;
+  name: string;
+  type: FinancingType;
+  provider: string;
+  termMonths: number;
+  loanAmount: number;
+  downPayment: number;
+  paymentTiming: PaymentTiming;
+  monthlyMode: MonthlyMode;
+  // Rate / payment inputs — only the one matching monthlyMode is used.
+  quotedMonthly: number;
+  monthlyAddOnRate: number; // %
+  totalAddOnRate: number; // %
+  annualEffectiveRate: number; // EIRPA %, also displayed as reference
+  annualNominalRate: number; // %
+  manualTotalRepayment: number;
+  receivesDiscount: boolean; // honoured when discountAppliesTo === "selected"
+  fees: FeeItem[];
+  insurance: InsuranceInput;
+  registration: RegistrationInput;
+  notes: string;
+}
 
 export interface VehicleInput {
   name: string;
   originalPrice: number;
-  dealerDiscount: number;
+  discountAmount: number;
+  discountType: DiscountType;
   discountAppliesTo: DiscountAppliesTo;
-  selectedOptions: FinancingKey[];
-}
-
-export interface BankInput {
-  bankName: string;
-  downPayment: number;
-  loanAmount: number;
-  termMonths: number;
-  monthlyAmortization: number;
-  paymentType: PaymentType;
-  chattelMortgage: number;
-  bankFees: number;
-  docStampTax: number;
-  notarial: number;
-  ltoEncumbrance: number;
-  registration: number;
-  comprehensiveInsurance: number;
-  ctpl: number;
-  otherFees: number;
-  promoNotes: string;
-}
-
-export interface C2cInput {
-  providerName: string;
-  loanableAmount: number;
-  termMonths: number;
-  monthlyAddOnRate: number;
-  eirpa: number;
-  monthlyPaymentOverride: number;
-  processingFee: number;
-  registration: number;
-  comprehensiveInsurance: number;
-  ctpl: number;
-  otherFees: number;
-  promoNotes: string;
-}
-
-export interface InHouseInput {
-  dealerName: string;
-  downPayment: number;
-  loanAmount: number;
-  termMonths: number;
-  monthlyAmortization: number;
-  paymentType: PaymentType;
-  chattelMortgage: number;
-  processingFee: number;
-  documentationFee: number;
-  registration: number;
-  comprehensiveInsurance: number;
-  ctpl: number;
-  otherFees: number;
-  promoNotes: string;
+  otherDiscounts: number;
+  reservationFee: number;
+  accessories: number;
+  otherCharges: number;
 }
 
 export interface ScenarioInput {
   vehicle: VehicleInput;
-  bank: BankInput;
-  c2c: C2cInput;
-  inHouse: InHouseInput;
+  options: FinancingOption[];
+  priority: Priority;
+  scope: ComparisonScope;
+  fullTerm: boolean; // include recurring (yearly) insurance across the full term
+}
+
+// ── Results ────────────────────────────────────────────────────────
+
+export interface FeeBreakdown {
+  name: string;
+  amount: number; // effective amount counted into totals
+  display: number; // original value (for waived rows)
+  timing: FeeTiming;
+  counted: boolean; // false when already included or excluded
+  waived: boolean;
 }
 
 export interface OptionResult {
-  key: FinancingKey;
-  label: string;
+  id: string;
+  name: string;
+  type: FinancingType;
+  typeLabel: string;
+  provider: string;
+
   discountApplied: boolean;
   discountedPrice: number;
-
-  downPayment: number;
-  cashPortion: number;
-  loanAmount: number;
-  oneMonthAdvance: number;
-  totalFees: number;
-  upfrontCash: number;
+  netVehiclePrice: number;
 
   termMonths: number;
-  monthlyPayment: number;
-  monthlyLabel: string;
-  totalMonthlyPayments: number;
+  paymentTiming: PaymentTiming;
   paymentTypeLabel: string;
 
+  monthlyMode: MonthlyMode;
+  monthlyLabel: string;
+  monthlyPayment: number;
+  totalLoanPayments: number;
+  totalInterest: number;
+  totalRepayment: number;
+  effectiveAddOnRate: number; // total interest / loan
+  monthlyAddOnEquivalent: number; // effectiveAddOnRate / term
+  eirpa?: number; // carried for display when provided
+
+  loanAmount: number;
+  downPayment: number;
+  cashPortion: number;
+  cashSurplus: number;
+  oneMonthAdvance: number;
+  reservationFee: number;
+
+  fees: FeeBreakdown[];
+  upfrontFees: number;
+  feesInTotal: number;
+  waivedFeesTotal: number;
+  insuranceTotal: number;
+  insuranceDisplay: number;
+  registrationTotal: number;
+  registrationDisplay: number;
+
+  upfrontCash: number;
   totalCost: number;
   financingCostAboveDiscounted: number;
-
-  totalInterest?: number;
-  totalRepayment?: number;
-  monthlyAddOnRate?: number;
-  eirpa?: number;
-  loanableAmount?: number;
+  differenceVsCheapest: number;
 
   warnings: string[];
+}
+
+export interface Recommendation {
+  key:
+    | "lowest-total"
+    | "lowest-monthly"
+    | "lowest-upfront"
+    | "lowest-interest"
+    | "no-chattel"
+    | "simplest";
+  label: string;
+  optionId: string;
+  optionName: string;
+  detail: string;
 }
 
 export interface LoanCompareResponse {
   vehicleName: string;
   originalPrice: number;
-  dealerDiscount: number;
+  discountAmount: number;
+  discountType: DiscountType;
   discountAppliesTo: DiscountAppliesTo;
+  scope: ComparisonScope;
+  fullTerm: boolean;
+  cheapestId: string | null;
   results: OptionResult[];
+  recommendations: Recommendation[];
 }

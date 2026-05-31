@@ -4,13 +4,13 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActionBar } from "./_components/action-bar";
-import { BankSection } from "./_components/bank-section";
-import { C2cSection } from "./_components/c2c-section";
+import { CompareSettings } from "./_components/compare-settings";
 import { EmptyResults } from "./_components/empty-results";
+import { FeesTable } from "./_components/fees-table";
 import { GlossaryCard } from "./_components/glossary-card";
-import { InHouseSection } from "./_components/in-house-section";
 import { KeyAssumptionsTable } from "./_components/key-assumptions-table";
 import { MonthlyPaymentTable } from "./_components/monthly-payment-table";
+import { OptionListEditor } from "./_components/option-list-editor";
 import { RecommendationCard } from "./_components/recommendation-card";
 import { ResultSummary } from "./_components/result-summary";
 import { SampleCallout } from "./_components/sample-callout";
@@ -18,12 +18,10 @@ import { SectionLabel } from "./_components/form-controls";
 import { TotalCostTable } from "./_components/total-cost-table";
 import { UpfrontCashTable } from "./_components/upfront-cash-table";
 import { VehicleSection } from "./_components/vehicle-section";
-import { EMPTY_SCENARIO, SAMPLE_SCENARIO } from "./_lib/defaults";
-import type { Priority } from "./_lib/options";
+import { EMPTY_SCENARIO, SAMPLE_SCENARIO, newId, newOption } from "./_lib/defaults";
+import type { ComparisonScope, Priority } from "./_lib/options";
 import type {
-  BankInput,
-  C2cInput,
-  InHouseInput,
+  FinancingOption,
   LoanCompareResponse,
   ScenarioInput,
   VehicleInput,
@@ -33,34 +31,71 @@ export default function LoanComparePage() {
   const [scenario, setScenario] = useState<ScenarioInput>(EMPTY_SCENARIO);
   const [response, setResponse] = useState<LoanCompareResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [priority, setPriority] = useState<Priority>("lowest-total");
   const [sampleDismissed, setSampleDismissed] = useState(false);
 
-  const updateVehicle = useCallback(<K extends keyof VehicleInput>(
-    field: K,
-    value: VehicleInput[K]
-  ) => {
-    setScenario((p) => ({ ...p, vehicle: { ...p.vehicle, [field]: value } }));
+  const updateVehicle = useCallback(
+    <K extends keyof VehicleInput>(field: K, value: VehicleInput[K]) => {
+      setScenario((p) => ({ ...p, vehicle: { ...p.vehicle, [field]: value } }));
+    },
+    []
+  );
+
+  const updateOption = useCallback((id: string, patch: Partial<FinancingOption>) => {
+    setScenario((p) => ({
+      ...p,
+      options: p.options.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+    }));
   }, []);
 
-  const updateBank = useCallback(<K extends keyof BankInput>(field: K, value: BankInput[K]) => {
-    setScenario((p) => ({ ...p, bank: { ...p.bank, [field]: value } }));
+  const addOption = useCallback(() => {
+    setScenario((p) => ({
+      ...p,
+      options: [...p.options, newOption({ name: `Option ${p.options.length + 1}` })],
+    }));
   }, []);
 
-  const updateC2c = useCallback(<K extends keyof C2cInput>(field: K, value: C2cInput[K]) => {
-    setScenario((p) => ({ ...p, c2c: { ...p.c2c, [field]: value } }));
+  const duplicateOption = useCallback((id: string) => {
+    setScenario((p) => {
+      const src = p.options.find((o) => o.id === id);
+      if (!src) return p;
+      const copy: FinancingOption = {
+        ...src,
+        id: newId(),
+        name: `${src.name || "Option"} (copy)`,
+        fees: src.fees.map((f) => ({ ...f, id: newId("fee") })),
+        insurance: { ...src.insurance },
+        registration: { ...src.registration },
+      };
+      const idx = p.options.findIndex((o) => o.id === id);
+      const options = [...p.options];
+      options.splice(idx + 1, 0, copy);
+      return { ...p, options };
+    });
   }, []);
 
-  const updateInHouse = useCallback(<K extends keyof InHouseInput>(
-    field: K,
-    value: InHouseInput[K]
-  ) => {
-    setScenario((p) => ({ ...p, inHouse: { ...p.inHouse, [field]: value } }));
+  const removeOption = useCallback((id: string) => {
+    setScenario((p) =>
+      p.options.length <= 1 ? p : { ...p, options: p.options.filter((o) => o.id !== id) }
+    );
   }, []);
+
+  const setScope = useCallback((scope: ComparisonScope) => setScenario((p) => ({ ...p, scope })), []);
+  const setPriority = useCallback(
+    (priority: Priority) => setScenario((p) => ({ ...p, priority })),
+    []
+  );
+  const setFullTerm = useCallback(
+    (fullTerm: boolean) => setScenario((p) => ({ ...p, fullTerm })),
+    []
+  );
 
   const handleCompare = async () => {
     if (!scenario.vehicle.originalPrice || scenario.vehicle.originalPrice <= 0) {
       toast.error("Enter a valid vehicle price.");
+      return;
+    }
+    if (scenario.options.length === 0) {
+      toast.error("Add at least one financing option.");
       return;
     }
     setIsLoading(true);
@@ -88,7 +123,7 @@ export default function LoanComparePage() {
   };
 
   const handleClear = () => {
-    setScenario(EMPTY_SCENARIO);
+    setScenario({ ...EMPTY_SCENARIO, options: [newOption({ name: "Option 1" })] });
     setResponse(null);
     setSampleDismissed(false);
   };
@@ -104,9 +139,10 @@ export default function LoanComparePage() {
             Car Financing Comparison
           </h1>
           <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Compare a bank auto loan, credit-to-cash / personal loan, and dealer in-house financing
-            side by side. Discounted price, upfront cash, monthly amortization, and lifecycle cost
-            — with freebies and discounts handled cleanly so nothing is double-counted.
+            Compare any number of financing options — bank auto loans, credit-to-cash, personal
+            loans, dealer in-house, or fully custom — side by side. Six monthly-payment modes,
+            itemized fees with no double-counting, insurance and registration handling, and a
+            recommendation tuned to your priority.
           </p>
         </header>
 
@@ -114,11 +150,25 @@ export default function LoanComparePage() {
 
         <VehicleSection vehicle={scenario.vehicle} onChange={updateVehicle} disabled={isLoading} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <BankSection input={scenario.bank} onChange={updateBank} disabled={isLoading} />
-          <C2cSection input={scenario.c2c} onChange={updateC2c} disabled={isLoading} />
-          <InHouseSection input={scenario.inHouse} onChange={updateInHouse} disabled={isLoading} />
-        </div>
+        <CompareSettings
+          scope={scenario.scope}
+          setScope={setScope}
+          priority={scenario.priority}
+          setPriority={setPriority}
+          fullTerm={scenario.fullTerm}
+          setFullTerm={setFullTerm}
+          disabled={isLoading}
+        />
+
+        <OptionListEditor
+          options={scenario.options}
+          discountAppliesTo={scenario.vehicle.discountAppliesTo}
+          onUpdate={updateOption}
+          onAdd={addOption}
+          onDuplicate={duplicateOption}
+          onRemove={removeOption}
+          disabled={isLoading}
+        />
 
         <ActionBar
           isLoading={isLoading}
@@ -129,14 +179,20 @@ export default function LoanComparePage() {
 
         {response ? (
           <div className="space-y-6 pt-4">
-            <ResultSummary results={response.results} />
+            <ResultSummary results={response.results} cheapestId={response.cheapestId} />
             <KeyAssumptionsTable response={response} />
-            <UpfrontCashTable results={response.results} />
-            <MonthlyPaymentTable results={response.results} />
-            <TotalCostTable results={response.results} />
+            <MonthlyPaymentTable results={response.results} cheapestId={response.cheapestId} />
+            <UpfrontCashTable results={response.results} cheapestId={response.cheapestId} />
+            <FeesTable results={response.results} />
+            <TotalCostTable
+              results={response.results}
+              cheapestId={response.cheapestId}
+              scope={response.scope}
+            />
             <RecommendationCard
               results={response.results}
-              priority={priority}
+              recommendations={response.recommendations}
+              priority={scenario.priority}
               setPriority={setPriority}
             />
             <GlossaryCard />

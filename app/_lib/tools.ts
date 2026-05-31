@@ -6,6 +6,7 @@ import {
   PiggyBank,
   Scale,
   TrendingUp,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,8 +51,16 @@ export const TOOLS: Tool[] = [
     icon: Scale,
     title: "Car Financing Comparison",
     href: "/loan-compare",
-    desc: "Compare a bank auto loan, credit-to-cash, and dealer in-house financing side by side with full cost breakdown.",
-    meta: "3 financing types · upfront + monthly + total cost",
+    desc: "Compare unlimited financing options — bank auto loans, credit-to-cash, in-house, or custom — with full cost breakdown and a priority-based pick.",
+    meta: "Unlimited options · 6 rate modes · loan / upfront / total cost",
+  },
+  {
+    status: "live",
+    icon: Wallet,
+    title: "Freelancer Payout Comparison",
+    href: "/payout-compare",
+    desc: "Getting paid from abroad? See which app nets you the most pesos after fees and FX — Wise, Payoneer, PayPal, e-wallets, banks, and crypto.",
+    meta: "8 platforms · live FX · net PHP simulator",
   },
   {
     status: "soon",
