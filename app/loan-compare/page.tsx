@@ -16,6 +16,7 @@ import { MonthlyPaymentTable } from "./_components/monthly-payment-table";
 import { OptionListEditor } from "./_components/option-list-editor";
 import { RecommendationCard } from "./_components/recommendation-card";
 import { ResultSummary } from "./_components/result-summary";
+import { AmortizationCard } from "./_components/amortization-card";
 import { SampleCallout } from "./_components/sample-callout";
 import { TotalCostTable } from "./_components/total-cost-table";
 import { UpfrontCashTable } from "./_components/upfront-cash-table";
@@ -225,6 +226,11 @@ export default function LoanComparePage() {
               cheapestId={response.cheapestId}
               scope={response.scope}
             />
+            {(() => {
+              const cheapest =
+                response.results.find((r) => r.id === response.cheapestId) ?? response.results[0];
+              return cheapest ? <AmortizationCard result={cheapest} /> : null;
+            })()}
             <RecommendationCard
               results={response.results}
               recommendations={response.recommendations}
