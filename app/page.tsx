@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SectionRule, ToolCard } from "./_components/tool-card";
 import { SECONDARY_LINKS, TOOLS } from "./_lib/tools";
+import { JsonLd } from "@/components/json-ld";
+import { SITE_URL, webApplicationLd } from "./_lib/seo";
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+};
 
 export default function LandingPage() {
   const liveCount = TOOLS.filter((t) => t.status === "live").length;
@@ -9,6 +16,7 @@ export default function LandingPage() {
 
   return (
     <main>
+      <JsonLd data={webApplicationLd()} />
       {/* Hero */}
       <header className="container mx-auto px-4 pt-20 sm:pt-28 pb-12 landing-reveal">
         <p className="font-mono-label text-[10px] uppercase tracking-[0.3em] text-muted-foreground opacity-60 mb-4">
@@ -18,8 +26,8 @@ export default function LandingPage() {
           Savvy Spender
         </h1>
         <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
-          Calmly check the math before you sign. Installment calculator, card FX comparison, and
-          car financing comparison — with more on the way.
+          Calmly check the math before you sign. Installment and rent-vs-buy calculators, card FX and
+          freelancer-payout comparisons, and car financing — all free, no sign-up.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
           <Link
