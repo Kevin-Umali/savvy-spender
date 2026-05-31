@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -56,11 +56,13 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
     defaultValues: { ...BASE_DEFAULTS, ...initialValues },
   });
 
+  const initialType = (initialValues?.calculatorType ?? "balance-conversion") as CalculatorType;
+  const initialPresets = initialType === "personal-loan" ? PERSONAL_LOAN_TERMS : PRESET_TERMS;
   const initialTerm = initialValues?.numInstallments;
   const [selectedTerms, setSelectedTerms] = useState<string[]>(() =>
-    initialTerm && !PRESET_TERMS.includes(initialTerm)
-      ? [...PRESET_TERMS, initialTerm].sort((a, b) => +a - +b)
-      : PRESET_TERMS
+    initialTerm && !initialPresets.includes(initialTerm)
+      ? [...initialPresets, initialTerm].sort((a, b) => +a - +b)
+      : initialPresets
   );
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -87,8 +89,14 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
     return amount - estimatedDST - processingFee;
   }, [calculatorType, amount, estimatedDST, processingFee]);
 
-  // Reset selected terms when calc type changes; keep current selection in sync
+  // Reset selected terms when calc type changes; keep current selection in sync.
+  // Skips the initial mount so a deep-link-prefilled term/selection isn't wiped.
+  const didMountTerms = useRef(false);
   useEffect(() => {
+    if (!didMountTerms.current) {
+      didMountTerms.current = true;
+      return;
+    }
     setSelectedTerms(availablePresets);
     if (!availablePresets.includes(form.getValues("numInstallments"))) {
       form.setValue("numInstallments", availablePresets[0]);

@@ -121,11 +121,11 @@ export function ComparisonTable({
 
         {/* Mobile: stacked cards */}
         <div className="md:hidden space-y-2">
-          {displayData.map((entry, i) => {
+          {displayData.map((entry) => {
             const phpCost = computePhpCost(entry);
             return (
               <div
-                key={i}
+                key={`${entry.issuer}-${entry.card}`}
                 className={cn(
                   "rounded-md border p-3",
                   entry.hasZeroMarkup
@@ -193,11 +193,11 @@ export function ComparisonTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayData.map((entry, i) => {
+              {displayData.map((entry) => {
                 const phpCost = computePhpCost(entry);
                 return (
                   <TableRow
-                    key={i}
+                    key={`${entry.issuer}-${entry.card}`}
                     className={cn(entry.hasZeroMarkup && "bg-emerald-50/50 dark:bg-emerald-950/20")}
                   >
                     <TableCell className="font-medium">{entry.issuer}</TableCell>

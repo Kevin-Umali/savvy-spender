@@ -32,6 +32,7 @@ export function decodeState<T extends Record<string, Primitive>>(
     if (raw === null) return;
     const def = defaults[key];
     if (typeof def === "number") {
+      if (raw.trim() === "") return; // empty string would coerce to 0
       const n = Number(raw);
       if (Number.isFinite(n)) out[key] = n as T[keyof T];
     } else if (typeof def === "boolean") {
@@ -58,7 +59,16 @@ export function useQueryState<T extends Record<string, Primitive>>(
   const [state, setState] = useState<T>(() => decodeState(searchParams, defaults, codes));
 
   useEffect(() => {
-    const query = encodeState(state, defaults, codes);
+    // Merge managed keys onto the existing query so unrelated params (utm_*, etc.)
+    // are preserved rather than stripped on mount.
+    const params = new URLSearchParams(searchParams.toString());
+    (Object.keys(codes) as (keyof T)[]).forEach((key) => {
+      const value = state[key];
+      const code = codes[key];
+      if (value === defaults[key]) params.delete(code);
+      else params.set(code, typeof value === "boolean" ? (value ? "1" : "0") : String(value));
+    });
+    const query = params.toString();
     router.replace(query ? `?${query}` : window.location.pathname, { scroll: false });
     // defaults & codes are module-level constants; only `state` drives updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps
