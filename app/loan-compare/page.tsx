@@ -182,7 +182,7 @@ export default function LoanComparePage() {
             <ResultSummary results={response.results} cheapestId={response.cheapestId} />
             <KeyAssumptionsTable response={response} />
             <MonthlyPaymentTable results={response.results} cheapestId={response.cheapestId} />
-            <UpfrontCashTable results={response.results} cheapestId={response.cheapestId} />
+            <UpfrontCashTable results={response.results} />
             <FeesTable results={response.results} />
             <TotalCostTable
               results={response.results}

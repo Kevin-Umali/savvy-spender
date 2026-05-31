@@ -1,104 +1,71 @@
 "use client";
 
 import { useMemo } from "react";
+import { Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { formatCurrency } from "@/lib/client";
 import { PRIORITY_OPTIONS, type Priority } from "../_lib/options";
-import {
-  computeRecommendations,
-  pickByPriority,
-  priorityRationale,
-} from "../_lib/recommendation";
-import type { OptionResult } from "../_lib/types";
-import { FieldLabel, SectionLabel } from "./form-controls";
-import { Row } from "./table-primitives";
+import { pickByPriority, priorityRationale } from "../_lib/recommendation";
+import type { OptionResult, Recommendation } from "../_lib/types";
+import { SectionLabel, SelectField } from "./form-controls";
 
-export function RecommendationCard({
+interface RecommendationCardProps {
+  results: OptionResult[];
+  recommendations: Recommendation[];
+  priority: Priority;
+  setPriority: (priority: Priority) => void;
+}
+
+export const RecommendationCard: React.FC<RecommendationCardProps> = ({
   results,
+  recommendations,
   priority,
   setPriority,
-}: {
-  results: OptionResult[];
-  priority: Priority;
-  setPriority: (p: Priority) => void;
-}) {
-  const recs = useMemo(() => computeRecommendations(results), [results]);
-  const priorityWinner = pickByPriority(results, priority);
+}) => {
+  const winner = useMemo(() => pickByPriority(results, priority), [results, priority]);
+  const rationale = useMemo(
+    () => priorityRationale(priority, winner, results),
+    [priority, winner, results]
+  );
 
   return (
     <Card className="border-border">
       <CardHeader className="pb-3">
-        <SectionLabel>Table 5</SectionLabel>
-        <CardTitle className="font-display font-light text-lg tracking-tight">
-          Recommendation summary
+        <SectionLabel>Recommendation</SectionLabel>
+        <CardTitle className="font-display font-light text-xl tracking-tight mt-0.5">
+          Winners by goal
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="overflow-x-auto -mx-6 px-6">
-          <table className="w-full text-sm">
-            <tbody className="[&_tr]:border-b last:[&_tr]:border-0">
-              <Row
-                label="Lowest monthly payment"
-                value={recs.lowestMonthly.label}
-                sub={formatCurrency(recs.lowestMonthly.monthlyPayment)}
-              />
-              <Row
-                label="Lowest upfront cash"
-                value={recs.lowestUpfront.label}
-                sub={formatCurrency(recs.lowestUpfront.upfrontCash)}
-              />
-              <Row
-                label="Lowest total cost"
-                value={recs.lowestTotal.label}
-                sub={formatCurrency(recs.lowestTotal.totalCost)}
-              />
-              <Row
-                label="Simplest process"
-                value="Credit-to-Cash"
-                sub="Treated as a cash purchase, no chattel"
-              />
-              <Row
-                label="No chattel mortgage"
-                value={recs.noChattel.label}
-                sub={formatCurrency(recs.noChattel.totalCost)}
-              />
-            </tbody>
-          </table>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {recommendations.map((rec) => (
+            <div key={rec.key} className="rounded-sm border border-border p-2.5">
+              <p className="font-mono-label text-[9px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
+                {rec.label}
+              </p>
+              <p className="text-sm font-medium leading-tight mt-0.5">{rec.optionName}</p>
+              <p className="text-[11px] text-muted-foreground">{rec.detail}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="border-t pt-4">
-          <FieldLabel>Your priority</FieldLabel>
-          <Select value={priority} onValueChange={(v) => setPriority(v as Priority)}>
-            <SelectTrigger className="h-9 text-sm max-w-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PRIORITY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {priorityWinner && (
-            <div className="mt-4 rounded-md border border-emerald-200 dark:border-emerald-900 bg-emerald-50/60 dark:bg-emerald-950/30 p-4">
-              <SectionLabel>Best for your priority</SectionLabel>
-              <p className="font-display font-light text-xl mt-1">{priorityWinner.label}</p>
-              <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">
-                {priorityRationale(priority, priorityWinner)}
+        <div className="grid sm:grid-cols-[260px_1fr] gap-3 items-start pt-1">
+          <SelectField
+            label="Your priority"
+            value={priority}
+            onChange={setPriority}
+            options={PRIORITY_OPTIONS}
+          />
+          <div className="rounded-md border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-3 flex gap-2.5">
+            <Trophy className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium">{winner.name}</p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed mt-0.5">
+                {rationale}
               </p>
             </div>
-          )}
+          </div>
         </div>
       </CardContent>
     </Card>
   );
-}
+};

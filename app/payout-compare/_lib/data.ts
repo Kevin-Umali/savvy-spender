@@ -8,9 +8,10 @@ import type { PayoutPlatform } from "./types";
  *   2. FX markup over the mid-market rate on conversion to PHP, and
  *   3. cash-out / withdrawal fee to a local bank or wallet.
  *
- * Figures are indicative, based on publicly published fee schedules, and change
- * often. Always confirm the exact fees with the provider for your corridor and
- * amount before relying on them.
+ * Figures are indicative, based on publicly published fee schedules and Wise's
+ * country guides (May 2026), and change often. They vary by corridor, amount,
+ * and sender. Always confirm the exact fees with the provider before relying on
+ * them — bank peso-denominated line items in particular are poorly documented.
  */
 export const PAYOUT_DATA_REVIEWED = "May 2026";
 
@@ -20,13 +21,13 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     category: "transfer",
     receivePct: 0,
     receiveFixed: 0,
-    fxMarkupPct: 0.6,
+    fxMarkupPct: 0.65,
     withdrawPct: 0,
     withdrawFixedPhp: 0,
-    payoutSpeed: "1–2 days",
+    payoutSpeed: "Seconds – 2 days",
     canHoldForeign: true,
     notes:
-      "Free USD receiving via ACH; converts near the mid-market rate with a small (~0.5%) fee. Free payout to a PHP bank.",
+      "Cheapest transparent option. Free USD receiving over local/ACH rails (a SWIFT wire costs ~$6); converts at the true mid-market rate for ~0.6%. Hold USD and convert when the rate suits you.",
   },
   {
     name: "Payoneer",
@@ -36,10 +37,10 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     fxMarkupPct: 2,
     withdrawPct: 0,
     withdrawFixedPhp: 0,
-    payoutSpeed: "Few hours – 1 day",
+    payoutSpeed: "2 hrs – 2 days",
     canHoldForeign: true,
     notes:
-      "Popular with marketplaces. ~1% to receive (free between Payoneer accounts) plus up to ~2% over mid-market to withdraw to a PHP bank.",
+      "Built for marketplaces. Receiving from a marketplace/client is free–~1% (card-funded clients cost up to 3.99% + $0.49); withdrawing USD to a PHP bank adds up to ~2% over mid-market.",
   },
   {
     name: "PayPal → PHP bank",
@@ -49,10 +50,10 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     fxMarkupPct: 3.5,
     withdrawPct: 0,
     withdrawFixedPhp: 50,
-    payoutSpeed: "Instant – 1 day",
+    payoutSpeed: "1–5 days",
     canHoldForeign: true,
     notes:
-      "Convenient but pricey: ~4.4% + $0.30 to receive a commercial payment, then a ~3–4% FX markup to withdraw. Bank withdrawal is free over ₱7,000, else ₱50.",
+      "Two stacked costs people miss: ~4.4% + ₱15 to receive an international goods-and-services payment, THEN a ~3–4% conversion spread to move USD→PHP. Bank withdrawal is ₱50 under ₱7,000, else free.",
   },
   {
     name: "PayPal → GCash",
@@ -65,58 +66,58 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     payoutSpeed: "Instant – 1 day",
     canHoldForeign: false,
     notes:
-      "Link GCash to PayPal and cash out for free, but you still pay PayPal's receiving fee and FX markup.",
+      "Cash-out to GCash is free, but you still pay PayPal's ~4.4% receiving fee and the ~3–4% USD→PHP conversion spread. GCash itself holds only pesos.",
   },
   {
     name: "Maya (via remittance)",
     category: "ewallet",
-    receivePct: 1.5,
+    receivePct: 0,
     receiveFixed: 0,
-    fxMarkupPct: 2.5,
+    fxMarkupPct: 2,
     withdrawPct: 0,
-    withdrawFixedPhp: 0,
-    payoutSpeed: "Minutes – hours",
+    withdrawFixedPhp: 15,
+    payoutSpeed: "Minutes",
     canHoldForeign: false,
     notes:
-      "Receive via a partner remittance into a Maya wallet. Fees vary by sender; bank-out from Maya is generally free.",
+      "PHP-only wallet: free to receive (auto-converted), so the FX cost lives in the sending partner's rate. Bank-out is ~₱15 via InstaPay and often free via PESONet.",
   },
   {
     name: "Bank wire (inward SWIFT)",
     category: "bank",
     receivePct: 0,
-    receiveFixed: 0,
-    fxMarkupPct: 1.5,
+    receiveFixed: 14,
+    fxMarkupPct: 2,
     withdrawPct: 0,
-    withdrawFixedPhp: 500,
+    withdrawFixedPhp: 0,
     payoutSpeed: "2–5 days",
     canHoldForeign: true,
     notes:
-      "Direct telegraphic transfer to a PHP bank. Banks add a ~1–2% FX spread and an inward remittance fee (commonly ₱200–₱1,000+).",
+      "Direct telegraphic transfer to a PHP bank (BPI/BDO). A stated inward SWIFT fee (~$14) plus possible intermediary-bank fees, but the bigger hidden cost is an undisclosed ~1–2.5% FX spread on conversion.",
   },
   {
     name: "Remitly",
     category: "bank",
     receivePct: 0,
-    receiveFixed: 2.99,
-    fxMarkupPct: 1,
+    receiveFixed: 3.99,
+    fxMarkupPct: 1.2,
     withdrawPct: 0,
     withdrawFixedPhp: 0,
-    payoutSpeed: "Minutes – days",
+    payoutSpeed: "Minutes – 5 days",
     canHoldForeign: false,
     notes:
-      "Best when the client/you send from abroad. Low FX spread with a small fixed fee; first transfers often promo-free.",
+      "Sender-initiated remittance: $3.99 under $1,000 and free at $1,000+. The headline 'special rate' is a first-transfer promo; the everyday rate carries a ~1%+ spread. Recipient gets PHP, no USD hold.",
   },
   {
     name: "USDT off-ramp (PDAX / Coins.ph)",
     category: "crypto",
     receivePct: 0,
-    receiveFixed: 1,
-    fxMarkupPct: 0.8,
-    withdrawPct: 0.2,
-    withdrawFixedPhp: 0,
+    receiveFixed: 0,
+    fxMarkupPct: 1,
+    withdrawPct: 0.15,
+    withdrawFixedPhp: 10,
     payoutSpeed: "Minutes",
     canHoldForeign: true,
     notes:
-      "Get paid in USDT, sell on a licensed PH exchange, cash out to a bank/wallet. Cheapest spread but adds crypto price/transfer risk and KYC.",
+      "Cheapest FX if the client pays in USDT. Sell on a licensed PH exchange with limit orders (~0.1–0.5% spot; the quick 'Convert' hides 1–3%); cash-out is free–₱10 via InstaPay/PESONet. Adds peg/liquidity risk and KYC.",
   },
 ];

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useFxRates } from "@/app/fx-compare/_lib/use-fx-rates";
+import { useFxRates } from "@/lib/fx";
 import { ComparisonTable } from "./_components/comparison-table";
 import { DisclaimerCard } from "./_components/disclaimer-card";
 import { SimulatorSidebar } from "./_components/simulator-sidebar";

@@ -1,74 +1,90 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { SectionLabel } from "./form-controls";
 
-export function TableShell({
-  title,
-  caption,
-  children,
-}: {
+export type ColumnAlign = "left" | "right";
+
+interface TableShellProps {
   title: string;
-  caption?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card className="border-border">
-      <CardHeader className="pb-3">
-        <SectionLabel>{title}</SectionLabel>
-        {caption && (
-          <CardTitle className="font-display font-light text-lg tracking-tight">{caption}</CardTitle>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">{children}</div>
-      </CardContent>
-    </Card>
-  );
+  subtitle?: string;
+  children: ReactNode;
 }
 
-export const HeaderRow: React.FC<{ cols: string[] }> = ({ cols }) => (
-  <tr className="border-b">
-    {cols.map((c, i) => (
-      <th
-        key={c}
-        className={cn(
-          "font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60 py-2 px-3",
-          i === 0 ? "text-left" : "text-right"
-        )}
-      >
-        {c}
-      </th>
-    ))}
-  </tr>
+/** Card wrapper for a results table. Children should be a <HeaderRow/> + <tbody>. */
+export const TableShell: React.FC<TableShellProps> = ({ title, subtitle, children }) => (
+  <Card className="border-border">
+    <CardHeader className="pb-3">
+      <SectionLabel>{title}</SectionLabel>
+      {subtitle && (
+        <CardTitle className="font-display font-light text-sm text-muted-foreground tracking-tight">
+          {subtitle}
+        </CardTitle>
+      )}
+    </CardHeader>
+    <CardContent>
+      <div className="overflow-x-auto -mx-6 px-6">
+        <table className="w-full text-sm">{children}</table>
+      </div>
+    </CardContent>
+  </Card>
 );
 
-export const Td: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className,
-}) => <td className={cn("py-2 px-3 text-sm", className)}>{children}</td>;
+interface HeaderRowProps {
+  cols: string[];
+  align?: ColumnAlign[];
+}
 
-export const TdNum: React.FC<{
-  children: React.ReactNode;
-  strong?: boolean;
+export const HeaderRow: React.FC<HeaderRowProps> = ({ cols, align }) => (
+  <thead>
+    <tr className="border-b">
+      {cols.map((col, i) => (
+        <th
+          key={col}
+          className={cn(
+            "font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60 py-2 px-3",
+            (align?.[i] ?? (i === 0 ? "left" : "right")) === "right" ? "text-right" : "text-left"
+          )}
+        >
+          {col}
+        </th>
+      ))}
+    </tr>
+  </thead>
+);
+
+interface RowProps {
+  children: ReactNode;
   className?: string;
-}> = ({ children, strong, className }) => (
-  <td className={cn("py-2 px-3 text-right tabular-nums text-sm", strong && "font-semibold", className)}>
+}
+
+export const Row: React.FC<RowProps> = ({ children, className }) => (
+  <tr className={cn("border-b last:border-0", className)}>{children}</tr>
+);
+
+interface CellProps {
+  children?: ReactNode;
+  className?: string;
+}
+
+export const Td: React.FC<CellProps> = ({ children, className }) => (
+  <td className={cn("py-2 px-3 align-top", className)}>{children}</td>
+);
+
+interface NumCellProps extends CellProps {
+  strong?: boolean;
+}
+
+export const TdNum: React.FC<NumCellProps> = ({ children, strong, className }) => (
+  <td
+    className={cn(
+      "py-2 px-3 text-right tabular-nums align-top",
+      strong && "font-semibold",
+      className
+    )}
+  >
     {children}
   </td>
-);
-
-export const Row: React.FC<{ label: string; value: string; sub?: string }> = ({
-  label,
-  value,
-  sub,
-}) => (
-  <tr>
-    <td className="py-2 px-3 text-[12px] text-muted-foreground">{label}</td>
-    <td className="py-2 px-3 text-right">
-      <div className="text-sm font-medium">{value}</div>
-      {sub && <div className="text-[11px] text-muted-foreground tabular-nums">{sub}</div>}
-    </td>
-  </tr>
 );

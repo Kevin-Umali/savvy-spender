@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { FxRateState } from "@/app/fx-compare/_lib/types";
+import type { FxRateState } from "@/lib/fx";
 
 export function SimulatorSidebar({
   state,

@@ -1,113 +1,94 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DISCOUNT_APPLIES_OPTIONS,
-  FINANCING_KEYS,
-  FINANCING_META,
-  type FinancingKey,
+  DISCOUNT_TYPE_OPTIONS,
+  type DiscountAppliesTo,
+  type DiscountType,
 } from "../_lib/options";
 import type { VehicleInput } from "../_lib/types";
-import { FieldLabel, NumField, SectionLabel, TextField } from "./form-controls";
+import { NumField, SectionLabel, SelectField, TextField } from "./form-controls";
 
-export function VehicleSection({
-  vehicle,
-  onChange,
-  disabled,
-}: {
+interface VehicleSectionProps {
   vehicle: VehicleInput;
   onChange: <K extends keyof VehicleInput>(field: K, value: VehicleInput[K]) => void;
   disabled?: boolean;
-}) {
-  const toggleSelected = (key: FinancingKey) => {
-    const exists = vehicle.selectedOptions.includes(key);
-    onChange(
-      "selectedOptions",
-      exists
-        ? vehicle.selectedOptions.filter((k) => k !== key)
-        : [...vehicle.selectedOptions, key]
-    );
-  };
-
-  return (
-    <Card className="border-border">
-      <CardHeader className="pb-3">
-        <SectionLabel>Vehicle</SectionLabel>
-        <CardTitle className="font-display font-light text-xl tracking-tight">
-          Vehicle details &amp; dealer discount
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <TextField
-          label="Vehicle name"
-          value={vehicle.name}
-          onChange={(v) => onChange("name", v)}
-          placeholder="e.g. Toyota Yaris Cross 2026"
-          disabled={disabled}
-        />
-        <NumField
-          label="Original selling price"
-          value={vehicle.originalPrice}
-          onChange={(n) => onChange("originalPrice", n)}
-          step={1000}
-          disabled={disabled}
-        />
-        <NumField
-          label="Dealer discount"
-          value={vehicle.dealerDiscount}
-          onChange={(n) => onChange("dealerDiscount", n)}
-          step={1000}
-          disabled={disabled}
-          tip="Cash discount offered by the dealer. May only apply to specific financing channels."
-        />
-        <div>
-          <FieldLabel tip="Controls which options have the discount netted from the price.">
-            Discount applies to
-          </FieldLabel>
-          <Select
-            value={vehicle.discountAppliesTo}
-            onValueChange={(v) => onChange("discountAppliesTo", v as VehicleInput["discountAppliesTo"])}
-            disabled={disabled}
-          >
-            <SelectTrigger className="h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DISCOUNT_APPLIES_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {vehicle.discountAppliesTo === "selected" && (
-          <div className="sm:col-span-2 lg:col-span-4">
-            <FieldLabel>Discount applies to (select)</FieldLabel>
-            <div className="flex flex-wrap gap-3">
-              {FINANCING_KEYS.map((key) => (
-                <label key={key} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Checkbox
-                    checked={vehicle.selectedOptions.includes(key)}
-                    onCheckedChange={() => toggleSelected(key)}
-                    disabled={disabled}
-                  />
-                  {FINANCING_META[key].label}
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
 }
+
+export const VehicleSection: React.FC<VehicleSectionProps> = ({ vehicle, onChange, disabled }) => (
+  <Card className="border-border">
+    <CardHeader className="pb-3 space-y-1">
+      <SectionLabel>Vehicle</SectionLabel>
+      <p className="text-[11px] text-muted-foreground leading-snug">
+        Applies to every financing option. Discounts are subtracted once per eligible option — never
+        double-counted.
+      </p>
+    </CardHeader>
+    <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <TextField
+        label="Vehicle name"
+        value={vehicle.name}
+        onChange={(v) => onChange("name", v)}
+        disabled={disabled}
+        placeholder="Toyota Yaris Cross 2026"
+      />
+      <NumField
+        label="Original selling price"
+        value={vehicle.originalPrice}
+        onChange={(v) => onChange("originalPrice", v)}
+        step={1000}
+        disabled={disabled}
+        placeholder="1690000"
+      />
+      <NumField
+        label={vehicle.discountType === "percent" ? "Dealer discount (%)" : "Dealer discount (₱)"}
+        value={vehicle.discountAmount}
+        onChange={(v) => onChange("discountAmount", v)}
+        step={vehicle.discountType === "percent" ? 0.1 : 1000}
+        disabled={disabled}
+        tip="The headline dealer discount. Switch between a fixed amount and a percentage with the selector beside it."
+      />
+      <SelectField
+        label="Discount type"
+        value={vehicle.discountType}
+        onChange={(v: DiscountType) => onChange("discountType", v)}
+        options={DISCOUNT_TYPE_OPTIONS}
+        disabled={disabled}
+      />
+      <SelectField
+        label="Discount applies to"
+        value={vehicle.discountAppliesTo}
+        onChange={(v: DiscountAppliesTo) => onChange("discountAppliesTo", v)}
+        options={DISCOUNT_APPLIES_OPTIONS}
+        tip="'Selected' uses each option's own 'receives discount' toggle."
+        disabled={disabled}
+      />
+      <NumField
+        label="Other discounts / promos (₱)"
+        value={vehicle.otherDiscounts}
+        onChange={(v) => onChange("otherDiscounts", v)}
+        disabled={disabled}
+      />
+      <NumField
+        label="Reservation fee (₱)"
+        value={vehicle.reservationFee}
+        onChange={(v) => onChange("reservationFee", v)}
+        tip="Counted as upfront cash and part of total cost."
+        disabled={disabled}
+      />
+      <NumField
+        label="Required accessories (₱)"
+        value={vehicle.accessories}
+        onChange={(v) => onChange("accessories", v)}
+        disabled={disabled}
+      />
+      <NumField
+        label="Other dealer charges (₱)"
+        value={vehicle.otherCharges}
+        onChange={(v) => onChange("otherCharges", v)}
+        disabled={disabled}
+      />
+    </CardContent>
+  </Card>
+);
