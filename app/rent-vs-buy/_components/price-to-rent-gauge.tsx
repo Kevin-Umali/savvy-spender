@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  * Price-to-rent ratio (price ÷ annual rent) — the classic at-a-glance heuristic.
  * <15 favours buying, 15–20 is a toss-up, >20 favours renting.
  */
-export function PriceToRentGauge({ ratio }: { ratio: number }) {
+export const PriceToRentGauge: React.FC<{ ratio: number }> = ({ ratio }) => {
   const verdict = ratio < 15 ? "Buy-favoured" : ratio <= 20 ? "Borderline" : "Rent-favoured";
   const color =
     ratio < 15 ? "text-emerald-600 dark:text-emerald-400" : ratio <= 20 ? "text-amber-600 dark:text-amber-400" : "text-sky-600 dark:text-sky-400";
@@ -48,4 +48,4 @@ export function PriceToRentGauge({ ratio }: { ratio: number }) {
       </CardContent>
     </Card>
   );
-}
+};

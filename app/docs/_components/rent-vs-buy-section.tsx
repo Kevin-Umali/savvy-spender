@@ -1,6 +1,6 @@
 import { Body, Divider, DocSection, Formula, Note, SectionLabel, SectionTitle } from "./doc-primitives";
 
-export function RentVsBuySection() {
+export const RentVsBuySection: React.FC = () => {
   return (
     <>
       <DocSection>
@@ -65,4 +65,4 @@ export function RentVsBuySection() {
       </DocSection>
     </>
   );
-}
+};

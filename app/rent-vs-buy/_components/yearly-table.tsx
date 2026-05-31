@@ -11,7 +11,7 @@ interface Props {
   realPesos: boolean;
 }
 
-export function YearlyTable({ result, realPesos }: Props) {
+export const YearlyTable: React.FC<Props> = ({ result, realPesos }) => {
   const inflation = result.input.costInflationPct;
   const fmt = (v: number, year: number) =>
     formatCurrency(realPesos ? toRealPesos(v, year, inflation) : v);
@@ -79,19 +79,16 @@ export function YearlyTable({ result, realPesos }: Props) {
       </CardContent>
     </Card>
   );
-}
+};
 
-function Num({
-  children,
-  strong,
-  muted,
-  className,
-}: {
+interface NumProps {
   children: React.ReactNode;
   strong?: boolean;
   muted?: boolean;
   className?: string;
-}) {
+}
+
+const Num: React.FC<NumProps> = ({ children, strong, muted, className }) => {
   return (
     <td
       className={cn(
@@ -104,4 +101,4 @@ function Num({
       {children}
     </td>
   );
-}
+};

@@ -13,7 +13,7 @@ interface Props {
   realPesos: boolean;
 }
 
-export function ResultSummary({ result, mc, realPesos }: Props) {
+export const ResultSummary: React.FC<Props> = ({ result, mc, realPesos }) => {
   const horizon = result.input.horizonYears;
   const inflation = result.input.costInflationPct;
   const show = (v: number) => formatCurrency(realPesos ? toRealPesos(v, horizon, inflation) : v);
@@ -93,19 +93,16 @@ export function ResultSummary({ result, mc, realPesos }: Props) {
       </div>
     </div>
   );
-}
+};
 
-function Stat({
-  label,
-  value,
-  hint,
-  accent,
-}: {
+interface StatProps {
   label: string;
   value: string;
   hint?: string;
   accent?: "emerald" | "sky" | "amber";
-}) {
+}
+
+const Stat: React.FC<StatProps> = ({ label, value, hint, accent }) => {
   return (
     <Card className="border-border">
       <CardContent className="py-3">
@@ -126,4 +123,4 @@ function Stat({
       </CardContent>
     </Card>
   );
-}
+};

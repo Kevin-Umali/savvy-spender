@@ -10,7 +10,7 @@ import type { RentVsBuyInput } from "../_lib/types";
  * Goal-seek: the precise belief each lever needs for the verdict to flip. Turns
  * "buying wins" into a falsifiable claim the user can check against the market.
  */
-export function GoalSeekCard({ input }: { input: RentVsBuyInput }) {
+export const GoalSeekCard: React.FC<{ input: RentVsBuyInput }> = ({ input }) => {
   const items = useMemo(() => {
     const appr = solveForBreakEven(input, "appreciationPct", -5, 20);
     const ret = solveForBreakEven(input, "investReturnPct", 0, 20);
@@ -60,4 +60,4 @@ export function GoalSeekCard({ input }: { input: RentVsBuyInput }) {
       </CardContent>
     </Card>
   );
-}
+};

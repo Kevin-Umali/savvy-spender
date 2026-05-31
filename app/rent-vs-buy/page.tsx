@@ -19,7 +19,7 @@ import { PriceToRentGauge } from "./_components/price-to-rent-gauge";
 import { YearlyTable } from "./_components/yearly-table";
 import { AssumptionsCard } from "./_components/assumptions-card";
 
-function RentVsBuy() {
+const RentVsBuy: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -82,9 +82,9 @@ function RentVsBuy() {
         </section>
     </div>
   );
-}
+};
 
-export default function RentVsBuyPage() {
+const RentVsBuyPage: React.FC = () => {
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       <div className="mb-8 max-w-3xl">
@@ -110,4 +110,6 @@ export default function RentVsBuyPage() {
       </Suspense>
     </main>
   );
-}
+};
+
+export default RentVsBuyPage;

@@ -17,7 +17,7 @@ interface Props {
   setRealPesos: (v: boolean) => void;
 }
 
-export function InputsForm({ input, onChange, realPesos, setRealPesos }: Props) {
+export const InputsForm: React.FC<Props> = ({ input, onChange, realPesos, setRealPesos }) => {
   return (
     <Card className="border-border">
       <CardHeader className="pb-3">
@@ -62,23 +62,18 @@ export function InputsForm({ input, onChange, realPesos, setRealPesos }: Props) 
       </CardContent>
     </Card>
   );
-}
+};
 
-function NumField({
-  label,
-  tip,
-  suffix,
-  step,
-  value,
-  onChange,
-}: {
+interface NumFieldProps {
   label: string;
   tip: string;
   suffix?: string;
   step: number;
   value: number;
   onChange: (v: number) => void;
-}) {
+}
+
+const NumField: React.FC<NumFieldProps> = ({ label, tip, suffix, step, value, onChange }) => {
   return (
     <div>
       <Label className="font-mono-label text-[10px] uppercase tracking-[0.14em] text-muted-foreground opacity-70 mb-1 flex items-center gap-1">
@@ -110,17 +105,15 @@ function NumField({
       </div>
     </div>
   );
-}
+};
 
-function CheckRow({
-  label,
-  checked,
-  onChange,
-}: {
+interface CheckRowProps {
   label: string;
   checked: boolean;
   onChange: (v: boolean) => void;
-}) {
+}
+
+const CheckRow: React.FC<CheckRowProps> = ({ label, checked, onChange }) => {
   return (
     <label className="flex items-start gap-2 text-[11px] text-muted-foreground cursor-pointer select-none leading-relaxed">
       <Checkbox
@@ -131,4 +124,4 @@ function CheckRow({
       {label}
     </label>
   );
-}
+};

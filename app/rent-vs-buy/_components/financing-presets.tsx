@@ -11,7 +11,7 @@ interface Props {
 }
 
 /** Quick Philippine financing profiles that prefill rate / term / down payment. */
-export function FinancingPresets({ input, onApply }: Props) {
+export const FinancingPresets: React.FC<Props> = ({ input, onApply }) => {
   return (
     <Card className="border-border">
       <CardHeader className="pb-3">
@@ -45,4 +45,4 @@ export function FinancingPresets({ input, onApply }: Props) {
       </CardContent>
     </Card>
   );
-}
+};

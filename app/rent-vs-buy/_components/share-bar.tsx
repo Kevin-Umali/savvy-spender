@@ -12,7 +12,7 @@ interface Props {
 }
 
 /** Copy a shareable link encoding the exact scenario, or reset to defaults. */
-export function ShareBar({ input, onReset }: Props) {
+export const ShareBar: React.FC<Props> = ({ input, onReset }) => {
   const copyLink = async () => {
     const query = encodeInput(input);
     const url = `${window.location.origin}${window.location.pathname}${query ? `?${query}` : ""}`;
@@ -38,4 +38,4 @@ export function ShareBar({ input, onReset }: Props) {
       </Button>
     </div>
   );
-}
+};

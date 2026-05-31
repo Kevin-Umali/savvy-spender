@@ -36,7 +36,7 @@ const compact = (n: number): string => {
  * point estimate; the shaded fan is the P10–P90 range across ~2,000 Monte-Carlo
  * scenarios. Buying breaks even where the line crosses zero.
  */
-export function BreakevenChart({ result, mc, realPesos }: Props) {
+export const BreakevenChart: React.FC<Props> = ({ result, mc, realPesos }) => {
   const inflation = result.input.costInflationPct;
 
   const data = useMemo(() => {
@@ -159,4 +159,4 @@ export function BreakevenChart({ result, mc, realPesos }: Props) {
       </CardContent>
     </Card>
   );
-}
+};

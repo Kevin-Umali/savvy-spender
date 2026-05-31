@@ -25,10 +25,6 @@ const CODES: Record<string, keyof RentVsBuyInput> = {
   in: "monthlyIncome",
 };
 
-const FIELD_TO_CODE = Object.fromEntries(
-  Object.entries(CODES).map(([code, field]) => [field, code])
-) as Record<keyof RentVsBuyInput, string>;
-
 /** Encode inputs into a query string (only values that differ from defaults). */
 export function encodeInput(input: RentVsBuyInput): string {
   const params = new URLSearchParams();
@@ -55,5 +51,3 @@ export function decodeInput(params: URLSearchParams): RentVsBuyInput {
   if (sl !== null) input.assumeSaleAtHorizon = sl === "1";
   return input;
 }
-
-export { FIELD_TO_CODE };

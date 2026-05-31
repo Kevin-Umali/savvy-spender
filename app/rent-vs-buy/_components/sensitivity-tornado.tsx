@@ -14,7 +14,7 @@ const compact = (n: number): string => {
  * Ranked bars showing how far the net-worth verdict swings when each assumption
  * is shifted ±20%. The longest bar is the lever the decision hinges on.
  */
-export function SensitivityTornado({ bars }: { bars: SensitivityBar[] }) {
+export const SensitivityTornado: React.FC<{ bars: SensitivityBar[] }> = ({ bars }) => {
   const maxSwing = Math.max(1, ...bars.map((b) => b.swing));
 
   return (
@@ -48,4 +48,4 @@ export function SensitivityTornado({ bars }: { bars: SensitivityBar[] }) {
       </CardContent>
     </Card>
   );
-}
+};

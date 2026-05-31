@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 /** Methodology + the disclaimer every Savvy Spender tool carries. */
-export function AssumptionsCard() {
+export const AssumptionsCard: React.FC = () => {
   return (
     <Card className="border-border">
       <CardHeader className="pb-2">
@@ -33,4 +33,4 @@ export function AssumptionsCard() {
       </CardContent>
     </Card>
   );
-}
+};
