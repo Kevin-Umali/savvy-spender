@@ -18,6 +18,7 @@ import { GoalSeekCard } from "./_components/goal-seek-card";
 import { PriceToRentGauge } from "./_components/price-to-rent-gauge";
 import { YearlyTable } from "./_components/yearly-table";
 import { AssumptionsCard } from "./_components/assumptions-card";
+import { ToolHeader } from "@/app/_components/tool-header";
 
 const RentVsBuy: React.FC = () => {
   const router = useRouter();
@@ -87,19 +88,10 @@ const RentVsBuy: React.FC = () => {
 const RentVsBuyPage: React.FC = () => {
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
-      <div className="mb-8 max-w-3xl">
-        <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-2">
-          Tool
-        </p>
-        <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em]">
-          Rent vs. Buy a Home
-        </h1>
-        <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Should you buy that condo or keep renting and invest the difference? This runs a year-by-year
-          wealth simulation — mortgage, amilyar, dues, appreciation, and the opportunity cost of your
-          down payment — then tells you the break-even year and the probability buying actually wins.
-        </p>
-      </div>
+      <ToolHeader
+        title="Rent vs. Buy a Home"
+        description="Should you buy that condo or keep renting and invest the difference? This runs a year-by-year wealth simulation — mortgage, amilyar, dues, appreciation, and the opportunity cost of your down payment — then tells you the break-even year and the probability buying actually wins."
+      />
 
       <Suspense
         fallback={

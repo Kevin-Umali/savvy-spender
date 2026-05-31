@@ -14,10 +14,11 @@ import { OptionListEditor } from "./_components/option-list-editor";
 import { RecommendationCard } from "./_components/recommendation-card";
 import { ResultSummary } from "./_components/result-summary";
 import { SampleCallout } from "./_components/sample-callout";
-import { SectionLabel } from "./_components/form-controls";
 import { TotalCostTable } from "./_components/total-cost-table";
 import { UpfrontCashTable } from "./_components/upfront-cash-table";
 import { VehicleSection } from "./_components/vehicle-section";
+import { ToolHeader } from "@/app/_components/tool-header";
+import { HowItWorks } from "@/app/_components/how-it-works";
 import { EMPTY_SCENARIO, SAMPLE_SCENARIO, newId, newOption } from "./_lib/defaults";
 import type { ComparisonScope, Priority } from "./_lib/options";
 import type {
@@ -133,18 +134,18 @@ export default function LoanComparePage() {
   return (
     <TooltipProvider delayDuration={200}>
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-6">
-        <header className="max-w-3xl">
-          <SectionLabel>Tool</SectionLabel>
-          <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em] mt-2">
-            Car Financing Comparison
-          </h1>
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Compare any number of financing options — bank auto loans, credit-to-cash, personal
-            loans, dealer in-house, or fully custom — side by side. Six monthly-payment modes,
-            itemized fees with no double-counting, insurance and registration handling, and a
-            recommendation tuned to your priority.
-          </p>
-        </header>
+        <ToolHeader
+          title="Car Financing Comparison"
+          description="Compare any number of financing options — bank auto loans, credit-to-cash, personal loans, dealer in-house, or fully custom — side by side. Six monthly-payment modes, itemized fees with no double-counting, insurance and registration handling, and a recommendation tuned to your priority."
+        />
+
+        <HowItWorks
+          docsHref="/docs"
+          points={[
+            { heading: "What it does", body: "Converts any quoted rate mode (add-on, effective, nominal, or a flat quote) into a monthly payment and total cost, so bank, in-house, and cash-style options compare on equal terms." },
+            { heading: "Reading it", body: "Pick a comparison scope (full cost, loan-only, or upfront cash) and the recommendation updates to your chosen priority." },
+          ]}
+        />
 
         {showSampleCallout && <SampleCallout onLoad={handleLoadSample} />}
 

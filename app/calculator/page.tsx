@@ -11,6 +11,16 @@ import AmortizationSchedule from "./_components/amortization-schedule";
 import { CALCULATOR_CONFIG, type CalculatorType } from "./_lib/config";
 import type { AllInstallmentOption, PaymentDifferences } from "./_lib/types";
 import type { CalculateForm } from "./_lib/schema";
+import { ToolHeader } from "@/app/_components/tool-header";
+import { HowItWorks } from "@/app/_components/how-it-works";
+import { Glossary } from "@/app/_components/glossary";
+
+const CALC_GLOSSARY = [
+  { term: "Add-on rate", def: "A flat monthly % charged on the original principal, not the declining balance — common for PH installments." },
+  { term: "EIR / EIRPA", def: "Effective interest rate per annum — the real annualized cost, so plans with different terms compare fairly." },
+  { term: "Factor rate", def: "The multiplier that turns the principal into total repayment over the term." },
+  { term: "DST", def: "Documentary stamp tax (₱1.50 per ₱200) applied to personal loans above ₱250,000." },
+];
 
 export default function CalculatorPage() {
   const [calculatedData, setCalculatedData] = useState<AllInstallmentOption>();
@@ -67,18 +77,10 @@ export default function CalculatorPage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
-      {/* Page Header */}
-      <div className="mb-8 max-w-3xl">
-        <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60 mb-2">
-          Tool
-        </p>
-        <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em]">
-          Installment Calculator
-        </h1>
-        <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Compare balance conversion, credit-to-cash, and personal loan installment plans across multiple terms.
-        </p>
-      </div>
+      <ToolHeader
+        title="Installment Calculator"
+        description="Compare balance conversion, credit-to-cash, and personal loan installment plans across multiple terms — with monthly payments, effective interest, and a full amortization schedule."
+      />
 
       <div className="grid lg:grid-cols-[380px_1fr] gap-6 lg:gap-10">
         {/* Form column — sticky on desktop */}
@@ -114,6 +116,15 @@ export default function CalculatorPage() {
               )}
             </>
           )}
+
+          <HowItWorks
+            docsHref="/docs"
+            points={[
+              { heading: "What it does", body: "Turns a lump sum into fixed monthly installments across terms and shows the true cost of each." },
+              { heading: "Reading it", body: "The lowest monthly payment isn't always the cheapest — check total interest and the effective interest rate (EIR), which annualizes the real cost." },
+            ]}
+          />
+          <Glossary items={CALC_GLOSSARY} />
         </section>
       </div>
     </main>
