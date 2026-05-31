@@ -2,7 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { downloadCsv } from "@/lib/csv";
 import { ActionBar } from "./_components/action-bar";
 import { CompareSettings } from "./_components/compare-settings";
 import { EmptyResults } from "./_components/empty-results";
@@ -54,6 +57,28 @@ export default function LoanComparePage() {
       options: [...p.options, newOption({ name: `Option ${p.options.length + 1}` })],
     }));
   }, []);
+
+  const addPresetOption = useCallback((option: FinancingOption) => {
+    setScenario((p) => ({ ...p, options: [...p.options, option] }));
+  }, []);
+
+  const exportCsv = useCallback(() => {
+    if (!response) return;
+    downloadCsv(
+      "car-financing-comparison",
+      ["Option", "Type", "Provider", "Term (mo)", "Monthly", "Total interest", "Upfront cash", "Total cost"],
+      response.results.map((r) => [
+        r.name,
+        r.typeLabel,
+        r.provider || "",
+        r.termMonths,
+        r.monthlyPayment.toFixed(2),
+        r.totalInterest.toFixed(2),
+        r.upfrontCash.toFixed(2),
+        r.totalCost.toFixed(2),
+      ])
+    );
+  }, [response]);
 
   const duplicateOption = useCallback((id: string) => {
     setScenario((p) => {
@@ -166,6 +191,7 @@ export default function LoanComparePage() {
           discountAppliesTo={scenario.vehicle.discountAppliesTo}
           onUpdate={updateOption}
           onAdd={addOption}
+          onAddPreset={addPresetOption}
           onDuplicate={duplicateOption}
           onRemove={removeOption}
           disabled={isLoading}
@@ -180,6 +206,15 @@ export default function LoanComparePage() {
 
         {response ? (
           <div className="space-y-6 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+                Results
+              </p>
+              <Button variant="outline" size="sm" onClick={exportCsv} className="gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                Export CSV
+              </Button>
+            </div>
             <ResultSummary results={response.results} cheapestId={response.cheapestId} />
             <KeyAssumptionsTable response={response} />
             <MonthlyPaymentTable results={response.results} cheapestId={response.cheapestId} />
