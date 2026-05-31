@@ -3,6 +3,7 @@ import {
   Building2,
   Calculator,
   Globe,
+  Home,
   PiggyBank,
   Scale,
   TrendingUp,
@@ -61,6 +62,14 @@ export const TOOLS: Tool[] = [
     href: "/payout-compare",
     desc: "Getting paid from abroad? See which app nets you the most pesos after fees and FX — Wise, Payoneer, PayPal, e-wallets, banks, and crypto.",
     meta: "8 platforms · live FX · net PHP simulator",
+  },
+  {
+    status: "live",
+    icon: Home,
+    title: "Rent vs. Buy a Home",
+    href: "/rent-vs-buy",
+    desc: "Buy the condo or keep renting and invest the difference? A year-by-year wealth simulation with the break-even year and the odds buying actually wins.",
+    meta: "break-even year · invest-the-difference · Monte-Carlo odds",
   },
   {
     status: "soon",

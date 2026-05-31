@@ -3,16 +3,18 @@ import { CarFinancingSection } from "./_components/car-financing-section";
 import { Divider } from "./_components/doc-primitives";
 import { FxSection } from "./_components/fx-section";
 import { InstallmentSection } from "./_components/installment-section";
+import { RentVsBuySection } from "./_components/rent-vs-buy-section";
 
 export const metadata: Metadata = {
   title: "Savvy Spender - Documentation",
   description:
-    "How each calculator works — inputs, formulas, and what the results mean. Covers the Installment Calculator, Card FX Comparison, and Car Financing Comparison tools.",
+    "How each calculator works — inputs, formulas, and what the results mean. Covers the Installment Calculator, Card FX Comparison, Car Financing Comparison, and Rent vs. Buy a Home tools.",
   keywords: [
     "Payment Calculator Documentation",
     "Installment Calculator Documentation",
     "Card FX Comparison Documentation",
     "Car Financing Comparison Documentation",
+    "Rent vs Buy Calculator Philippines",
     "Balance Conversion Calculator",
     "Credit-to-Cash Calculator",
     "Financial Calculations Philippines",
@@ -57,6 +59,9 @@ export default function Page() {
       <Divider strong />
 
       <CarFinancingSection />
+      <Divider strong />
+
+      <RentVsBuySection />
       <Divider strong />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
