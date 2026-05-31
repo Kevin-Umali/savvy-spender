@@ -105,6 +105,7 @@ export function ComparisonTable({
                   </div>
                 </div>
                 <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{platform.notes}</p>
+                <SourceTags sources={platform.sources} />
               </div>
             );
           })}
@@ -161,6 +162,7 @@ export function ComparisonTable({
                     )}
                     <TableCell className="text-[11px] text-muted-foreground max-w-[280px] leading-relaxed">
                       {platform.notes}
+                      <SourceTags sources={platform.sources} />
                     </TableCell>
                   </TableRow>
                 );
@@ -186,7 +188,11 @@ export function ComparisonTable({
                       rows[0].result.netPhp - rows[rows.length - 1].result!.netPhp
                     )}
                   </span>{" "}
-                  more than the costliest option here.
+                  more than the costliest option here — about{" "}
+                  <span className="font-medium tabular-nums">
+                    {formatCurrency((rows[0].result.netPhp - rows[rows.length - 1].result!.netPhp) * 12)}
+                  </span>{" "}
+                  a year if you&apos;re paid monthly.
                 </>
               )}
             </p>
@@ -196,6 +202,20 @@ export function ComparisonTable({
     </Card>
   );
 }
+
+const SourceTags: React.FC<{ sources?: string[] }> = ({ sources }) =>
+  sources && sources.length ? (
+    <span className="mt-1.5 flex flex-wrap gap-1">
+      {sources.map((s) => (
+        <span
+          key={s}
+          className="rounded-sm bg-muted px-1.5 py-0.5 font-mono-label text-[9px] uppercase tracking-[0.1em] text-muted-foreground"
+        >
+          {s}
+        </span>
+      ))}
+    </span>
+  ) : null;
 
 const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,

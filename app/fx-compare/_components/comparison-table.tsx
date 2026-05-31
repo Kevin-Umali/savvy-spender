@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -27,12 +28,28 @@ export function ComparisonTable({
   phpPerUnit: number | null;
   currencyName: string;
 }) {
+  const [zeroOnly, setZeroOnly] = useState(false);
+  const [network, setNetwork] = useState<string>("all");
+
+  const networks = useMemo(
+    () => Array.from(new Set(CARD_FX_DATA.map((c) => c.network))).sort(),
+    []
+  );
+
   const sortedData = useMemo(
     () =>
       [...CARD_FX_DATA].sort(
         (a, b) => a.fxMarkup - b.fxMarkup || a.issuer.localeCompare(b.issuer)
       ),
     []
+  );
+
+  const displayData = useMemo(
+    () =>
+      sortedData.filter(
+        (c) => (!zeroOnly || c.hasZeroMarkup) && (network === "all" || c.network === network)
+      ),
+    [sortedData, zeroOnly, network]
   );
 
   const computePhpCost = useCallback(
@@ -76,9 +93,35 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
+        {/* Filter bar */}
+        <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer select-none">
+            <Checkbox checked={zeroOnly} onCheckedChange={(v) => setZeroOnly(Boolean(v))} />
+            0% forex only
+          </label>
+          <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            Network
+            <select
+              value={network}
+              onChange={(e) => setNetwork(e.target.value)}
+              className="h-7 rounded-sm border bg-background px-2 text-[11px]"
+            >
+              <option value="all">All</option>
+              {networks.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
+            {displayData.length} {displayData.length === 1 ? "card" : "cards"}
+          </span>
+        </div>
+
         {/* Mobile: stacked cards */}
         <div className="md:hidden space-y-2">
-          {sortedData.map((entry, i) => {
+          {displayData.map((entry, i) => {
             const phpCost = computePhpCost(entry);
             return (
               <div
@@ -150,7 +193,7 @@ export function ComparisonTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedData.map((entry, i) => {
+              {displayData.map((entry, i) => {
                 const phpCost = computePhpCost(entry);
                 return (
                   <TableRow
