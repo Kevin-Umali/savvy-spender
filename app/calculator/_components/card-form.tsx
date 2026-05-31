@@ -19,9 +19,20 @@ import type { CalculatorType } from "../_lib/config";
 const PRESET_TERMS = ["3", "6", "9", "12", "18", "24", "36"];
 const PERSONAL_LOAN_TERMS = ["6", "12", "18", "24", "30", "36"];
 
+const BASE_DEFAULTS: CalculateForm = {
+  calculatorType: "balance-conversion",
+  amount: 10000,
+  interestRate: 0.99,
+  numInstallments: "3",
+  processingFee: 0,
+  installmentAmount: 0,
+  monthlyBudget: 0,
+};
+
 interface CardInstallmentFormProps {
   onSubmit: (values: CalculateForm) => void;
   isLoading?: boolean;
+  initialValues?: Partial<CalculateForm>;
 }
 
 const InfoTip: React.FC<{ content: string }> = ({ content }) => (
@@ -35,21 +46,22 @@ const InfoTip: React.FC<{ content: string }> = ({ content }) => (
   </Tooltip>
 );
 
-const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isLoading = false }) => {
+const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
+  onSubmit,
+  isLoading = false,
+  initialValues,
+}) => {
   const form = useForm<CalculateForm>({
     resolver: zodResolver(CalculateFormSchema),
-    defaultValues: {
-      calculatorType: "balance-conversion",
-      amount: 10000,
-      interestRate: 0.99,
-      numInstallments: "3",
-      processingFee: 0,
-      installmentAmount: 0,
-      monthlyBudget: 0,
-    },
+    defaultValues: { ...BASE_DEFAULTS, ...initialValues },
   });
 
-  const [selectedTerms, setSelectedTerms] = useState<string[]>(["3", "6", "9", "12", "18", "24", "36"]);
+  const initialTerm = initialValues?.numInstallments;
+  const [selectedTerms, setSelectedTerms] = useState<string[]>(() =>
+    initialTerm && !PRESET_TERMS.includes(initialTerm)
+      ? [...PRESET_TERMS, initialTerm].sort((a, b) => +a - +b)
+      : PRESET_TERMS
+  );
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const calculatorType = form.watch("calculatorType") as CalculatorType;
@@ -98,15 +110,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
   };
 
   const handleReset = () => {
-    form.reset({
-      calculatorType: "balance-conversion",
-      amount: 10000,
-      interestRate: 0.99,
-      numInstallments: "3",
-      processingFee: 0,
-      installmentAmount: 0,
-      monthlyBudget: 0,
-    });
+    form.reset(BASE_DEFAULTS);
     setSelectedTerms(PRESET_TERMS);
     setShowAdvanced(false);
   };

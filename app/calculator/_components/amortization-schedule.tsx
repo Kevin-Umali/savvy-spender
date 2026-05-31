@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/client";
+import { downloadCsv } from "@/lib/csv";
 import { InstallmentOption } from "../_lib/types";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, ChevronUpIcon, DownloadIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 
 interface AmortizationScheduleProps {
@@ -53,6 +54,21 @@ const AmortizationSchedule: React.FC<AmortizationScheduleProps> = ({ selected, p
     return rows;
   }, [selected, principal, monthlyRate]);
 
+  const exportCsv = () => {
+    downloadCsv(
+      `amortization-${selected?.months ?? 0}mo`,
+      ["Month", "Payment", "Principal", "Interest", "Balance", "Total Paid"],
+      schedule.map((r) => [
+        r.month,
+        r.payment.toFixed(2),
+        r.principalPortion.toFixed(2),
+        r.interestPortion.toFixed(2),
+        r.remainingBalance.toFixed(2),
+        r.totalPaidSoFar.toFixed(2),
+      ])
+    );
+  };
+
   if (!selected || schedule.length === 0) return null;
 
   return (
@@ -76,9 +92,24 @@ const AmortizationSchedule: React.FC<AmortizationScheduleProps> = ({ selected, p
               month{+selected.months === 1 ? "" : "s"} · constant payments via add-on (flat) rate.
             </CardDescription>
           </div>
-          <Button variant="ghost" size="icon" aria-label={isExpanded ? "Collapse schedule" : "Expand schedule"}>
-            {isExpanded ? <ChevronUpIcon className="h-4 w-4" /> : <ChevronDownIcon className="h-4 w-4" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 font-mono-label text-[10px] uppercase tracking-[0.12em]"
+              aria-label="Download schedule as CSV"
+              onClick={(e) => {
+                e.stopPropagation();
+                exportCsv();
+              }}
+            >
+              <DownloadIcon className="h-3.5 w-3.5" />
+              CSV
+            </Button>
+            <Button variant="ghost" size="icon" aria-label={isExpanded ? "Collapse schedule" : "Expand schedule"}>
+              {isExpanded ? <ChevronUpIcon className="h-4 w-4" /> : <ChevronDownIcon className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
       </CardHeader>
 

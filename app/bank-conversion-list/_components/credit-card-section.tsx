@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Body,
   DataTable,
@@ -7,6 +8,15 @@ import {
   SectionTitle,
   SourceNote,
 } from "./section-primitives";
+
+const CalcCta: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
+  <Link
+    href={href}
+    className="inline-block mt-1 text-[12px] font-medium text-foreground underline underline-offset-4"
+  >
+    {children}
+  </Link>
+);
 
 export function CreditCardSection() {
   return (
@@ -34,6 +44,9 @@ export function CreditCardSection() {
           ]}
         />
         <Body>Promo rates (as low as 0.49%) are typically invite-only or limited-time.</Body>
+        <CalcCta href="/calculator?type=balance-conversion&rate=0.99">
+          Compute a balance conversion in the calculator →
+        </CalcCta>
         <SourceNote>
           Sources: BSP Circular No. 1098 (2020), No. 1165 (2023), and bank-published fee schedules.
           As of 2026.
@@ -59,6 +72,9 @@ export function CreditCardSection() {
           ]}
         />
         <Body>Processing fees typically range from ₱250–₱500 per availment.</Body>
+        <CalcCta href="/calculator?type=credit-to-cash&rate=0.99&fee=300">
+          Compute a credit-to-cash plan in the calculator →
+        </CalcCta>
         <SourceNote>
           Sources: Bank-published fee schedules and cardholder agreements. As of 2026.
         </SourceNote>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import CardInstallmentForm from "./_components/card-form";
@@ -22,7 +23,20 @@ const CALC_GLOSSARY = [
   { term: "DST", def: "Documentary stamp tax (₱1.50 per ₱200) applied to personal loans above ₱250,000." },
 ];
 
-export default function CalculatorPage() {
+const CALC_DEFAULTS: CalculateForm = {
+  calculatorType: "balance-conversion",
+  amount: 10000,
+  interestRate: 0.99,
+  numInstallments: "3",
+  processingFee: 0,
+  installmentAmount: 0,
+  monthlyBudget: 0,
+};
+
+const VALID_TYPES = ["balance-conversion", "credit-to-cash", "personal-loan"];
+
+function Calculator() {
+  const searchParams = useSearchParams();
   const [calculatedData, setCalculatedData] = useState<AllInstallmentOption>();
   const [paymentDifferences, setPaymentDifferences] = useState<PaymentDifferences>();
   const [hasCalculated, setHasCalculated] = useState(false);
@@ -75,6 +89,30 @@ export default function CalculatorPage() {
     calculateInstallmentData(values);
   };
 
+  // Prefill (and auto-calculate) from URL params — used by shareable links and
+  // the Bank list's "open in calculator" deep-links.
+  const initialValues: Partial<CalculateForm> = {};
+  const t = searchParams.get("type");
+  const a = searchParams.get("amt");
+  const r = searchParams.get("rate");
+  const f = searchParams.get("fee");
+  const n = searchParams.get("term");
+  if (t && VALID_TYPES.includes(t)) initialValues.calculatorType = t as CalculatorType;
+  if (a && Number.isFinite(+a)) initialValues.amount = +a;
+  if (r && Number.isFinite(+r)) initialValues.interestRate = +r;
+  if (f && Number.isFinite(+f)) initialValues.processingFee = +f;
+  if (n && Number.isFinite(+n)) initialValues.numInstallments = n;
+  const hasParams = Object.keys(initialValues).length > 0;
+
+  const didAutoRun = useRef(false);
+  useEffect(() => {
+    if (didAutoRun.current || !hasParams) return;
+    didAutoRun.current = true;
+    calculateInstallmentData({ ...CALC_DEFAULTS, ...initialValues });
+    // Run once on mount when deep-linked.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       <ToolHeader
@@ -85,7 +123,11 @@ export default function CalculatorPage() {
       <div className="grid lg:grid-cols-[380px_1fr] gap-6 lg:gap-10">
         {/* Form column — sticky on desktop */}
         <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-2 -mr-2">
-          <CardInstallmentForm onSubmit={onSubmit} isLoading={isLoading} />
+          <CardInstallmentForm
+            onSubmit={onSubmit}
+            isLoading={isLoading}
+            initialValues={hasParams ? initialValues : undefined}
+          />
         </aside>
 
         {/* Results column */}
@@ -145,5 +187,13 @@ function EmptyState() {
         effective interest, and the full amortization schedule.
       </p>
     </div>
+  );
+}
+
+export default function CalculatorPage() {
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-10 text-sm text-muted-foreground">Loading…</div>}>
+      <Calculator />
+    </Suspense>
   );
 }
