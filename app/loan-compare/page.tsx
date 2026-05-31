@@ -2,7 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { downloadCsv } from "@/lib/csv";
 import { ActionBar } from "./_components/action-bar";
 import { CompareSettings } from "./_components/compare-settings";
 import { EmptyResults } from "./_components/empty-results";
@@ -13,11 +16,14 @@ import { MonthlyPaymentTable } from "./_components/monthly-payment-table";
 import { OptionListEditor } from "./_components/option-list-editor";
 import { RecommendationCard } from "./_components/recommendation-card";
 import { ResultSummary } from "./_components/result-summary";
+import { AmortizationCard } from "./_components/amortization-card";
+import { TcoCard } from "./_components/tco-card";
 import { SampleCallout } from "./_components/sample-callout";
-import { SectionLabel } from "./_components/form-controls";
 import { TotalCostTable } from "./_components/total-cost-table";
 import { UpfrontCashTable } from "./_components/upfront-cash-table";
 import { VehicleSection } from "./_components/vehicle-section";
+import { ToolHeader } from "@/app/_components/tool-header";
+import { HowItWorks } from "@/app/_components/how-it-works";
 import { EMPTY_SCENARIO, SAMPLE_SCENARIO, newId, newOption } from "./_lib/defaults";
 import type { ComparisonScope, Priority } from "./_lib/options";
 import type {
@@ -53,6 +59,28 @@ export default function LoanComparePage() {
       options: [...p.options, newOption({ name: `Option ${p.options.length + 1}` })],
     }));
   }, []);
+
+  const addPresetOption = useCallback((option: FinancingOption) => {
+    setScenario((p) => ({ ...p, options: [...p.options, option] }));
+  }, []);
+
+  const exportCsv = useCallback(() => {
+    if (!response) return;
+    downloadCsv(
+      "car-financing-comparison",
+      ["Option", "Type", "Provider", "Term (mo)", "Monthly", "Total interest", "Upfront cash", "Total cost"],
+      response.results.map((r) => [
+        r.name,
+        r.typeLabel,
+        r.provider || "",
+        r.termMonths,
+        r.monthlyPayment.toFixed(2),
+        r.totalInterest.toFixed(2),
+        r.upfrontCash.toFixed(2),
+        r.totalCost.toFixed(2),
+      ])
+    );
+  }, [response]);
 
   const duplicateOption = useCallback((id: string) => {
     setScenario((p) => {
@@ -133,18 +161,18 @@ export default function LoanComparePage() {
   return (
     <TooltipProvider delayDuration={200}>
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-6">
-        <header className="max-w-3xl">
-          <SectionLabel>Tool</SectionLabel>
-          <h1 className="font-display font-extralight text-3xl sm:text-4xl lg:text-5xl tracking-[-0.03em] mt-2">
-            Car Financing Comparison
-          </h1>
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Compare any number of financing options — bank auto loans, credit-to-cash, personal
-            loans, dealer in-house, or fully custom — side by side. Six monthly-payment modes,
-            itemized fees with no double-counting, insurance and registration handling, and a
-            recommendation tuned to your priority.
-          </p>
-        </header>
+        <ToolHeader
+          title="Car Financing Comparison"
+          description="Compare any number of financing options — bank auto loans, credit-to-cash, personal loans, dealer in-house, or fully custom — side by side. Six monthly-payment modes, itemized fees with no double-counting, insurance and registration handling, and a recommendation tuned to your priority."
+        />
+
+        <HowItWorks
+          docsHref="/docs"
+          points={[
+            { heading: "What it does", body: "Converts any quoted rate mode (add-on, effective, nominal, or a flat quote) into a monthly payment and total cost, so bank, in-house, and cash-style options compare on equal terms." },
+            { heading: "Reading it", body: "Pick a comparison scope (full cost, loan-only, or upfront cash) and the recommendation updates to your chosen priority." },
+          ]}
+        />
 
         {showSampleCallout && <SampleCallout onLoad={handleLoadSample} />}
 
@@ -165,6 +193,7 @@ export default function LoanComparePage() {
           discountAppliesTo={scenario.vehicle.discountAppliesTo}
           onUpdate={updateOption}
           onAdd={addOption}
+          onAddPreset={addPresetOption}
           onDuplicate={duplicateOption}
           onRemove={removeOption}
           disabled={isLoading}
@@ -179,6 +208,15 @@ export default function LoanComparePage() {
 
         {response ? (
           <div className="space-y-6 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-mono-label text-[10px] uppercase tracking-[0.25em] text-muted-foreground opacity-60">
+                Results
+              </p>
+              <Button variant="outline" size="sm" onClick={exportCsv} className="gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                Export CSV
+              </Button>
+            </div>
             <ResultSummary results={response.results} cheapestId={response.cheapestId} />
             <KeyAssumptionsTable response={response} />
             <MonthlyPaymentTable results={response.results} cheapestId={response.cheapestId} />
@@ -189,6 +227,21 @@ export default function LoanComparePage() {
               cheapestId={response.cheapestId}
               scope={response.scope}
             />
+            {(() => {
+              const cheapest =
+                response.results.find((r) => r.id === response.cheapestId) ?? response.results[0];
+              if (!cheapest) return null;
+              return (
+                <>
+                  <AmortizationCard result={cheapest} />
+                  <TcoCard
+                    vehiclePrice={cheapest.netVehiclePrice}
+                    financingCost={cheapest.totalCost}
+                    optionName={cheapest.name}
+                  />
+                </>
+              );
+            })()}
             <RecommendationCard
               results={response.results}
               recommendations={response.recommendations}

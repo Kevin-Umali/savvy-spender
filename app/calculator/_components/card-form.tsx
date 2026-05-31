@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -19,9 +19,20 @@ import type { CalculatorType } from "../_lib/config";
 const PRESET_TERMS = ["3", "6", "9", "12", "18", "24", "36"];
 const PERSONAL_LOAN_TERMS = ["6", "12", "18", "24", "30", "36"];
 
+const BASE_DEFAULTS: CalculateForm = {
+  calculatorType: "balance-conversion",
+  amount: 10000,
+  interestRate: 0.99,
+  numInstallments: "3",
+  processingFee: 0,
+  installmentAmount: 0,
+  monthlyBudget: 0,
+};
+
 interface CardInstallmentFormProps {
   onSubmit: (values: CalculateForm) => void;
   isLoading?: boolean;
+  initialValues?: Partial<CalculateForm>;
 }
 
 const InfoTip: React.FC<{ content: string }> = ({ content }) => (
@@ -35,21 +46,24 @@ const InfoTip: React.FC<{ content: string }> = ({ content }) => (
   </Tooltip>
 );
 
-const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isLoading = false }) => {
+const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
+  onSubmit,
+  isLoading = false,
+  initialValues,
+}) => {
   const form = useForm<CalculateForm>({
     resolver: zodResolver(CalculateFormSchema),
-    defaultValues: {
-      calculatorType: "balance-conversion",
-      amount: 10000,
-      interestRate: 0.99,
-      numInstallments: "3",
-      processingFee: 0,
-      installmentAmount: 0,
-      monthlyBudget: 0,
-    },
+    defaultValues: { ...BASE_DEFAULTS, ...initialValues },
   });
 
-  const [selectedTerms, setSelectedTerms] = useState<string[]>(["3", "6", "9", "12", "18", "24", "36"]);
+  const initialType = (initialValues?.calculatorType ?? "balance-conversion") as CalculatorType;
+  const initialPresets = initialType === "personal-loan" ? PERSONAL_LOAN_TERMS : PRESET_TERMS;
+  const initialTerm = initialValues?.numInstallments;
+  const [selectedTerms, setSelectedTerms] = useState<string[]>(() =>
+    initialTerm && !initialPresets.includes(initialTerm)
+      ? [...initialPresets, initialTerm].sort((a, b) => +a - +b)
+      : initialPresets
+  );
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const calculatorType = form.watch("calculatorType") as CalculatorType;
@@ -75,8 +89,14 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
     return amount - estimatedDST - processingFee;
   }, [calculatorType, amount, estimatedDST, processingFee]);
 
-  // Reset selected terms when calc type changes; keep current selection in sync
+  // Reset selected terms when calc type changes; keep current selection in sync.
+  // Skips the initial mount so a deep-link-prefilled term/selection isn't wiped.
+  const didMountTerms = useRef(false);
   useEffect(() => {
+    if (!didMountTerms.current) {
+      didMountTerms.current = true;
+      return;
+    }
     setSelectedTerms(availablePresets);
     if (!availablePresets.includes(form.getValues("numInstallments"))) {
       form.setValue("numInstallments", availablePresets[0]);
@@ -98,15 +118,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({ onSubmit, isL
   };
 
   const handleReset = () => {
-    form.reset({
-      calculatorType: "balance-conversion",
-      amount: 10000,
-      interestRate: 0.99,
-      numInstallments: "3",
-      processingFee: 0,
-      installmentAmount: 0,
-      monthlyBudget: 0,
-    });
+    form.reset(BASE_DEFAULTS);
     setSelectedTerms(PRESET_TERMS);
     setShowAdvanced(false);
   };

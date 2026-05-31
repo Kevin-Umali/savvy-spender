@@ -10,6 +10,8 @@ export interface PayoutPlatform {
   withdrawFixedPhp: number; // fixed cash-out fee, in PHP
   payoutSpeed: string;
   canHoldForeign: boolean; // can you hold a foreign-currency balance?
+  sources?: string[]; // where payments typically originate (Upwork, Fiverr, direct client, …)
+  inactivityFeeUsd?: number; // annual fee charged if the account goes unused
   notes: string;
 }
 

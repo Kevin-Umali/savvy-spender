@@ -26,6 +26,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 0,
     payoutSpeed: "Seconds – 2 days",
     canHoldForeign: true,
+    sources: ["Direct client", "Upwork", "Invoicing"],
     notes:
       "Cheapest transparent option. Free USD receiving over local/ACH rails (a SWIFT wire costs ~$6); converts at the true mid-market rate for ~0.6%. Hold USD and convert when the rate suits you.",
   },
@@ -39,8 +40,10 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 0,
     payoutSpeed: "2 hrs – 2 days",
     canHoldForeign: true,
+    sources: ["Upwork", "Fiverr", "Marketplaces"],
+    inactivityFeeUsd: 29.95,
     notes:
-      "Built for marketplaces. Receiving from a marketplace/client is free–~1% (card-funded clients cost up to 3.99% + $0.49); withdrawing USD to a PHP bank adds up to ~2% over mid-market.",
+      "Built for marketplaces. Receiving from a marketplace/client is free–~1% (card-funded clients cost up to 3.99% + $0.49); withdrawing USD to a PHP bank adds up to ~2% over mid-market. Charges $29.95/yr if unused for 12 months.",
   },
   {
     name: "PayPal → PHP bank",
@@ -52,6 +55,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 50,
     payoutSpeed: "1–5 days",
     canHoldForeign: true,
+    sources: ["Fiverr", "Onlinejobs.ph", "Direct client"],
     notes:
       "Two stacked costs people miss: ~4.4% + ₱15 to receive an international goods-and-services payment, THEN a ~3–4% conversion spread to move USD→PHP. Bank withdrawal is ₱50 under ₱7,000, else free.",
   },
@@ -65,6 +69,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 0,
     payoutSpeed: "Instant – 1 day",
     canHoldForeign: false,
+    sources: ["Fiverr", "Onlinejobs.ph", "Direct client"],
     notes:
       "Cash-out to GCash is free, but you still pay PayPal's ~4.4% receiving fee and the ~3–4% USD→PHP conversion spread. GCash itself holds only pesos.",
   },
@@ -91,6 +96,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 0,
     payoutSpeed: "2–5 days",
     canHoldForeign: true,
+    sources: ["Direct client", "Enterprise"],
     notes:
       "Direct telegraphic transfer to a PHP bank (BPI/BDO). A stated inward SWIFT fee (~$14) plus possible intermediary-bank fees, but the bigger hidden cost is an undisclosed ~1–2.5% FX spread on conversion.",
   },
@@ -117,6 +123,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     withdrawFixedPhp: 10,
     payoutSpeed: "Minutes",
     canHoldForeign: true,
+    sources: ["Crypto-native client", "Web3"],
     notes:
       "Cheapest FX if the client pays in USDT. Sell on a licensed PH exchange with limit orders (~0.1–0.5% spot; the quick 'Convert' hides 1–3%); cash-out is free–₱10 via InstaPay/PESONet. Adds peg/liquidity risk and KYC.",
   },

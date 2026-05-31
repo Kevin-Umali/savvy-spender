@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { TOOLS, SECONDARY_LINKS, type LiveTool } from "@/app/_lib/tools";
+
+const LIVE_TOOLS = TOOLS.filter((tool): tool is LiveTool => tool.status === "live");
 
 const Footer: React.FC = () => {
   return (
@@ -12,7 +15,8 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="font-display font-light text-lg mb-3">Savvy Spender</h3>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              A focused installment calculator built for Filipino consumers. More tools coming soon.
+              Free, open-source financial tools built for Filipino consumers — installments, card
+              forex, car financing, freelancer payouts, and rent vs. buy.
             </p>
           </div>
 
@@ -22,24 +26,20 @@ const Footer: React.FC = () => {
               Explore
             </h3>
             <ul className="space-y-1.5 text-xs">
-              <li>
-                <Link href="/calculator" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Installment Calculator
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/bank-conversion-list"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Bank Conversion List
-                </Link>
-              </li>
-              <li>
-                <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Documentation
-                </Link>
-              </li>
+              {LIVE_TOOLS.map((tool) => (
+                <li key={tool.href}>
+                  <Link href={tool.href} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {tool.title}
+                  </Link>
+                </li>
+              ))}
+              {SECONDARY_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

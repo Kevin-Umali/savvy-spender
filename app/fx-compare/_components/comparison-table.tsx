@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -27,12 +28,28 @@ export function ComparisonTable({
   phpPerUnit: number | null;
   currencyName: string;
 }) {
+  const [zeroOnly, setZeroOnly] = useState(false);
+  const [network, setNetwork] = useState<string>("all");
+
+  const networks = useMemo(
+    () => Array.from(new Set(CARD_FX_DATA.map((c) => c.network))).sort(),
+    []
+  );
+
   const sortedData = useMemo(
     () =>
       [...CARD_FX_DATA].sort(
         (a, b) => a.fxMarkup - b.fxMarkup || a.issuer.localeCompare(b.issuer)
       ),
     []
+  );
+
+  const displayData = useMemo(
+    () =>
+      sortedData.filter(
+        (c) => (!zeroOnly || c.hasZeroMarkup) && (network === "all" || c.network === network)
+      ),
+    [sortedData, zeroOnly, network]
   );
 
   const computePhpCost = useCallback(
@@ -76,7 +93,80 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">
+        {/* Filter bar */}
+        <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer select-none">
+            <Checkbox checked={zeroOnly} onCheckedChange={(v) => setZeroOnly(Boolean(v))} />
+            0% forex only
+          </label>
+          <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            Network
+            <select
+              value={network}
+              onChange={(e) => setNetwork(e.target.value)}
+              className="h-7 rounded-sm border bg-background px-2 text-[11px]"
+            >
+              <option value="all">All</option>
+              {networks.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="font-mono-label text-[10px] uppercase tracking-[0.15em] text-muted-foreground opacity-60">
+            {displayData.length} {displayData.length === 1 ? "card" : "cards"}
+          </span>
+        </div>
+
+        {/* Mobile: stacked cards */}
+        <div className="md:hidden space-y-2">
+          {displayData.map((entry) => {
+            const phpCost = computePhpCost(entry);
+            return (
+              <div
+                key={`${entry.issuer}-${entry.card}`}
+                className={cn(
+                  "rounded-md border p-3",
+                  entry.hasZeroMarkup
+                    ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+                    : "border-border"
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{entry.issuer}</p>
+                    <p className="text-[12px] text-muted-foreground">{entry.card}</p>
+                    <div className="mt-1.5">
+                      <NetworkBadge network={entry.network} />
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {entry.hasZeroMarkup ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900 font-mono-label text-[9px] uppercase tracking-[0.12em]"
+                      >
+                        0% — Free
+                      </Badge>
+                    ) : (
+                      <span className="text-sm tabular-nums">{entry.fxMarkup.toFixed(1)}% markup</span>
+                    )}
+                    {phpCost !== null && (
+                      <p className="text-sm font-medium tabular-nums mt-1">
+                        ₱{phpCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{entry.notes}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block overflow-x-auto -mx-6 px-6">
           <Table>
             <TableHeader>
               <TableRow>
@@ -103,11 +193,11 @@ export function ComparisonTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedData.map((entry, i) => {
+              {displayData.map((entry) => {
                 const phpCost = computePhpCost(entry);
                 return (
                   <TableRow
-                    key={i}
+                    key={`${entry.issuer}-${entry.card}`}
                     className={cn(entry.hasZeroMarkup && "bg-emerald-50/50 dark:bg-emerald-950/20")}
                   >
                     <TableCell className="font-medium">{entry.issuer}</TableCell>
