@@ -1,8 +1,2 @@
-export interface FxRateState {
-  rates: Record<string, number> | null;
-  currencies: { code: string; name: string }[];
-  timestamp: string | null;
-  source: string | null;
-  error: string | null;
-  loading: boolean;
-}
+// FX rate state now lives in the shared lib/fx module so any tool can reuse it.
+export type { FxCurrency, FxRateState } from "@/lib/fx";

@@ -9,5 +9,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Vehicle price is required." }, { status: 400 });
   }
 
+  if (!Array.isArray(scenario.options) || scenario.options.length === 0) {
+    return NextResponse.json({ error: "Add at least one financing option." }, { status: 400 });
+  }
+
   return NextResponse.json(computeComparison(scenario));
 }

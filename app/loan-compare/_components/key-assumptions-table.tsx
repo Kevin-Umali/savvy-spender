@@ -1,42 +1,50 @@
 "use client";
 
 import { formatCurrency } from "@/lib/client";
-import { DISCOUNT_APPLIES_OPTIONS } from "../_lib/options";
+import { HeaderRow, Row, Td, TdNum, TableShell } from "./table-primitives";
 import type { LoanCompareResponse } from "../_lib/types";
-import { Row, TableShell } from "./table-primitives";
 
-export function KeyAssumptionsTable({ response }: { response: LoanCompareResponse }) {
-  const { vehicleName, originalPrice, dealerDiscount, results } = response;
+interface KeyAssumptionsTableProps {
+  response: LoanCompareResponse;
+}
+
+export const KeyAssumptionsTable: React.FC<KeyAssumptionsTableProps> = ({ response }) => {
+  const discountLabel =
+    response.discountAppliesTo === "none" || response.discountAmount === 0
+      ? "None"
+      : response.discountType === "percent"
+      ? `${response.discountAmount}% (${response.discountAppliesTo})`
+      : `${formatCurrency(response.discountAmount)} (${response.discountAppliesTo})`;
+
   return (
-    <TableShell title="Table 1" caption="Key assumptions">
-      <table className="w-full text-sm">
-        <tbody className="[&_tr]:border-b last:[&_tr]:border-0">
-          <Row label="Vehicle" value={vehicleName || "—"} />
-          <Row label="Original price" value={formatCurrency(originalPrice)} />
-          <Row label="Dealer discount" value={formatCurrency(dealerDiscount)} />
-          <Row
-            label="Discount applies to"
-            value={
-              DISCOUNT_APPLIES_OPTIONS.find((o) => o.value === response.discountAppliesTo)?.label ??
-              "—"
-            }
-          />
-          {results.map((r) => (
-            <Row
-              key={r.key}
-              label={`${r.label} — discounted price`}
-              value={`${formatCurrency(r.discountedPrice)}${r.discountApplied ? "" : " (no discount)"}`}
-            />
-          ))}
-          {results.map((r) => (
-            <Row
-              key={`${r.key}-loan`}
-              label={`${r.label} — loan amount (${r.termMonths} mo)`}
-              value={formatCurrency(r.loanAmount)}
-            />
-          ))}
-        </tbody>
-      </table>
+    <TableShell
+      title="Key assumptions"
+      subtitle={`${response.vehicleName || "Vehicle"} · discount: ${discountLabel}`}
+    >
+      <HeaderRow
+        cols={["Option", "Type", "Discounted price", "Net price", "Loan amount", "Term"]}
+        align={["left", "left", "right", "right", "right", "right"]}
+      />
+      <tbody>
+        <Row className="bg-muted/10">
+          <Td className="font-medium">Vehicle</Td>
+          <Td className="text-muted-foreground text-xs">Original price</Td>
+          <TdNum className="text-muted-foreground">{formatCurrency(response.originalPrice)}</TdNum>
+          <TdNum className="text-muted-foreground">{discountLabel}</TdNum>
+          <Td />
+          <Td />
+        </Row>
+        {response.results.map((result) => (
+          <Row key={result.id}>
+            <Td className="font-medium">{result.name}</Td>
+            <Td className="text-muted-foreground text-xs">{result.typeLabel}</Td>
+            <TdNum>{formatCurrency(result.discountedPrice)}</TdNum>
+            <TdNum>{formatCurrency(result.netVehiclePrice)}</TdNum>
+            <TdNum>{formatCurrency(result.loanAmount)}</TdNum>
+            <TdNum>{result.termMonths} mo</TdNum>
+          </Row>
+        ))}
+      </tbody>
     </TableShell>
   );
-}
+};
