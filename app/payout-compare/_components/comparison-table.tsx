@@ -64,7 +64,54 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">
+        {/* Mobile: stacked cards */}
+        <div className="md:hidden space-y-2">
+          {rows.map(({ platform, result }, i) => {
+            const isBest = live && i === 0;
+            return (
+              <div
+                key={platform.name}
+                className={cn(
+                  "rounded-md border p-3",
+                  isBest ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-border"
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">
+                      {platform.name}
+                      {isBest && (
+                        <Badge className="ml-2 bg-emerald-600 hover:bg-emerald-600 font-mono-label text-[9px] uppercase tracking-[0.12em]">
+                          Best
+                        </Badge>
+                      )}
+                    </p>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <CategoryBadge category={platform.category} />
+                      <span className="text-[11px] text-muted-foreground">{platform.payoutSpeed}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {result ? (
+                      <>
+                        <p className="text-sm font-medium tabular-nums">{formatCurrency(result.netPhp)}</p>
+                        <p className="text-[11px] text-muted-foreground tabular-nums">
+                          {result.effectiveCostPct.toFixed(1)}% fee
+                        </p>
+                      </>
+                    ) : (
+                      <span className="text-[12px] text-muted-foreground tabular-nums">~{platform.fxMarkupPct}% FX</span>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{platform.notes}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block overflow-x-auto -mx-6 px-6">
           <Table>
             <TableHeader>
               <TableRow>

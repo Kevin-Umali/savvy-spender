@@ -76,7 +76,54 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">
+        {/* Mobile: stacked cards */}
+        <div className="md:hidden space-y-2">
+          {sortedData.map((entry, i) => {
+            const phpCost = computePhpCost(entry);
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "rounded-md border p-3",
+                  entry.hasZeroMarkup
+                    ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+                    : "border-border"
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{entry.issuer}</p>
+                    <p className="text-[12px] text-muted-foreground">{entry.card}</p>
+                    <div className="mt-1.5">
+                      <NetworkBadge network={entry.network} />
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {entry.hasZeroMarkup ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900 font-mono-label text-[9px] uppercase tracking-[0.12em]"
+                      >
+                        0% — Free
+                      </Badge>
+                    ) : (
+                      <span className="text-sm tabular-nums">{entry.fxMarkup.toFixed(1)}% markup</span>
+                    )}
+                    {phpCost !== null && (
+                      <p className="text-sm font-medium tabular-nums mt-1">
+                        ₱{phpCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{entry.notes}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block overflow-x-auto -mx-6 px-6">
           <Table>
             <TableHeader>
               <TableRow>
