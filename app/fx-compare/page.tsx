@@ -26,7 +26,7 @@ function FxCompare() {
   const [state, patch] = useQueryState(FX_DEFAULTS, FX_CODES);
   const [search, setSearch] = useState("");
 
-  const selectedCurrency = state.currency;
+  const selectedCurrency = state.currency.trim().toUpperCase();
   const foreignAmount = state.amount;
 
   const phpPerUnit = useMemo(() => {
@@ -43,7 +43,7 @@ function FxCompare() {
         <SimulatorSidebar
           state={rateState}
           foreignAmount={foreignAmount}
-          setForeignAmount={(n) => patch({ amount: n })}
+          setForeignAmount={(n) => patch({ amount: Math.max(0, n) })}
           selectedCurrency={selectedCurrency}
           setSelectedCurrency={(c) => patch({ currency: c })}
           search={search}

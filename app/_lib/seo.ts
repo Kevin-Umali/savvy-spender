@@ -38,7 +38,7 @@ export function webApplicationLd(): object {
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web",
     description:
-      "Free, open-source Philippine financial tools — compare installment plans, credit-card forex, car financing, freelancer payouts, and rent vs. buy.",
+      "Free, open-source Philippine financial tools — compare installment plans, credit-card forex, car financing, freelancer payouts, rent vs. buy, and Pag-IBIG acquired-property bids.",
     offers: { "@type": "Offer", price: "0", priceCurrency: "PHP" },
   };
 }

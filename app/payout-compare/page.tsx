@@ -27,7 +27,7 @@ function PayoutCompare() {
   const [state, patch] = useQueryState(PAYOUT_DEFAULTS, PAYOUT_CODES);
   const [search, setSearch] = useState("");
 
-  const selectedCurrency = state.currency;
+  const selectedCurrency = state.currency.trim().toUpperCase();
   const amount = state.amount;
 
   const phpPerUnit = useMemo(() => {
@@ -41,7 +41,7 @@ function PayoutCompare() {
         <SimulatorSidebar
           state={rateState}
           amount={amount}
-          setAmount={(n) => patch({ amount: n })}
+          setAmount={(n) => patch({ amount: Math.max(0, n) })}
           selectedCurrency={selectedCurrency}
           setSelectedCurrency={(c) => patch({ currency: c })}
           search={search}

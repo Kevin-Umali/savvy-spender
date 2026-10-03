@@ -1,12 +1,11 @@
 "use client";
 
 import type { ChangeEvent } from "react";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { FIELD_GROUPS } from "../_lib/defaults";
 import type { RentVsBuyInput } from "../_lib/types";
 
@@ -78,14 +77,7 @@ const NumField: React.FC<NumFieldProps> = ({ label, tip, suffix, step, value, on
     <div>
       <Label className="font-mono-label text-[10px] uppercase tracking-[0.14em] text-muted-foreground opacity-70 mb-1 flex items-center gap-1">
         <span className="truncate">{label}</span>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <InfoCircledIcon className="h-3 w-3 shrink-0 text-muted-foreground cursor-help" />
-          </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-[240px] text-xs font-normal leading-relaxed">
-            {tip}
-          </TooltipContent>
-        </Tooltip>
+        <HelpTooltip label={`About ${label}`}>{tip}</HelpTooltip>
       </Label>
       <div className="relative">
         <Input

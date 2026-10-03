@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { CalculateForm, CalculateFormSchema } from "../_lib/schema";
 import { CALCULATOR_TYPES, CALCULATOR_CONFIG, DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "../_lib/config";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/client";
-import { ChevronDownIcon, InfoCircledIcon, ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
 import type { CalculatorType } from "../_lib/config";
 
 const PRESET_TERMS = ["3", "6", "9", "12", "18", "24", "36"];
@@ -36,14 +37,7 @@ interface CardInstallmentFormProps {
 }
 
 const InfoTip: React.FC<{ content: string }> = ({ content }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <InfoCircledIcon className="ml-1.5 h-3.5 w-3.5 inline-block text-muted-foreground cursor-help align-text-bottom" />
-    </TooltipTrigger>
-    <TooltipContent side="top" className="max-w-[280px] text-xs font-normal leading-relaxed">
-      <p>{content}</p>
-    </TooltipContent>
-  </Tooltip>
+  <HelpTooltip>{content}</HelpTooltip>
 );
 
 const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({

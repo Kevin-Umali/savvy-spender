@@ -4,6 +4,7 @@ import { Divider } from "./_components/doc-primitives";
 import { FxSection } from "./_components/fx-section";
 import { InstallmentSection } from "./_components/installment-section";
 import { RentVsBuySection } from "./_components/rent-vs-buy-section";
+import { PagibigBidSection } from "./_components/pagibig-bid-section";
 import { JsonLd } from "@/components/json-ld";
 import { faqPageLd } from "@/app/_lib/seo";
 
@@ -33,7 +34,7 @@ const FAQ = [
 export const metadata: Metadata = {
   title: "Savvy Spender - Documentation",
   description:
-    "How each calculator works — inputs, formulas, and what the results mean. Covers the Installment Calculator, Card FX Comparison, Car Financing Comparison, and Rent vs. Buy a Home tools.",
+    "How each calculator works — inputs, formulas, and what the results mean. Covers the Installment Calculator, Card FX Comparison, Car Financing Comparison, Rent vs. Buy a Home, and Pag-IBIG Bid & Financing tools.",
   keywords: [
     "Payment Calculator Documentation",
     "Installment Calculator Documentation",
@@ -88,6 +89,9 @@ export default function Page() {
       <Divider strong />
 
       <RentVsBuySection />
+      <Divider strong />
+
+      <PagibigBidSection />
       <Divider strong />
 
       <p className="text-xs text-muted-foreground leading-relaxed">

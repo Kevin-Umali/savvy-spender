@@ -72,6 +72,14 @@ export const TOOLS: Tool[] = [
     meta: "break-even year · invest-the-difference · Monte-Carlo odds",
   },
   {
+    status: "live",
+    icon: Building2,
+    title: "Pag-IBIG Bid & Financing",
+    href: "/pagibig-bid",
+    desc: "Plan an acquired-property bid. Compare discounts, payment modes, down payments, and monthly financing estimates.",
+    meta: "Bid premiums · discounts · loan terms",
+  },
+  {
     status: "soon",
     icon: TrendingUp,
     title: "Investment Planner",

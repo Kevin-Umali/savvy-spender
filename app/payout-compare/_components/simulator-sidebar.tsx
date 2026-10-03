@@ -83,6 +83,7 @@ export function SimulatorSidebar({
             ) : state.error ? (
               <div className="px-3 py-4 text-center text-[12px] text-red-600 dark:text-red-400">
                 {state.error}
+                <button type="button" onClick={state.retry} className="mt-2 block mx-auto underline text-foreground">Retry rates</button>
               </div>
             ) : (
               filteredCurrencies.map((c) => (
@@ -103,9 +104,15 @@ export function SimulatorSidebar({
                 </button>
               ))
             )}
+            {!state.loading && !state.error && filteredCurrencies.length === 0 && (
+              <p className="text-xs text-muted-foreground p-3">No matching currencies. Try another code or name.</p>
+            )}
           </div>
         </div>
 
+        {!state.loading && !state.error && !phpPerUnit && (
+          <p role="status" className="text-xs text-muted-foreground">No rate for {selectedCurrency}. Choose another currency.</p>
+        )}
         {phpPerUnit && (
           <div className="rounded-sm border bg-muted/20 px-3 py-2.5 space-y-1">
             <p className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">

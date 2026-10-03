@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -70,10 +71,12 @@ export default function RootLayout({
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <TooltipProvider delayDuration={200}>
           <Navbar />
           {children}
           <Footer />
           <Toaster position="top-center" richColors />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
