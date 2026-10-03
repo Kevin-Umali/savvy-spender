@@ -9,6 +9,42 @@ require.extensions['.ts'] = (module, file) => module._compile(ts.transpileModule
 const { DEFAULTS, computeBid, validateInput, offerForBudget, monthlyPayment } = require('../app/pagibig-bid/_lib/compute.ts');
 const { normalizeRates, normalizeTimestamp } = require('../lib/fx/normalize.ts');
 const close = (actual, expected, tolerance = 0.005) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} should be ${expected}`);
+const { calculateInstallmentOption } = require('../app/calculator/_lib/calc.ts');
+const { computeInstallments, estimateDST } = require('../app/calculator/_lib/compute.ts');
+const { computeNet } = require('../app/payout-compare/_lib/compute.ts');
+const { PAYOUT_PLATFORMS } = require('../app/payout-compare/_lib/data.ts');
+const { applicableCardFees } = require('../app/fx-compare/_lib/data.ts');
+
+test('percentage units, zero interest, fee-aware annual compounding, and short-term DST are consistent', () => {
+  const input = { calculatorType: 'balance-conversion', amount: 120000, interestRate: 0.99, numInstallments: '12', installmentAmount: 0, processingFee: 0, dstExempt: false };
+  const result = computeInstallments(input);
+  assert.equal(result.selected.monthlyPayment, 11188);
+  assert.equal(result.selected.interest, 14256);
+  const monthly = Math.pow(1 + Number(result.selected.eirPA) / 100, 1 / 12) - 1;
+  // Independent cash-flow residual, rather than repeating the implementation.
+  const pv = Array.from({ length: 12 }, (_, i) => 11188 / Math.pow(1 + monthly, i + 1)).reduce((a, b) => a + b, 0);
+  close(pv, 120000, 3); // Annual percentage is displayed rounded to two decimal places.
+  const fee = calculateInstallmentOption(120000, 0, 0.0099, 12, 500);
+  assert.ok(Number(fee.eirPA) > Number(result.selected.eirPA));
+  assert.equal(calculateInstallmentOption(120000, 0, 0, 12, 0).eirPA, '0');
+  assert.equal(calculateInstallmentOption(1000, 0, 0, 12, 1000).eirPA, 'N/A');
+  close(estimateDST(300001, 12, false), 2250.0075, 1e-8);
+  assert.equal(estimateDST(100000, 6, false), 375);
+  assert.equal(estimateDST(100000, 12, true), 0);
+  assert.equal(estimateDST(300000, 12, true), 2250);
+});
+
+test('payout thresholds and GCash percentage fees differ; expired FX promotions revert to standard fees', () => {
+  const bank = PAYOUT_PLATFORMS.find((p) => p.name === 'PayPal → PHP bank');
+  const gcash = PAYOUT_PLATFORMS.find((p) => p.name === 'PayPal → GCash');
+  assert.equal(computeNet(bank, 100, 50).withdrawFeePhp, 50);
+  assert.equal(computeNet(bank, 1000, 50).withdrawFeePhp, 0);
+  const result = computeNet(gcash, 1000, 50);
+  close(result.withdrawFeePhp, (1000 * (1 - 0.044) - 0.3) * 50 * (1 - 0.03) * 0.01);
+  const promo = (date) => applicableCardFees(new Date(date)).find((p) => p.promo);
+  assert.equal(promo('2026-10-03T00:00:00Z').fxMarkup, 1.5);
+  assert.equal(promo('2026-12-31T16:00:00Z').fxMarkup, 3.5); // January 1 in Manila
+});
 
 test('saved project example: discount is applied to offer, not minimum; down payment uses net', () => {
   const result = computeBid(DEFAULTS);

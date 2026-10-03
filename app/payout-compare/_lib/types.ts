@@ -8,10 +8,12 @@ export interface PayoutPlatform {
   fxMarkupPct: number; // % markup over the mid-market rate on conversion to PHP
   withdrawPct: number; // % cash-out / withdrawal fee
   withdrawFixedPhp: number; // fixed cash-out fee, in PHP
+  freeWithdrawalAtPhp?: number;
+  sourceUrl?: string;
   payoutSpeed: string;
   canHoldForeign: boolean; // can you hold a foreign-currency balance?
   sources?: string[]; // where payments typically originate (Upwork, Fiverr, direct client, …)
-  inactivityFeeUsd?: number; // annual fee charged if the account goes unused
+  inactivityFeeUsd?: number; // legacy field name; annual fee is based on receipts, not inactivity
   notes: string;
 }
 

@@ -1,4 +1,4 @@
-export const INSTALLMENT_PLAN_LIST = ["3", "6", "9", "12", "15", "18", "21", "24", "27", "30", "33", "36"];
+export const INSTALLMENT_PLAN_LIST = ["3", "6", "9", "12", "18", "24", "36"];
 
 export const PERSONAL_LOAN_PLAN_LIST = ["6", "12", "18", "24", "30", "36"];
 
@@ -6,17 +6,20 @@ export const CALCULATOR_TYPES = [
   {
     value: "balance-conversion",
     label: "Balance Conversion",
-    description: "Bought something with your credit card? Compare bank installment vs. 0% merchant plans.",
+    description:
+      "Bought something with your credit card? Compare bank installment vs. 0% merchant plans.",
   },
   {
     value: "credit-to-cash",
     label: "Credit-to-Cash",
-    description: "Convert your available credit limit into cash deposited to your bank account.",
+    description:
+      "Convert your available credit limit into cash deposited to your bank account.",
   },
   {
     value: "personal-loan",
     label: "Personal Loan",
-    description: "Calculate bank personal loan payments with DST and origination fees.",
+    description:
+      "Calculate bank personal loan payments with DST and origination fees.",
   },
 ] as const;
 
@@ -49,7 +52,7 @@ export const CALCULATOR_CONFIG: Record<
     processingFeeLabel: "Processing Fee",
     processingFeePlaceholder: "Enter processing fee (e.g., 300-500)",
     processingFeeDescription:
-      "One-time fee charged by the bank for the conversion (typically ₱300–₱500).",
+      "Enter the actual one-time fee from the current offer. Fees vary by issuer and amount.",
     defaultInterestRate: 0.99,
     defaultProcessingFee: 0,
   },
@@ -64,7 +67,7 @@ export const CALCULATOR_CONFIG: Record<
     processingFeeLabel: "Processing Fee",
     processingFeePlaceholder: "Enter processing fee (e.g., 250-500)",
     processingFeeDescription:
-      "One-time fee charged by the bank for the cash conversion (typically ₱250–₱500).",
+      "Enter the actual cash-conversion fee from the current offer.",
     defaultInterestRate: 0.99,
     defaultProcessingFee: 0,
   },
@@ -79,13 +82,8 @@ export const CALCULATOR_CONFIG: Record<
     processingFeeLabel: "Origination / Disbursement Fee",
     processingFeePlaceholder: "Enter origination fee (e.g., 1300-1500)",
     processingFeeDescription:
-      "Bank disbursement or origination fee deducted from loan proceeds (typically ₱1,300–₱1,500).",
+      "Enter the actual disbursement or origination fee deducted from proceeds.",
     defaultInterestRate: 1.25,
     defaultProcessingFee: 1500,
   },
 };
-
-/** DST rate: ₱1.50 per ₱200 of loan face value (~0.75%) */
-export const DST_RATE_PER_200 = 1.5;
-/** Loans at or below this amount are DST-exempt for personal use */
-export const DST_EXEMPTION_THRESHOLD = 250000;

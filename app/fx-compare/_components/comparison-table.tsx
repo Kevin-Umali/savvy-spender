@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { parseAsBoolean, parseAsStringLiteral, useQueryStates } from "nuqs";
+import { useShareSnapshot } from "@/components/share-state-provider";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,10 +15,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { CARD_FX_DATA, type CardFxEntry } from "../_lib/data";
+import {
+  CARD_FX_DATA,
+  applicableCardFees,
+  type CardFxEntry,
+} from "../_lib/data";
 import { NetworkBadge } from "./network-badge";
 import { PhpCostSummary } from "./php-cost-summary";
 
+const filterParsers = {
+  zeroOnly: parseAsBoolean.withDefault(false),
+  network: parseAsStringLiteral([
+    "all",
+    "Visa",
+    "Mastercard",
+    "Diners",
+    "JCB",
+    "Amex",
+    "UnionPay",
+  ] as const).withDefault("all"),
+};
 export function ComparisonTable({
   selectedCurrency,
   foreignAmount,
@@ -28,28 +46,34 @@ export function ComparisonTable({
   phpPerUnit: number | null;
   currencyName: string;
 }) {
-  const [zeroOnly, setZeroOnly] = useState(false);
-  const [network, setNetwork] = useState<string>("all");
+  const [filters, setFilters] = useQueryStates(filterParsers, {
+    shallow: true,
+    scroll: false,
+  });
+  const { zeroOnly, network } = filters;
+  useShareSnapshot(filterParsers, filters);
 
   const networks = useMemo(
     () => Array.from(new Set(CARD_FX_DATA.map((c) => c.network))).sort(),
-    []
+    [],
   );
 
   const sortedData = useMemo(
     () =>
-      [...CARD_FX_DATA].sort(
-        (a, b) => a.fxMarkup - b.fxMarkup || a.issuer.localeCompare(b.issuer)
+      applicableCardFees().sort(
+        (a, b) => a.fxMarkup - b.fxMarkup || a.issuer.localeCompare(b.issuer),
       ),
-    []
+    [],
   );
 
   const displayData = useMemo(
     () =>
       sortedData.filter(
-        (c) => (!zeroOnly || c.hasZeroMarkup) && (network === "all" || c.network === network)
+        (c) =>
+          (!zeroOnly || c.hasZeroMarkup) &&
+          (network === "all" || c.network === network),
       ),
-    [sortedData, zeroOnly, network]
+    [sortedData, zeroOnly, network],
   );
 
   const computePhpCost = useCallback(
@@ -57,7 +81,7 @@ export function ComparisonTable({
       if (!phpPerUnit || !foreignAmount) return null;
       return foreignAmount * phpPerUnit * (1 + entry.fxMarkup / 100);
     },
-    [phpPerUnit, foreignAmount]
+    [phpPerUnit, foreignAmount],
   );
 
   return (
@@ -93,17 +117,28 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
+        {displayData.length === 0 && (
+          <p className="mb-3 text-xs text-muted-foreground">
+            No verified products match these filters. Clear the filters to see
+            the current verified list.
+          </p>
+        )}
         {/* Filter bar */}
         <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
           <label className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer select-none">
-            <Checkbox checked={zeroOnly} onCheckedChange={(v) => setZeroOnly(Boolean(v))} />
+            <Checkbox
+              checked={zeroOnly}
+              onCheckedChange={(v) => void setFilters({ zeroOnly: Boolean(v) })}
+            />
             0% forex only
           </label>
           <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
             Network
             <select
               value={network}
-              onChange={(e) => setNetwork(e.target.value)}
+              onChange={(e) =>
+                void setFilters({ network: e.target.value as typeof network })
+              }
               className="h-7 rounded-sm border bg-background px-2 text-[11px]"
             >
               <option value="all">All</option>
@@ -130,13 +165,15 @@ export function ComparisonTable({
                   "rounded-md border p-3",
                   entry.hasZeroMarkup
                     ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
-                    : "border-border"
+                    : "border-border",
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium text-sm">{entry.issuer}</p>
-                    <p className="text-[12px] text-muted-foreground">{entry.card}</p>
+                    <p className="text-[12px] text-muted-foreground">
+                      {entry.card}
+                    </p>
                     <div className="mt-1.5">
                       <NetworkBadge network={entry.network} />
                     </div>
@@ -150,16 +187,32 @@ export function ComparisonTable({
                         0% — Free
                       </Badge>
                     ) : (
-                      <span className="text-sm tabular-nums">{entry.fxMarkup.toFixed(1)}% markup</span>
+                      <span className="text-sm tabular-nums">
+                        {entry.fxMarkup.toFixed(1)}% markup
+                      </span>
                     )}
                     {phpCost !== null && (
                       <p className="text-sm font-medium tabular-nums mt-1">
-                        ₱{phpCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₱
+                        {phpCost.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </p>
                     )}
                   </div>
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{entry.notes}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+                  {entry.notes}{" "}
+                  <a
+                    href={entry.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Issuer source
+                  </a>
+                </p>
               </div>
             );
           })}
@@ -198,9 +251,14 @@ export function ComparisonTable({
                 return (
                   <TableRow
                     key={`${entry.issuer}-${entry.card}`}
-                    className={cn(entry.hasZeroMarkup && "bg-emerald-50/50 dark:bg-emerald-950/20")}
+                    className={cn(
+                      entry.hasZeroMarkup &&
+                        "bg-emerald-50/50 dark:bg-emerald-950/20",
+                    )}
                   >
-                    <TableCell className="font-medium">{entry.issuer}</TableCell>
+                    <TableCell className="font-medium">
+                      {entry.issuer}
+                    </TableCell>
                     <TableCell className="text-[12px] text-muted-foreground max-w-[160px]">
                       {entry.card}
                     </TableCell>
@@ -216,7 +274,9 @@ export function ComparisonTable({
                           0% — Free
                         </Badge>
                       ) : (
-                        <span className="text-sm">{entry.fxMarkup.toFixed(1)}%</span>
+                        <span className="text-sm">
+                          {entry.fxMarkup.toFixed(1)}%
+                        </span>
                       )}
                     </TableCell>
                     {phpPerUnit && foreignAmount > 0 && (
@@ -230,7 +290,15 @@ export function ComparisonTable({
                       </TableCell>
                     )}
                     <TableCell className="text-[11px] text-muted-foreground max-w-[220px] leading-relaxed">
-                      {entry.notes}
+                      {entry.notes}{" "}
+                      <a
+                        href={entry.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline"
+                      >
+                        Issuer source
+                      </a>
                     </TableCell>
                   </TableRow>
                 );

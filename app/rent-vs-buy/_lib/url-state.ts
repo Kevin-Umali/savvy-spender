@@ -1,5 +1,28 @@
-import { DEFAULT_INPUT } from "./defaults";
 import type { RentVsBuyInput } from "./types";
+import type { NumberBounds } from "@/lib/query-parsers";
+
+export const INPUT_BOUNDS: NumberBounds<RentVsBuyInput> = {
+  price: [0, 1e12],
+  floorAreaSqm: [0, 1e6],
+  appreciationPct: [-50, 100],
+  downPaymentPct: [0, 100],
+  mortgageRatePct: [0, 100],
+  loanTermYears: [1, 50],
+  closingCostPct: [0, 100],
+  assessmentLevelPct: [0, 100],
+  rptRatePct: [0, 100],
+  sefRatePct: [0, 100],
+  maintenancePct: [0, 100],
+  homeInsurancePct: [0, 100],
+  monthlyRent: [0, 1e12],
+  duesPerSqmMonthly: [0, 1e12],
+  rentGrowthPct: [-50, 100],
+  investReturnPct: [-50, 100],
+  costInflationPct: [-50, 100],
+  horizonYears: [1, 60],
+  sellingCostPct: [0, 100],
+  monthlyIncome: [0, 1e12],
+};
 
 /** Compact short codes so a shared link stays readable. */
 const CODES: Record<string, keyof RentVsBuyInput> = {
@@ -25,29 +48,9 @@ const CODES: Record<string, keyof RentVsBuyInput> = {
   in: "monthlyIncome",
 };
 
-/** Encode inputs into a query string (only values that differ from defaults). */
-export function encodeInput(input: RentVsBuyInput): string {
-  const params = new URLSearchParams();
-  for (const [code, field] of Object.entries(CODES)) {
-    const value = input[field] as number;
-    if (value !== (DEFAULT_INPUT[field] as number)) params.set(code, String(value));
-  }
-  if (input.assumeSaleAtHorizon !== DEFAULT_INPUT.assumeSaleAtHorizon) {
-    params.set("sl", input.assumeSaleAtHorizon ? "1" : "0");
-  }
-  return params.toString();
-}
-
-/** Rebuild a full input from a query string, falling back to defaults. */
-export function decodeInput(params: URLSearchParams): RentVsBuyInput {
-  const input: RentVsBuyInput = { ...DEFAULT_INPUT };
-  for (const [code, field] of Object.entries(CODES)) {
-    const raw = params.get(code);
-    if (raw === null) continue;
-    const num = Number(raw);
-    if (Number.isFinite(num)) (input[field] as number) = num;
-  }
-  const sl = params.get("sl");
-  if (sl !== null) input.assumeSaleAtHorizon = sl === "1";
-  return input;
-}
+export const QUERY_CODES = {
+  ...Object.fromEntries(
+    Object.entries(CODES).map(([code, field]) => [field, code]),
+  ),
+  assumeSaleAtHorizon: "sl",
+} as Record<keyof RentVsBuyInput, string>;

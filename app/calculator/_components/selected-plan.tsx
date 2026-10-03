@@ -33,20 +33,27 @@ const StatBlock: React.FC<{
         accent === "primary" && "text-foreground",
         accent === "warning" && "text-orange-600 dark:text-orange-400",
         accent === "success" && "text-emerald-600 dark:text-emerald-400",
-        accent === "danger" && "text-red-600 dark:text-red-400"
+        accent === "danger" && "text-red-600 dark:text-red-400",
       )}
     >
       {value}
     </p>
     {hint && (
-      <p className="mt-1.5 text-[11px] text-muted-foreground leading-relaxed">{hint}</p>
+      <p className="mt-1.5 text-[11px] text-muted-foreground leading-relaxed">
+        {hint}
+      </p>
     )}
   </div>
 );
 
-const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, paymentDifferences, isLoading = false }) => {
+const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({
+  calculatedData,
+  paymentDifferences,
+  isLoading = false,
+}) => {
   const hasBudget = (calculatedData?.monthlyBudget ?? 0) > 0;
-  const isBalanceConversion = calculatedData?.calculatorType === "balance-conversion";
+  const isBalanceConversion =
+    calculatedData?.calculatorType === "balance-conversion";
   const isPersonalLoan = calculatedData?.calculatorType === "personal-loan";
 
   if (isLoading) {
@@ -73,12 +80,24 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
   const selected = calculatedData.selected;
   const monthlyPayment = +selected.monthlyPayment;
   const budget = calculatedData.monthlyBudget ?? 0;
-  const monthlyAccent = !hasBudget ? "primary" : monthlyPayment <= budget ? "success" : "danger";
+  const monthlyAccent = !hasBudget
+    ? "primary"
+    : monthlyPayment <= budget
+      ? "success"
+      : "danger";
   const monthlyHint = hasBudget ? (
     monthlyPayment <= budget ? (
-      <>Fits your <span className="tabular-nums">{formatCurrency(budget)}</span> budget</>
+      <>
+        Fits your <span className="tabular-nums">{formatCurrency(budget)}</span>{" "}
+        budget
+      </>
     ) : (
-      <>Exceeds budget by <span className="tabular-nums">{formatCurrency(monthlyPayment - budget)}</span></>
+      <>
+        Exceeds budget by{" "}
+        <span className="tabular-nums">
+          {formatCurrency(monthlyPayment - budget)}
+        </span>
+      </>
     )
   ) : null;
 
@@ -95,18 +114,27 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
             Selected Plan
           </p>
           <p className="text-sm mt-0.5">
-            <span className="font-display font-light text-lg tabular-nums">{selected.months}</span>{" "}
+            <span className="font-display font-light text-lg tabular-nums">
+              {selected.months}
+            </span>{" "}
             <span className="text-muted-foreground">months</span>
             <span className="mx-2 text-muted-foreground/40">·</span>
-            <span className="tabular-nums">{formatPercent(selected.simpleInterest)}</span>{" "}
+            <span className="tabular-nums">
+              {formatPercent(selected.simpleInterest)}
+            </span>{" "}
             <span className="text-muted-foreground">simple</span>
             <span className="mx-2 text-muted-foreground/40">·</span>
-            <span className="tabular-nums">{formatPercent(selected.eirPA)}</span>{" "}
+            <span className="tabular-nums">
+              {formatPercent(selected.eirPA)}
+            </span>{" "}
             <span className="text-muted-foreground">EIR</span>
           </p>
         </div>
         <div className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
-          Factor <span className="text-foreground tabular-nums">{selected.factorRate}</span>
+          Factor{" "}
+          <span className="text-foreground tabular-nums">
+            {selected.factorRate}
+          </span>
         </div>
       </div>
 
@@ -125,7 +153,11 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
           hint={
             fullPayment > 0 && extraCost > 0 ? (
               <>
-                +<span className="tabular-nums">{formatCurrency(extraCost)}</span> over cash
+                +
+                <span className="tabular-nums">
+                  {formatCurrency(extraCost)}
+                </span>{" "}
+                over cash
               </>
             ) : null
           }
@@ -138,16 +170,17 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
           hint={
             fullPayment > 0 ? (
               <span className="tabular-nums">
-                {((+selected.interest / fullPayment) * 100).toFixed(1)}% of principal
+                {((+selected.interest / fullPayment) * 100).toFixed(1)}% of
+                principal
               </span>
             ) : null
           }
           accent="warning"
         />
         <StatBlock
-          label="Effective Rate (PA)"
+          label="Annual Effective Cost"
           value={formatPercent(selected.eirPA)}
-          hint={<>Factor rate <span className="tabular-nums">{selected.factorRate}</span></>}
+          hint="Compounded monthly rate; upfront fees included"
           accent="primary"
         />
       </div>
@@ -166,7 +199,9 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
                   DST
                 </dt>
                 <dd className="tabular-nums font-medium">
-                  {calculatedData.dst > 0 ? formatCurrency(calculatedData.dst) : "Exempt"}
+                  {calculatedData.dst > 0
+                    ? formatCurrency(calculatedData.dst)
+                    : "Exempt"}
                 </dd>
               </div>
             )}
@@ -175,7 +210,9 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
                 <dt className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
                   Net Proceeds
                 </dt>
-                <dd className="tabular-nums font-semibold">{formatCurrency(calculatedData.netProceeds)}</dd>
+                <dd className="tabular-nums font-semibold">
+                  {formatCurrency(calculatedData.netProceeds)}
+                </dd>
               </div>
             )}
             {isBalanceConversion &&
@@ -188,19 +225,24 @@ const CardSelectedPlan: React.FC<CardSelectedPlanProps> = ({ calculatedData, pay
                   <dd className="tabular-nums font-medium">
                     {formatCurrency(selected.suggestedPrincipal.suggested)}{" "}
                     <span className="text-muted-foreground text-[11px]">
-                      → {formatCurrency(selected.suggestedPrincipal.totalPayment)} total
+                      →{" "}
+                      {formatCurrency(selected.suggestedPrincipal.totalPayment)}{" "}
+                      total
                     </span>
                   </dd>
                 </div>
               )}
             {isBalanceConversion &&
-              (paymentDifferences?.totalInstallmentWithZeroPercent ?? 0) > 0 && (
+              (paymentDifferences?.totalInstallmentWithZeroPercent ?? 0) >
+                0 && (
                 <div className="flex items-baseline justify-between sm:justify-start sm:gap-2">
                   <dt className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60">
                     0% Merchant
                   </dt>
                   <dd className="tabular-nums font-medium">
-                    {formatCurrency(paymentDifferences!.totalInstallmentWithZeroPercent!)}
+                    {formatCurrency(
+                      paymentDifferences!.totalInstallmentWithZeroPercent!,
+                    )}
                   </dd>
                 </div>
               )}

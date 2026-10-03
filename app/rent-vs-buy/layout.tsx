@@ -5,7 +5,7 @@ import { breadcrumbLd, buildToolMetadata } from "@/app/_lib/seo";
 export const metadata: Metadata = buildToolMetadata({
   title: "Rent vs. Buy a Home",
   description:
-    "Should you buy a condo or keep renting and invest the difference? A year-by-year wealth simulation for the Philippines — mortgage, amilyar, dues, appreciation — with the break-even year and the probability buying wins.",
+    "Should you buy a condo or keep renting and invest the difference? A year-by-year wealth simulation for the Philippines — mortgage, amilyar, dues, appreciation — with the break-even year and the share of illustrative model runs where buying wins.",
   path: "/rent-vs-buy",
   keywords: [
     "rent vs buy calculator philippines",
@@ -17,7 +17,11 @@ export const metadata: Metadata = buildToolMetadata({
   ],
 });
 
-export default function RentVsBuyLayout({ children }: { children: React.ReactNode }) {
+export default function RentVsBuyLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <JsonLd

@@ -2,7 +2,7 @@ import type { RentVsBuyInput } from "./types";
 
 /**
  * One-click Philippine financing profiles. Each overrides only the financing
- * levers (rate, term, down payment) — grounded in 2026 Pag-IBIG and bank rates.
+ * levers (rate, term, down payment) — illustrative constant-rate scenarios, not current lender offers.
  */
 export interface FinancingPreset {
   key: string;
@@ -14,20 +14,20 @@ export interface FinancingPreset {
 export const FINANCING_PRESETS: FinancingPreset[] = [
   {
     key: "pagibig-socialized",
-    label: "Pag-IBIG socialized",
-    note: "3% fixed 5 yrs · for lower-cost housing",
+    label: "Low-rate example",
+    note: "3% held constant for the full simulated term; not a repricing model",
     overrides: { mortgageRatePct: 3, loanTermYears: 30, downPaymentPct: 10 },
   },
   {
     key: "pagibig-regular",
-    label: "Pag-IBIG regular",
-    note: "~6.25% · up to 30-yr term",
+    label: "6.25% example",
+    note: "6.25% held constant; verify actual fixing period and eligibility",
     overrides: { mortgageRatePct: 6.25, loanTermYears: 30, downPaymentPct: 20 },
   },
   {
     key: "bank-fixed",
-    label: "Bank fixed",
-    note: "~6.75% · BPI / BDO 2026",
+    label: "6.75% example",
+    note: "6.75% constant-rate scenario, not a current bank offer",
     overrides: { mortgageRatePct: 6.75, loanTermYears: 20, downPaymentPct: 20 },
   },
 ];

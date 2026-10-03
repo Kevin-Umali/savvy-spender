@@ -11,11 +11,11 @@ import { faqPageLd } from "@/app/_lib/seo";
 const FAQ = [
   {
     q: "Which Philippine credit card has the lowest foreign transaction fee?",
-    a: "Forex markups range from 0% on a few cards (e.g. some UnionBank and promo cards) up to ~3.5% on standard cards. The Card FX Comparison tool ranks 30+ PH cards by their all-in markup and simulates the peso cost of a purchase on live rates.",
+    a: "The answer depends on the specific card, conversion rate, promo eligibility, and transaction date. Card FX Comparison shows verified issuer fees with source links; peso costs use a reference rate, not a guaranteed billing quote.",
   },
   {
     q: "Is Wise or Payoneer cheaper for Filipino freelancers?",
-    a: "Wise usually converts closest to the mid-market rate (under ~1%), while Payoneer adds roughly 2% plus a possible annual inactivity fee. The Freelancer Payout Comparison computes the net pesos each option leaves after receiving, FX, and cash-out fees.",
+    a: "Compare actual dated quotes for your currency, payment rail, and amount. The tool illustrates USD payout assumptions, not universal provider tariffs. Payoneer's annual fee generally depends on receipts over a 12-month period and exceptions, not simply inactivity.",
   },
   {
     q: "What is balance conversion and credit-to-cash?",
@@ -23,11 +23,11 @@ const FAQ = [
   },
   {
     q: "Should I rent or buy a condo in the Philippines?",
-    a: "It depends on appreciation, your mortgage rate, rent, and the return you'd earn investing your down payment instead. The Rent vs. Buy tool runs a year-by-year wealth simulation and shows the break-even year plus the probability buying wins.",
+    a: "It depends on appreciation, your mortgage rate, rent, and the return you'd earn investing your down payment instead. The Rent vs. Buy tool runs a year-by-year wealth simulation and shows the break-even year plus the share of illustrative model runs where buying wins.",
   },
   {
     q: "How is car loan monthly amortization computed?",
-    a: "Most PH banks quote an add-on rate or an effective rate; the monthly payment is a standard annuity on the financed amount. The Car Financing Comparison converts any rate mode into a monthly payment and total cost so options compare fairly.",
+    a: "The formula depends on the rate method: flat add-on interest is charged on the original principal, while a declining-balance rate uses an annuity. The Car Financing Comparison converts any rate mode into a monthly payment and total cost so options compare fairly.",
   },
 ];
 
@@ -51,12 +51,14 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://www.savvyspender.info/docs",
     title: "Savvy Spender - Documentation",
-    description: "How each calculator works — inputs, formulas, and what the results mean.",
+    description:
+      "How each calculator works — inputs, formulas, and what the results mean.",
   },
   twitter: {
     site: "https://www.savvyspender.info/",
     title: "Savvy Spender - Documentation",
-    description: "How each calculator works — inputs, formulas, and what the results mean.",
+    description:
+      "How each calculator works — inputs, formulas, and what the results mean.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: { telephone: false },
@@ -74,7 +76,8 @@ export default function Page() {
           Documentation
         </h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          How each calculator works — inputs, formulas, and what the results mean.
+          How each calculator works — inputs, formulas, and what the results
+          mean.
         </p>
       </div>
       <Divider strong />
@@ -95,9 +98,10 @@ export default function Page() {
       <Divider strong />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        All calculations are for reference purposes only. Rates, fees, and regulatory requirements
-        change over time. Always verify details directly with the relevant bank or financial
-        institution before making any financial decision.
+        All calculations are for reference purposes only. Rates, fees, and
+        regulatory requirements change over time. Always verify details directly
+        with the relevant bank or financial institution before making any
+        financial decision.
       </p>
     </div>
   );

@@ -6,7 +6,7 @@ export const calculateRate = (
   present: number,
   future: number = 0,
   type: number = 0,
-  guess: number = 0.01
+  guess: number = 0.01,
 ): number => {
   // https://support.microsoft.com/en-gb/office/rate-function-9f665657-4a7e-4bb7-a030-83fc59e748ce
   const epsMax = 1e-10;
@@ -21,7 +21,10 @@ export const calculateRate = (
   let rate = guess;
 
   if (Math.abs(rate) < epsMax) {
-    y = present * (1 + periods * rate) + payment * (1 + rate * type) * periods + future;
+    y =
+      present * (1 + periods * rate) +
+      payment * (1 + rate * type) * periods +
+      future;
   } else {
     f = Math.exp(periods * Math.log(1 + rate));
     y = present * f + payment * (1 / rate + type) * (f - 1) + future;
@@ -38,7 +41,10 @@ export const calculateRate = (
     x1 = rate;
 
     if (Math.abs(rate) < epsMax) {
-      y = present * (1 + periods * rate) + payment * (1 + rate * type) * periods + future;
+      y =
+        present * (1 + periods * rate) +
+        payment * (1 + rate * type) * periods +
+        future;
     } else {
       f = Math.exp(periods * Math.log(1 + rate));
       y = present * f + payment * (1 / rate + type) * (f - 1) + future;
@@ -56,7 +62,7 @@ export const suggestPrincipalBinarySearch = (
   installmentAmountWithZeroInterest: number,
   interestRate: number,
   numInstallments: number,
-  processingFee: number
+  processingFee: number,
 ) => {
   let low = 0;
   let high = installmentAmountWithZeroInterest;
@@ -80,22 +86,35 @@ export const suggestPrincipalBinarySearch = (
   return Math.floor(bestSuggestion);
 };
 
-const calculateSimpleInterest = (amount: number, rate: number, periods: number) => amount * rate * periods;
+const calculateSimpleInterest = (
+  amount: number,
+  rate: number,
+  periods: number,
+) => amount * rate * periods;
 
-const formatNumber = (number: number, decimals: number) => Number(number.toFixed(decimals));
+const formatNumber = (number: number, decimals: number) =>
+  Number(number.toFixed(decimals));
 
 export const calculateInstallmentOption = (
   principal: number,
   installmentAmount: number,
   monthlyInterestRate: number, // Monthly interest rate as a decimal
   numInstallments: number,
-  processingFee: number = 0
+  processingFee: number = 0,
 ): InstallmentOption => {
-  const simpleInterestTotal = calculateSimpleInterest(principal, monthlyInterestRate, numInstallments);
-  const simpleInterestPercentage = formatNumber((simpleInterestTotal / principal) * 100, 2);
+  const simpleInterestTotal = calculateSimpleInterest(
+    principal,
+    monthlyInterestRate,
+    numInstallments,
+  );
+  const simpleInterestPercentage = formatNumber(
+    (simpleInterestTotal / principal) * 100,
+    2,
+  );
 
   // Factor rate calculation for installment payments
-  const factorRateValue = (1 + simpleInterestPercentage / 100) / numInstallments;
+  const factorRateValue =
+    (1 + monthlyInterestRate * numInstallments) / numInstallments;
   const formattedFactorRateValue = formatNumber(factorRateValue, 4);
 
   const totalPayment = principal + simpleInterestTotal;
@@ -104,31 +123,42 @@ export const calculateInstallmentOption = (
   const monthlyPayment = totalPayment / numInstallments;
   const formattedMonthlyPayment = formatNumber(monthlyPayment, 2);
 
-  // Assuming calculateRate() is a defined function elsewhere in your codebase for calculating EIR
-  const eirPAValue = calculateRate(numInstallments, -factorRateValue, 1) * 12;
-  const eirPAPercentage = formatNumber(eirPAValue * 100, 2);
+  // Fee is paid upfront / withheld: cash available today is principal minus fee.
+  // Solve the cash-flow rate and compound it over 12 months, not simply ×12.
+  const proceeds = principal - processingFee;
+  const monthlyEir =
+    proceeds > 0
+      ? solveMonthlyRate(proceeds, monthlyPayment, numInstallments)
+      : null;
+  const eirPAPercentage =
+    monthlyEir === null
+      ? null
+      : formatNumber(Math.expm1(12 * Math.log1p(monthlyEir)) * 100, 2);
 
   // Use a binary search method to suggest a principal amount
   const suggestedPrincipal = suggestPrincipalBinarySearch(
     installmentAmount,
     monthlyInterestRate,
     numInstallments,
-    processingFee
+    processingFee,
   );
 
   // Calculate the suggested principal or amount
   const simpleInterestTotalSuggested = calculateSimpleInterest(
     suggestedPrincipal,
     monthlyInterestRate,
-    numInstallments
+    numInstallments,
   );
-  const totalPaymentSuggested = formatNumber(suggestedPrincipal + simpleInterestTotalSuggested + processingFee, 2);
+  const totalPaymentSuggested = formatNumber(
+    suggestedPrincipal + simpleInterestTotalSuggested + processingFee,
+    2,
+  );
 
   return {
     months: numInstallments,
     simpleInterest: simpleInterestPercentage.toString(),
     factorRate: formattedFactorRateValue,
-    eirPA: eirPAPercentage.toString(),
+    eirPA: eirPAPercentage === null ? "N/A" : eirPAPercentage.toString(),
     monthlyPayment: formattedMonthlyPayment,
     interest: simpleInterestTotal,
     totalPayment: formattedTotalPayment,
@@ -138,3 +168,23 @@ export const calculateInstallmentOption = (
     },
   };
 };
+
+/** Bounded monotonic solver for equal end-of-month payments; includes zero rate. */
+export function solveMonthlyRate(
+  proceeds: number,
+  payment: number,
+  periods: number,
+): number {
+  if (Math.abs(payment * periods - proceeds) < 1e-8) return 0;
+  const presentValue = (rate: number) =>
+    (payment * -Math.expm1(-periods * Math.log1p(rate))) / rate;
+  let low = 0;
+  let high = 1;
+  while (presentValue(high) > proceeds && high < 1e12) high *= 2;
+  for (let i = 0; i < 100; i++) {
+    const mid = (low + high) / 2;
+    if (presentValue(mid) > proceeds) low = mid;
+    else high = mid;
+  }
+  return (low + high) / 2;
+}

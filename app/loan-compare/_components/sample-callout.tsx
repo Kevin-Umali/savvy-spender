@@ -11,8 +11,9 @@ export function SampleCallout({ onLoad }: { onLoad: () => void }) {
         </p>
         <p className="text-sm">
           Not sure where to start? Load the{" "}
-          <span className="font-medium">Toyota Yaris Cross 2026</span> sample to see how the
-          comparison works.
+          <span className="font-medium">Toyota Yaris Cross 2026</span> sample to
+          see how the comparison works. These are saved illustrative figures,
+          not current dealer or lender offers.
         </p>
       </div>
       <Button
