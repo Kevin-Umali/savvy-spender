@@ -33,12 +33,12 @@ export function FxSection() {
         </Body>
         <Formula>
           <div>1. open.er-api.com — returns time_last_update_utc</div>
-          <div>2. api.frankfurter.app — returns date</div>
+          <div>2. api.frankfurter.dev/v1 — returns date</div>
           <div>3. cdn.jsdelivr.net/@fawazahmed0/currency-api — returns date</div>
         </Formula>
         <Body>
           Rates are cached server-side for 1 hour (Next.js revalidation). The sidebar shows which
-          source responded and when the rate was last updated. This is a reference rate — your
+          source responded and when the rate was last updated. Currency codes are normalized across providers; invalid or outdated responses fall through to the next source. If none responds, use Retry rates. This is a reference rate — your
           actual billing rate may differ slightly from what your bank applies.
         </Body>
       </DocSection>

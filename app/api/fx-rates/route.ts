@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 
-export interface FxRatesResponse {
-  rates: Record<string, number>;
-  base: string;
-  timestamp: string;
-  source: string;
-  currencies: { code: string; name: string }[];
-}
+import type { FxRatesResponse } from "@/lib/fx/types";
+import { normalizeRates, normalizeTimestamp } from "@/lib/fx/normalize";
+
+// The route must retry providers after an outage rather than cache a static 503.
+export const dynamic = "force-dynamic";
 
 // ISO 4217 currency names (subset — most commonly traded)
 const CURRENCY_NAMES: Record<string, string> = {
@@ -37,18 +35,18 @@ const APIS: ApiDef[] = [
     name: "open.er-api",
     url: "https://open.er-api.com/v6/latest/PHP",
     normalize: (data) => {
-      const d = data as { result?: string; rates?: Record<string, number>; time_last_update_utc?: string };
-      if (d.result !== "success" || !d.rates) return null;
-      return { rates: d.rates, timestamp: d.time_last_update_utc ?? new Date().toISOString() };
+      const d = data as { result?: string; base_code?: string; rates?: Record<string, number>; time_last_update_utc?: string };
+      if (d.result !== "success" || d.base_code !== "PHP" || !d.rates) return null;
+      return { rates: d.rates, timestamp: d.time_last_update_utc ?? "" };
     },
   },
   {
     name: "frankfurter",
-    url: "https://api.frankfurter.app/latest?from=PHP",
+    url: "https://api.frankfurter.dev/v1/latest?base=PHP",
     normalize: (data) => {
-      const d = data as { rates?: Record<string, number>; date?: string };
-      if (!d.rates) return null;
-      return { rates: d.rates, timestamp: d.date ?? new Date().toISOString() };
+      const d = data as { base?: string; rates?: Record<string, number>; date?: string };
+      if (d.base !== "PHP" || !d.rates) return null;
+      return { rates: d.rates, timestamp: d.date ?? "" };
     },
   },
   {
@@ -58,7 +56,7 @@ const APIS: ApiDef[] = [
       const d = data as { date?: string; php?: Record<string, number> };
       if (!d.php) return null;
       // Rates are from PHP, same convention as others
-      return { rates: d.php, timestamp: d.date ?? new Date().toISOString() };
+      return { rates: d.php, timestamp: d.date ?? "" };
     },
   },
 ];
@@ -68,13 +66,18 @@ async function tryFetchRates(): Promise<{ rates: Record<string, number>; timesta
     try {
       const res = await fetch(api.url, {
         next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(5000),
         headers: { "Accept": "application/json" },
       });
       if (!res.ok) continue;
       const data = await res.json();
+      if (!data || typeof data !== "object" || Array.isArray(data)) continue;
       const normalized = api.normalize(data);
       if (!normalized) continue;
-      return { ...normalized, source: api.name };
+      const rates = normalizeRates(normalized.rates);
+      const timestamp = normalizeTimestamp(normalized.timestamp);
+      if (!rates || !timestamp) continue;
+      return { rates, timestamp, source: api.name };
     } catch {
       continue;
     }
@@ -88,12 +91,11 @@ export async function GET() {
   if (!result) {
     return NextResponse.json(
       { error: "All FX rate sources are unavailable. Please try again later." },
-      { status: 503 }
+      { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
 
-  // Remove PHP itself from rates
-  const { PHP: _php, ...rates } = result.rates;
+  const rates = result.rates;
 
   // Build sorted currency list with known names
   const currencies = Object.keys(rates)

@@ -1,7 +1,6 @@
 "use client";
 
 import type { ChangeEvent, ReactNode } from "react";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { cn } from "@/lib/utils";
 import { TERM_OPTIONS } from "../_lib/options";
 
@@ -36,14 +35,7 @@ export const FieldLabel: React.FC<FieldLabelProps> = ({ children, tip }) => (
   <Label className="font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-70 mb-1 block">
     {children}
     {tip && (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <InfoCircledIcon className="ml-1 h-3 w-3 inline-block text-muted-foreground cursor-help align-text-bottom" />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[260px] text-xs font-normal leading-relaxed">
-          {tip}
-        </TooltipContent>
-      </Tooltip>
+      <HelpTooltip label={typeof children === "string" ? `About ${children}` : "More information"}>{tip}</HelpTooltip>
     )}
   </Label>
 );

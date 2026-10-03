@@ -10,4 +10,13 @@ export interface FxRateState {
   source: string | null;
   error: string | null;
   loading: boolean;
+  retry: () => void;
+}
+
+export interface FxRatesResponse {
+  rates: Record<string, number>;
+  base: "PHP";
+  timestamp: string;
+  source: string;
+  currencies: FxCurrency[];
 }
