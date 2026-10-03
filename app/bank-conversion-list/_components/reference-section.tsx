@@ -14,18 +14,47 @@ export function ReferenceSection() {
         <SectionLabel>Reference</SectionLabel>
         <SectionTitle>Philippine Loan Rate Overview</SectionTitle>
         <Body>
-          A quick comparison of typical rates and interest methods across major product types.
+          A quick comparison of typical rates and interest methods across major
+          product types.
         </Body>
         <DataTable
-          headers={["Product Type", "Interest Method", "Typical Rate", "Approx. EIR"]}
+          headers={[
+            "Product Type",
+            "Interest Method",
+            "Rate source",
+            "Effective cost",
+          ]}
           rows={[
-            ["Credit card revolving", "Declining balance", "2%/month", "24–36% p.a."],
-            ["CC balance conversion", "Add-on (flat)", "0.49%–1.00%/month", "10%–23% p.a."],
-            ["Personal loan (bank)", "Add-on (flat)", "1.20%–1.79%/month", "25%–33% p.a."],
-            ["SSS salary loan", "Add-on (flat)", "10% p.a. stated", "~18% effective"],
-            ["Car loan (bank)", "Add-on (flat)", "0.5%–1.2%/month", "11%–27% p.a."],
-            ["Pag-IBIG housing", "Declining balance", "3%–6.375% p.a.", "= stated rate"],
-            ["Private bank housing", "Declining balance", "5.5%–7.75% p.a.", "= stated rate"],
+            [
+              "Credit card revolving",
+              "Average daily balance / issuer terms",
+              "Issuer schedule",
+              "Depends on billing and payments",
+            ],
+            [
+              "CC balance conversion",
+              "Usually add-on (flat)",
+              "Actual offer",
+              "Solve cash flows including fees",
+            ],
+            [
+              "Personal / car loan",
+              "Offer-specific",
+              "Actual offer",
+              "Do not annualize add-on simply ×12",
+            ],
+            [
+              "SSS salary loan",
+              "Diminishing balance",
+              "8% / 10% p.a.; see current terms",
+              "Includes service fee and deductions",
+            ],
+            [
+              "Housing loan",
+              "Declining balance",
+              "Program and fixing-period specific",
+              "Nominal rate is not compounded annual cost",
+            ],
           ]}
         />
       </DocSection>
@@ -39,11 +68,17 @@ export function ReferenceSection() {
           headers={["Regulation", "Limit"]}
           rows={[
             ["Credit card revolving interest", "3% per month / 36% per annum"],
-            ["Installment loan add-on rate", "1% per month maximum"],
+            [
+              "Credit-card installment add-on rate",
+              "1% per month maximum (not a blanket cap on all loans)",
+            ],
             ["Cash advance processing fee", "₱200 per transaction maximum"],
           ]}
         />
-        <Body>Source: BSP Circular No. 1098 (2020), updated by Circular No. 1165 (2023).</Body>
+        <Body>
+          Source: BSP Circular No. 1098 (2020), updated by Circular No. 1165
+          (2023).
+        </Body>
       </DocSection>
     </>
   );

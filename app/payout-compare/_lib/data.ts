@@ -13,7 +13,8 @@ import type { PayoutPlatform } from "./types";
  * and sender. Always confirm the exact fees with the provider before relying on
  * them — bank peso-denominated line items in particular are poorly documented.
  */
-export const PAYOUT_DATA_REVIEWED = "May 2026";
+export const PAYOUT_DATA_REVIEWED =
+  "October 3, 2026 (terms checked; numeric examples are not live quotes)";
 
 export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
   {
@@ -28,7 +29,8 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     canHoldForeign: true,
     sources: ["Direct client", "Upwork", "Invoicing"],
     notes:
-      "Cheapest transparent option. Free USD receiving over local/ACH rails (a SWIFT wire costs ~$6); converts at the true mid-market rate for ~0.6%. Hold USD and convert when the rate suits you.",
+      "USD ACH receiving is free; USD wire/SWIFT receiving costs $6.11. The 0.65% here is an illustrative conversion cost, not a universal Wise tariff. Get a corridor-specific quote.",
+    sourceUrl: "https://wise.com/ph/pricing/",
   },
   {
     name: "Payoneer",
@@ -43,35 +45,40 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     sources: ["Upwork", "Fiverr", "Marketplaces"],
     inactivityFeeUsd: 29.95,
     notes:
-      "Built for marketplaces. Receiving from a marketplace/client is free–~1% (card-funded clients cost up to 3.99% + $0.49); withdrawing USD to a PHP bank adds up to ~2% over mid-market. Charges $29.95/yr if unused for 12 months.",
+      "1% receiving and 2% conversion are example assumptions. Fees depend on payment rail and corridor. The $29.95 annual fee generally applies when receipts are below $6,000 in any consecutive 12 months (exceptions apply), not simply when inactive. Annual fee is excluded from this per-payout estimate.",
+    sourceUrl: "https://www.payoneer.com/pricing/",
   },
   {
     name: "PayPal → PHP bank",
     category: "transfer",
     receivePct: 4.4,
     receiveFixed: 0.3,
-    fxMarkupPct: 3.5,
+    fxMarkupPct: 3,
     withdrawPct: 0,
     withdrawFixedPhp: 50,
+    freeWithdrawalAtPhp: 7000,
     payoutSpeed: "1–5 days",
     canHoldForeign: true,
     sources: ["Fiverr", "Onlinejobs.ph", "Direct client"],
     notes:
-      "Two stacked costs people miss: ~4.4% + ₱15 to receive an international goods-and-services payment, THEN a ~3–4% conversion spread to move USD→PHP. Bank withdrawal is ₱50 under ₱7,000, else free.",
+      "Illustrative USD commercial-payment scenario, not all payment types. $0.30 fixed receiving fee is USD-specific. Assumes standard PHP-bank withdrawal: ₱50 below ₱7,000, otherwise ₱0. Account/type-specific charges and PayPal's actual conversion quote can differ.",
+    sourceUrl: "https://www.paypal.com/ph/business/paypal-business-fees",
   },
   {
     name: "PayPal → GCash",
     category: "ewallet",
     receivePct: 4.4,
     receiveFixed: 0.3,
-    fxMarkupPct: 3.5,
-    withdrawPct: 0,
+    fxMarkupPct: 3,
+    withdrawPct: 1,
     withdrawFixedPhp: 0,
     payoutSpeed: "Instant – 1 day",
     canHoldForeign: false,
     sources: ["Fiverr", "Onlinejobs.ph", "Direct client"],
     notes:
-      "Cash-out to GCash is free, but you still pay PayPal's ~4.4% receiving fee and the ~3–4% USD→PHP conversion spread. GCash itself holds only pesos.",
+      "GCash charges 1% on all PayPal cash-in amounts from March 7, 2026. Receiving and conversion figures are illustrative USD commercial-payment assumptions; confirm the PayPal quote and GCash limits.",
+    sourceUrl:
+      "https://help.gcash.com/hc/en-us/articles/360017595774-Cash-in-fees",
   },
   {
     name: "Maya (via remittance)",
@@ -111,7 +118,7 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     payoutSpeed: "Minutes – 5 days",
     canHoldForeign: false,
     notes:
-      "Sender-initiated remittance: $3.99 under $1,000 and free at $1,000+. The headline 'special rate' is a first-transfer promo; the everyday rate carries a ~1%+ spread. Recipient gets PHP, no USD hold.",
+      "Sender-initiated remittance. $3.99 and 1.2% are illustrative assumptions, not a current universal tariff; actual fee/rate depends on sending country, payment method, delivery, and promotions. Check the sender's quote.",
   },
   {
     name: "USDT off-ramp (PDAX / Coins.ph)",
@@ -125,6 +132,6 @@ export const PAYOUT_PLATFORMS: PayoutPlatform[] = [
     canHoldForeign: true,
     sources: ["Crypto-native client", "Web3"],
     notes:
-      "Cheapest FX if the client pays in USDT. Sell on a licensed PH exchange with limit orders (~0.1–0.5% spot; the quick 'Convert' hides 1–3%); cash-out is free–₱10 via InstaPay/PESONet. Adds peg/liquidity risk and KYC.",
+      "Illustrative USD-equivalent stablecoin settlement, not a fiat payout alternative with identical risk. Trading spread and withdrawal fees here are assumptions; network fees are excluded. Adds peg, custody, liquidity, and compliance risk. Verify the exchange's supported assets and quote.",
   },
 ];

@@ -12,18 +12,31 @@ import { CopyLinkButton } from "@/app/_components/copy-link-button";
 import { useQueryState } from "@/lib/use-query-state";
 
 const FX_GLOSSARY = [
-  { term: "Mid-market rate", def: "The real interbank rate with no markup — the benchmark every card is measured against." },
-  { term: "FX markup", def: "The total % your card adds over the mid-market rate on a foreign charge." },
-  { term: "Network assessment", def: "Visa (~1%) or Mastercard (~0.2–1%) cross-border fee, usually bundled into the markup." },
-  { term: "0% forex", def: "Cards that waive the bank's markup; the network assessment may still apply." },
+  {
+    term: "Mid-market rate",
+    def: "The real interbank rate with no markup — the benchmark every card is measured against.",
+  },
+  {
+    term: "FX fee",
+    def: "Issuer/network fee applied to the card's conversion rate. That rate can differ from mid-market.",
+  },
+  {
+    term: "Network assessment",
+    def: "A product-specific network fee; check whether the issuer's published total includes it.",
+  },
+  {
+    term: "0% forex",
+    def: "Cards that waive the bank's markup; the network assessment may still apply.",
+  },
 ];
 
 const FX_DEFAULTS = { currency: "USD", amount: 100 };
 const FX_CODES = { currency: "c", amount: "a" } as const;
+const FX_BOUNDS = { amount: [0, 1e12] as const };
 
 function FxCompare() {
   const rateState = useFxRates();
-  const [state, patch] = useQueryState(FX_DEFAULTS, FX_CODES);
+  const [state, patch] = useQueryState(FX_DEFAULTS, FX_CODES, FX_BOUNDS);
   const [search, setSearch] = useState("");
 
   const selectedCurrency = state.currency.trim().toUpperCase();
@@ -35,7 +48,8 @@ function FxCompare() {
   }, [rateState.rates, selectedCurrency]);
 
   const currencyName =
-    rateState.currencies.find((c) => c.code === selectedCurrency)?.name ?? selectedCurrency;
+    rateState.currencies.find((c) => c.code === selectedCurrency)?.name ??
+    selectedCurrency;
 
   return (
     <div className="grid lg:grid-cols-[280px_1fr] gap-6 lg:gap-10">
@@ -66,8 +80,14 @@ function FxCompare() {
         <HowItWorks
           docsHref="/docs"
           points={[
-            { heading: "What it does", body: "Ranks PH credit cards by their all-in foreign-transaction markup and shows the peso cost of a purchase at the live mid-market rate." },
-            { heading: "Reading it", body: "Lower markup = cheaper abroad. A 0% card keeps the full mid-market value; standard cards add ~1.5–3.5%." },
+            {
+              heading: "What it does",
+              body: "Compares verified published foreign-transaction fees. Peso amounts use a reference FX rate for illustration, not your issuer's actual rate at posting.",
+            },
+            {
+              heading: "Reading it",
+              body: "Lower fees do not guarantee the cheapest bill: conversion rates, promo eligibility, and billing arrangements differ. Open each issuer source before choosing.",
+            },
           ]}
         />
         <Glossary items={FX_GLOSSARY} />
@@ -83,7 +103,11 @@ export default function FxComparePage() {
         title="Card FX Comparison"
         description="See which PH credit card is cheapest to use abroad. Compare foreign transaction markups across major card issuers and simulate the PHP cost of any foreign purchase."
       />
-      <Suspense fallback={<div className="py-10 text-sm text-muted-foreground">Loading…</div>}>
+      <Suspense
+        fallback={
+          <div className="py-10 text-sm text-muted-foreground">Loading…</div>
+        }
+      >
         <FxCompare />
       </Suspense>
     </main>

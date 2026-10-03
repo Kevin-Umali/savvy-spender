@@ -27,16 +27,18 @@ export function ComparisonTable({
   phpPerUnit: number | null;
 }) {
   const rows = useMemo(() => {
-    if (!phpPerUnit || !amount) {
+    if (!phpPerUnit || !amount || selectedCurrency !== "USD") {
       return [...PAYOUT_PLATFORMS]
         .sort((a, b) => a.fxMarkupPct - b.fxMarkupPct)
         .map((p) => ({ platform: p, result: null }));
     }
-    return PAYOUT_PLATFORMS.map((p) => ({ platform: p, result: computeNet(p, amount, phpPerUnit) }))
-      .sort((a, b) => b.result.netPhp - a.result.netPhp);
-  }, [amount, phpPerUnit]);
+    return PAYOUT_PLATFORMS.map((p) => ({
+      platform: p,
+      result: computeNet(p, amount, phpPerUnit),
+    })).sort((a, b) => b.result.netPhp - a.result.netPhp);
+  }, [amount, phpPerUnit, selectedCurrency]);
 
-  const live = Boolean(phpPerUnit && amount);
+  const live = Boolean(phpPerUnit && amount && selectedCurrency === "USD");
 
   return (
     <Card className="border-border">
@@ -64,6 +66,12 @@ export function ComparisonTable({
         </div>
       </CardHeader>
       <CardContent>
+        <p className="mb-4 text-xs text-muted-foreground">
+          Illustrative USD scenarios, not current provider quotes or a
+          guaranteed cheapest route.{" "}
+          {selectedCurrency !== "USD" &&
+            "Fee estimates are disabled for other currencies: USD fixed fees cannot be treated as EUR, JPY, etc. Select USD to see the example comparison."}
+        </p>
         {/* Mobile: stacked cards */}
         <div className="md:hidden space-y-2">
           {rows.map(({ platform, result }, i) => {
@@ -73,7 +81,9 @@ export function ComparisonTable({
                 key={platform.name}
                 className={cn(
                   "rounded-md border p-3",
-                  isBest ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-border"
+                  isBest
+                    ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+                    : "border-border",
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -82,29 +92,47 @@ export function ComparisonTable({
                       {platform.name}
                       {isBest && (
                         <Badge className="ml-2 bg-emerald-600 hover:bg-emerald-600 font-mono-label text-[9px] uppercase tracking-[0.12em]">
-                          Best
+                          Example leader
                         </Badge>
                       )}
                     </p>
                     <div className="mt-1.5 flex items-center gap-2">
                       <CategoryBadge category={platform.category} />
-                      <span className="text-[11px] text-muted-foreground">{platform.payoutSpeed}</span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {platform.payoutSpeed}
+                      </span>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     {result ? (
                       <>
-                        <p className="text-sm font-medium tabular-nums">{formatCurrency(result.netPhp)}</p>
+                        <p className="text-sm font-medium tabular-nums">
+                          {formatCurrency(result.netPhp)}
+                        </p>
                         <p className="text-[11px] text-muted-foreground tabular-nums">
                           {result.effectiveCostPct.toFixed(1)}% fee
                         </p>
                       </>
                     ) : (
-                      <span className="text-[12px] text-muted-foreground tabular-nums">~{platform.fxMarkupPct}% FX</span>
+                      <span className="text-[12px] text-muted-foreground tabular-nums">
+                        ~{platform.fxMarkupPct}% FX
+                      </span>
                     )}
                   </div>
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{platform.notes}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+                  {platform.notes}
+                </p>
+                {platform.sourceUrl && (
+                  <a
+                    className="text-xs underline"
+                    href={platform.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Provider source
+                  </a>
+                )}
                 <SourceTags sources={platform.sources} />
               </div>
             );
@@ -130,13 +158,15 @@ export function ComparisonTable({
                 return (
                   <TableRow
                     key={platform.name}
-                    className={cn(isBest && "bg-emerald-50/50 dark:bg-emerald-950/20")}
+                    className={cn(
+                      isBest && "bg-emerald-50/50 dark:bg-emerald-950/20",
+                    )}
                   >
                     <TableCell className="font-medium">
                       {platform.name}
                       {isBest && (
                         <Badge className="ml-2 bg-emerald-600 hover:bg-emerald-600 font-mono-label text-[9px] uppercase tracking-[0.12em]">
-                          Best
+                          Example leader
                         </Badge>
                       )}
                     </TableCell>
@@ -148,7 +178,9 @@ export function ComparisonTable({
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {result ? (
-                        <span className="text-sm">{result.effectiveCostPct.toFixed(1)}%</span>
+                        <span className="text-sm">
+                          {result.effectiveCostPct.toFixed(1)}%
+                        </span>
                       ) : (
                         <span className="text-sm text-muted-foreground">
                           ~{platform.fxMarkupPct}% FX
@@ -162,6 +194,19 @@ export function ComparisonTable({
                     )}
                     <TableCell className="text-[11px] text-muted-foreground max-w-[280px] leading-relaxed">
                       {platform.notes}
+                      {platform.sourceUrl && (
+                        <>
+                          {" "}
+                          <a
+                            className="underline"
+                            href={platform.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Provider source
+                          </a>
+                        </>
+                      )}
                       <SourceTags sources={platform.sources} />
                     </TableCell>
                   </TableRow>
@@ -174,23 +219,31 @@ export function ComparisonTable({
         {live && rows[0]?.result && (
           <div className="mt-4 rounded-md border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-3">
             <p className="text-sm">
-              <span className="font-medium">{rows[0].platform.name}</span> nets you{" "}
+              With these example assumptions,{" "}
+              <span className="font-medium">{rows[0].platform.name}</span> would
+              net{" "}
               <span className="font-medium tabular-nums">
                 {formatCurrency(rows[0].result.netPhp)}
               </span>{" "}
-              — keeping {(100 - rows[0].result.effectiveCostPct).toFixed(1)}% of the mid-market value.
+              — keeping {(100 - rows[0].result.effectiveCostPct).toFixed(1)}% of
+              the mid-market value.
               {rows.length > 1 && rows[rows.length - 1].result && (
                 <>
                   {" "}
                   That&apos;s{" "}
                   <span className="font-medium tabular-nums">
                     {formatCurrency(
-                      rows[0].result.netPhp - rows[rows.length - 1].result!.netPhp
+                      rows[0].result.netPhp -
+                        rows[rows.length - 1].result!.netPhp,
                     )}
                   </span>{" "}
                   more than the costliest option here — about{" "}
                   <span className="font-medium tabular-nums">
-                    {formatCurrency((rows[0].result.netPhp - rows[rows.length - 1].result!.netPhp) * 12)}
+                    {formatCurrency(
+                      (rows[0].result.netPhp -
+                        rows[rows.length - 1].result!.netPhp) *
+                        12,
+                    )}
                   </span>{" "}
                   a year if you&apos;re paid monthly.
                 </>
@@ -224,7 +277,7 @@ const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({
   <TableHead
     className={cn(
       "font-mono-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground opacity-60",
-      className
+      className,
     )}
   >
     {children}

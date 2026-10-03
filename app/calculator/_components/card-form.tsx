@@ -1,17 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQueryStates } from "nuqs";
+import {
+  CALC_DEFAULTS,
+  calculatorParsers,
+  calculatorUrlKeys,
+} from "../_lib/url-state";
+import { estimateDST } from "../_lib/compute";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { CalculateForm, CalculateFormSchema } from "../_lib/schema";
-import { CALCULATOR_TYPES, CALCULATOR_CONFIG, DST_EXEMPTION_THRESHOLD, DST_RATE_PER_200 } from "../_lib/config";
+import { CALCULATOR_TYPES, CALCULATOR_CONFIG } from "../_lib/config";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/client";
 import { ChevronDownIcon, ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
@@ -28,12 +43,12 @@ const BASE_DEFAULTS: CalculateForm = {
   processingFee: 0,
   installmentAmount: 0,
   monthlyBudget: 0,
+  dstExempt: false,
 };
 
 interface CardInstallmentFormProps {
   onSubmit: (values: CalculateForm) => void;
   isLoading?: boolean;
-  initialValues?: Partial<CalculateForm>;
 }
 
 const InfoTip: React.FC<{ content: string }> = ({ content }) => (
@@ -43,66 +58,77 @@ const InfoTip: React.FC<{ content: string }> = ({ content }) => (
 const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
   onSubmit,
   isLoading = false,
-  initialValues,
 }) => {
+  const [query, setQuery] = useQueryStates(calculatorParsers, {
+    urlKeys: calculatorUrlKeys,
+  });
   const form = useForm<CalculateForm>({
     resolver: zodResolver(CalculateFormSchema),
-    defaultValues: { ...BASE_DEFAULTS, ...initialValues },
+    values: { ...query, customPlanList: query.customPlanList ?? undefined },
   });
 
-  const initialType = (initialValues?.calculatorType ?? "balance-conversion") as CalculatorType;
-  const initialPresets = initialType === "personal-loan" ? PERSONAL_LOAN_TERMS : PRESET_TERMS;
-  const initialTerm = initialValues?.numInstallments;
-  const [selectedTerms, setSelectedTerms] = useState<string[]>(() =>
-    initialTerm && !initialPresets.includes(initialTerm)
-      ? [...initialPresets, initialTerm].sort((a, b) => +a - +b)
-      : initialPresets
-  );
+  const selectedTerms = Array.from(
+    new Set([
+      ...(query.customPlanList ??
+        (query.calculatorType === "personal-loan"
+          ? PERSONAL_LOAN_TERMS
+          : PRESET_TERMS)),
+      query.numInstallments,
+    ]),
+  ).sort((a, b) => +a - +b);
+  const setSelectedTerms = (
+    update: string[] | ((prev: string[]) => string[]),
+  ) => {
+    void setQuery({
+      customPlanList:
+        typeof update === "function" ? update(selectedTerms) : update,
+    });
+  };
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const calculatorType = form.watch("calculatorType") as CalculatorType;
   const amount = form.watch("amount");
   const processingFee = form.watch("processingFee") ?? 0;
   const numInstallments = form.watch("numInstallments");
+  const dstExempt = form.watch("dstExempt");
+
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (!name || !(name in CALC_DEFAULTS)) return;
+      const key = name as keyof typeof CALC_DEFAULTS;
+      const value = values[key];
+      if (typeof value === "string" && typeof CALC_DEFAULTS[key] === "number") {
+        if (value.trim() === "" || !Number.isFinite(Number(value))) return;
+        void setQuery({ [name]: Number(value) });
+      } else if (value !== undefined) void setQuery({ [name]: value });
+    });
+    return () => subscription.unsubscribe();
+  }, [form, setQuery]);
 
   const config = CALCULATOR_CONFIG[calculatorType];
 
   // Available presets depend on calculator type
   const availablePresets = useMemo(
-    () => (calculatorType === "personal-loan" ? PERSONAL_LOAN_TERMS : PRESET_TERMS),
-    [calculatorType]
+    () =>
+      calculatorType === "personal-loan" ? PERSONAL_LOAN_TERMS : PRESET_TERMS,
+    [calculatorType],
   );
 
   const estimatedDST = useMemo(() => {
-    if (calculatorType !== "personal-loan" || !amount || amount <= DST_EXEMPTION_THRESHOLD) return 0;
-    return Math.ceil(amount / 200) * DST_RATE_PER_200;
-  }, [calculatorType, amount]);
+    if (calculatorType !== "personal-loan" || !amount) return 0;
+    return estimateDST(amount, +numInstallments, dstExempt);
+  }, [calculatorType, amount, numInstallments, dstExempt]);
 
   const estimatedNetProceeds = useMemo(() => {
     if (calculatorType !== "personal-loan" || !amount) return 0;
     return amount - estimatedDST - processingFee;
   }, [calculatorType, amount, estimatedDST, processingFee]);
 
-  // Reset selected terms when calc type changes; keep current selection in sync.
-  // Skips the initial mount so a deep-link-prefilled term/selection isn't wiped.
-  const didMountTerms = useRef(false);
-  useEffect(() => {
-    if (!didMountTerms.current) {
-      didMountTerms.current = true;
-      return;
-    }
-    setSelectedTerms(availablePresets);
-    if (!availablePresets.includes(form.getValues("numInstallments"))) {
-      form.setValue("numInstallments", availablePresets[0]);
-    }
-    if (!config.showInstallmentAmount) {
-      form.setValue("installmentAmount", 0);
-    }
-  }, [calculatorType, availablePresets, config, form]);
-
   const toggleTerm = (term: string) => {
     setSelectedTerms((prev) => {
-      const next = prev.includes(term) ? prev.filter((t) => t !== term) : [...prev, term].sort((a, b) => +a - +b);
+      const next = prev.includes(term)
+        ? prev.filter((t) => t !== term)
+        : [...prev, term].sort((a, b) => +a - +b);
       // If the primary selection is no longer in the list, fall back to the first remaining
       if (!next.includes(numInstallments) && next.length > 0) {
         form.setValue("numInstallments", next[0]);
@@ -113,12 +139,13 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
 
   const handleReset = () => {
     form.reset(BASE_DEFAULTS);
-    setSelectedTerms(PRESET_TERMS);
+    void setQuery(null);
     setShowAdvanced(false);
   };
 
   const handleFormSubmit = (values: CalculateForm) => {
-    const planList = selectedTerms.length > 0 ? selectedTerms : availablePresets;
+    const planList =
+      selectedTerms.length > 0 ? selectedTerms : availablePresets;
     // Make sure the primary selection is included
     const finalList = planList.includes(values.numInstallments)
       ? planList
@@ -154,9 +181,17 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                     "rounded-sm px-2 py-1.5 text-[11px] font-medium transition-colors disabled:opacity-60",
                     calculatorType === type.value
                       ? "bg-background border border-foreground/15 shadow-sm text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
-                  onClick={() => form.setValue("calculatorType", type.value)}
+                  onClick={() =>
+                    void setQuery({
+                      calculatorType: type.value,
+                      customPlanList: null,
+                      numInstallments:
+                        type.value === "personal-loan" ? "6" : "3",
+                      installmentAmount: 0,
+                    })
+                  }
                   title={type.description}
                 >
                   {type.label.split(" ")[0]}
@@ -164,12 +199,18 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
               ))}
             </div>
             <p className="mt-1.5 text-[11px] text-muted-foreground leading-relaxed">
-              {CALCULATOR_TYPES.find((t) => t.value === calculatorType)?.description}
+              {
+                CALCULATOR_TYPES.find((t) => t.value === calculatorType)
+                  ?.description
+              }
             </p>
           </fieldset>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-5">
+            <form
+              onSubmit={form.handleSubmit(handleFormSubmit)}
+              className="space-y-5"
+            >
               <fieldset disabled={isLoading} className="space-y-5">
                 {/* Amount */}
                 <FormField
@@ -190,7 +231,12 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                         />
                       </FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder={config.amountPlaceholder} className="tabular-nums" {...field} />
+                        <Input
+                          type="number"
+                          placeholder={config.amountPlaceholder}
+                          className="tabular-nums"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -205,11 +251,19 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                     <FormItem>
                       <FormLabel className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
                         Monthly Add-On Rate
-                        <span className="ml-1.5 text-muted-foreground/60">(%)</span>
+                        <span className="ml-1.5 text-muted-foreground/60">
+                          (%)
+                        </span>
                         <InfoTip content="Flat monthly rate applied to the original principal. BSP caps credit card installments at 1%. PH personal loans are typically 1.20%–1.79%." />
                       </FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="0.99" className="tabular-nums" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.99"
+                          className="tabular-nums"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,7 +287,9 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                             disabled={isLoading}
                             onClick={() => {
                               if (!inComparison) {
-                                setSelectedTerms((prev) => [...prev, term].sort((a, b) => +a - +b));
+                                setSelectedTerms((prev) =>
+                                  [...prev, term].sort((a, b) => +a - +b),
+                                );
                               }
                               form.setValue("numInstallments", term);
                             }}
@@ -243,7 +299,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                                 ? "border-foreground bg-foreground text-background"
                                 : inComparison
                                   ? "border-foreground/30 bg-background hover:border-foreground/60"
-                                  : "border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground"
+                                  : "border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground",
                             )}
                           >
                             {term}mo
@@ -264,27 +320,54 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                     })}
                   </div>
                   <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
-                    Comparing <span className="tabular-nums font-medium text-foreground">{selectedTerms.length}</span>{" "}
+                    Comparing{" "}
+                    <span className="tabular-nums font-medium text-foreground">
+                      {selectedTerms.length}
+                    </span>{" "}
                     term{selectedTerms.length === 1 ? "" : "s"}. Primary:{" "}
-                    <span className="tabular-nums font-medium text-foreground">{numInstallments}mo</span>.
+                    <span className="tabular-nums font-medium text-foreground">
+                      {numInstallments}mo
+                    </span>
+                    .
                   </p>
                 </div>
 
                 {/* DST preview — personal loan only, always visible since it's contextually important */}
                 {config.showDST && amount > 0 && (
                   <div className="rounded-sm border bg-muted/30 p-3 space-y-1.5">
+                    <label className="flex gap-2 items-start text-xs">
+                      <input
+                        type="checkbox"
+                        checked={dstExempt}
+                        onChange={(e) =>
+                          form.setValue("dstExempt", e.target.checked)
+                        }
+                      />
+                      Qualifying personal-use DST exemption (loan ≤ ₱250,000).
+                      Confirm eligibility with lender.
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      DST estimate: 0.75%, prorated for terms below 12 months
+                      using months / 12. Actual tax uses term days / 365.
+                    </p>
                     <p className="font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
                       Disbursement Preview
                     </p>
                     <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
                       <dt className="text-muted-foreground">DST</dt>
                       <dd className="text-right tabular-nums">
-                        {estimatedDST > 0 ? formatCurrency(estimatedDST) : "Exempt"}
+                        {estimatedDST > 0
+                          ? formatCurrency(estimatedDST)
+                          : "Exempt"}
                       </dd>
                       <dt className="text-muted-foreground">Fee</dt>
-                      <dd className="text-right tabular-nums">{formatCurrency(processingFee || 0)}</dd>
+                      <dd className="text-right tabular-nums">
+                        {formatCurrency(processingFee || 0)}
+                      </dd>
                       <dt className="font-medium">Net proceeds</dt>
-                      <dd className="text-right tabular-nums font-semibold">{formatCurrency(estimatedNetProceeds)}</dd>
+                      <dd className="text-right tabular-nums font-semibold">
+                        {formatCurrency(estimatedNetProceeds)}
+                      </dd>
                     </dl>
                   </div>
                 )}
@@ -297,7 +380,12 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                     className="w-full flex items-center justify-between font-mono-label text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <span>Advanced Options</span>
-                    <ChevronDownIcon className={cn("h-3.5 w-3.5 transition-transform", showAdvanced && "rotate-180")} />
+                    <ChevronDownIcon
+                      className={cn(
+                        "h-3.5 w-3.5 transition-transform",
+                        showAdvanced && "rotate-180",
+                      )}
+                    />
                   </button>
 
                   {showAdvanced && (
@@ -313,7 +401,7 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
                                 content={
                                   calculatorType === "personal-loan"
                                     ? "Origination fee deducted from proceeds. Typical: ₱1,300–₱1,500."
-                                    : "One-time conversion fee added to your balance. Typical: ₱250–₱500."
+                                    : "Enter the actual fee. Effective cost assumes it is paid upfront, not financed over the term."
                                 }
                               />
                             </FormLabel>
@@ -413,7 +501,8 @@ const CardInstallmentForm: React.FC<CardInstallmentFormProps> = ({
           </Form>
 
           <p className="text-[10px] text-muted-foreground/70 leading-relaxed pt-2 border-t">
-            Add-on (flat) rates only. Effective interest rate (EIR) is computed for you. Verify final terms with your bank.
+            Add-on (flat) rates only. Effective interest rate (EIR) is computed
+            for you. Verify final terms with your bank.
           </p>
         </CardContent>
       </Card>

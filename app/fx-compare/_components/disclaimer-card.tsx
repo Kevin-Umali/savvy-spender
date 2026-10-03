@@ -9,17 +9,18 @@ export function DisclaimerCard() {
         Disclaimer
       </p>
       <p>
-        Bank markups are sourced from publicly available fee schedules and may change. The reference
-        rate used here is from an open FX API (not a bank rate). Final PHP amount may differ from
-        your actual billing.
+        Bank markups are sourced from publicly available fee schedules and may
+        change. The reference rate used here is from an open FX API (not a bank
+        rate). Final PHP amount may differ from your actual billing.
       </p>
       <p>
-        Visa adds a ~1% cross-border assessment and Mastercard ~0.2%, typically bundled into the
-        bank&apos;s quoted markup. Always verify with your card issuer before travel.
+        Network assessments are issuer- and product-specific, not a universal
+        Visa/Mastercard rate. The table includes verified products only; it is
+        not an exhaustive card directory. Promo eligibility matters.
       </p>
       <p className="border-t pt-2 text-[10px] opacity-60">
-        Bank markup data last reviewed: {CARD_FX_DATA_REVIEWED}. Sources: bank fee schedules,
-        cardholder agreements, BSP filings.
+        Bank markup data last reviewed: {CARD_FX_DATA_REVIEWED}. Sources: bank
+        fee schedules, cardholder agreements, BSP filings.
       </p>
     </div>
   );

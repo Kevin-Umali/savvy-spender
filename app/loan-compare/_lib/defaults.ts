@@ -4,7 +4,8 @@ import type { FinancingType, MonthlyMode, PaymentTiming } from "./options";
 let idCounter = 0;
 /** Stable-ish id; uses crypto.randomUUID when available. */
 export function newId(prefix = "opt"): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`;
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto)
+    return `${prefix}-${crypto.randomUUID()}`;
   idCounter += 1;
   return `${prefix}-${Date.now()}-${idCounter}`;
 }
@@ -24,7 +25,9 @@ export function newFee(partial: Partial<FeeItem> = {}): FeeItem {
   };
 }
 
-export function newOption(partial: Partial<FinancingOption> = {}): FinancingOption {
+export function newOption(
+  partial: Partial<FinancingOption> = {},
+): FinancingOption {
   return {
     id: newId(),
     name: "",
@@ -77,7 +80,7 @@ export const EMPTY_SCENARIO: ScenarioInput = {
     accessories: 0,
     otherCharges: 0,
   },
-  options: [newOption({ name: "Option 1" })],
+  options: [newOption({ id: "option-1", name: "Option 1" })],
   priority: "balanced",
   scope: "full_purchase",
   fullTerm: false,
@@ -89,9 +92,17 @@ function sample(
   type: FinancingType,
   monthlyMode: MonthlyMode,
   paymentTiming: PaymentTiming,
-  extra: Partial<FinancingOption>
+  extra: Partial<FinancingOption>,
 ): FinancingOption {
-  return newOption({ name, type, paymentTiming, monthlyMode, loanAmount: 1_000_000, termMonths: 36, ...extra });
+  return newOption({
+    name,
+    type,
+    paymentTiming,
+    monthlyMode,
+    loanAmount: 1_000_000,
+    termMonths: 36,
+    ...extra,
+  });
 }
 
 /**
@@ -133,16 +144,28 @@ export const SAMPLE_SCENARIO: ScenarioInput = {
       downPayment: 600_000,
       quotedMonthly: 32_711.75,
     }),
-    sample("Credit-to-Cash 0.49%", "credit_to_cash", "monthly_addon", "arrears", {
-      provider: "Credit card",
-      monthlyAddOnRate: 0.49,
-      annualEffectiveRate: 10.82,
-    }),
-    sample("Credit-to-Cash 0.59%", "credit_to_cash", "monthly_addon", "arrears", {
-      provider: "Credit card",
-      monthlyAddOnRate: 0.59,
-      annualEffectiveRate: 12.97,
-    }),
+    sample(
+      "Credit-to-Cash 0.49%",
+      "credit_to_cash",
+      "monthly_addon",
+      "arrears",
+      {
+        provider: "Credit card",
+        monthlyAddOnRate: 0.49,
+        annualEffectiveRate: 10.82,
+      },
+    ),
+    sample(
+      "Credit-to-Cash 0.59%",
+      "credit_to_cash",
+      "monthly_addon",
+      "arrears",
+      {
+        provider: "Credit card",
+        monthlyAddOnRate: 0.59,
+        annualEffectiveRate: 12.97,
+      },
+    ),
   ],
   priority: "balanced",
   scope: "loan_only",

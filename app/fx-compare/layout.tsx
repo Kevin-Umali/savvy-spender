@@ -5,7 +5,7 @@ import { breadcrumbLd, buildToolMetadata } from "@/app/_lib/seo";
 export const metadata: Metadata = buildToolMetadata({
   title: "Card FX Comparison",
   description:
-    "Find the Philippine credit card with the lowest foreign transaction fee. Compare forex markups across 30+ cards and simulate the peso cost of any foreign or online purchase on live rates.",
+    "Compare verified Philippine card-specific foreign transaction fees with issuer sources. Estimate peso costs using a reference FX rate; actual conversion rates and promo eligibility vary.",
   path: "/fx-compare",
   keywords: [
     "no foreign transaction fee credit card philippines",
@@ -17,7 +17,11 @@ export const metadata: Metadata = buildToolMetadata({
   ],
 });
 
-export default function FxCompareLayout({ children }: { children: React.ReactNode }) {
+export default function FxCompareLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <JsonLd

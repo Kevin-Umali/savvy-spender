@@ -12,19 +12,39 @@ import { CopyLinkButton } from "@/app/_components/copy-link-button";
 import { useQueryState } from "@/lib/use-query-state";
 
 const PAYOUT_GLOSSARY = [
-  { term: "Receiving fee", def: "Charged when the payment lands — a %, a fixed fee, or both." },
-  { term: "FX markup", def: "The % over the mid-market rate when the platform converts to PHP." },
-  { term: "Cash-out fee", def: "Cost to move pesos from the platform to your bank or e-wallet." },
-  { term: "Inactivity fee", def: "Some platforms (e.g. Payoneer) charge an annual fee if the account goes unused." },
-  { term: "Hold foreign", def: "Whether you can keep a USD balance instead of auto-converting on arrival." },
+  {
+    term: "Receiving fee",
+    def: "Charged when the payment lands — a %, a fixed fee, or both.",
+  },
+  {
+    term: "FX markup",
+    def: "The % over the mid-market rate when the platform converts to PHP.",
+  },
+  {
+    term: "Cash-out fee",
+    def: "Cost to move pesos from the platform to your bank or e-wallet.",
+  },
+  {
+    term: "Annual account fee",
+    def: "Payoneer's annual fee generally depends on receipts over a consecutive 12-month period, with exceptions. Excluded from per-payout estimates.",
+  },
+  {
+    term: "Hold foreign",
+    def: "Whether you can keep a USD balance instead of auto-converting on arrival.",
+  },
 ];
 
 const PAYOUT_DEFAULTS = { currency: "USD", amount: 1000 };
 const PAYOUT_CODES = { currency: "c", amount: "a" } as const;
+const PAYOUT_BOUNDS = { amount: [0, 1e12] as const };
 
 function PayoutCompare() {
   const rateState = useFxRates();
-  const [state, patch] = useQueryState(PAYOUT_DEFAULTS, PAYOUT_CODES);
+  const [state, patch] = useQueryState(
+    PAYOUT_DEFAULTS,
+    PAYOUT_CODES,
+    PAYOUT_BOUNDS,
+  );
   const [search, setSearch] = useState("");
 
   const selectedCurrency = state.currency.trim().toUpperCase();
@@ -55,13 +75,26 @@ function PayoutCompare() {
         <div className="flex justify-end">
           <CopyLinkButton />
         </div>
-        <ComparisonTable selectedCurrency={selectedCurrency} amount={amount} phpPerUnit={phpPerUnit} />
+        <ComparisonTable
+          selectedCurrency={selectedCurrency}
+          amount={amount}
+          phpPerUnit={phpPerUnit}
+        />
         <HowItWorks
           docsHref="/docs"
           points={[
-            { heading: "What it does", body: "Computes the net pesos you keep after three fee layers — receiving fee, FX markup, and cash-out fee — on a live mid-market rate." },
-            { heading: "Reading it", body: "Rows are sorted by net PHP, so the top keeps the most of your money. Wise usually converts closest to mid-market; Payoneer adds ~2%; PayPal is typically costliest." },
-            { heading: "Tip", body: "If a platform lets you hold a foreign balance, you can convert when the rate is better instead of on arrival." },
+            {
+              heading: "What it does",
+              body: "Computes the net pesos you keep after three fee layers — receiving fee, FX markup, and cash-out fee — on a live mid-market rate.",
+            },
+            {
+              heading: "Reading it",
+              body: "Rows rank the illustrative USD assumptions, not actual provider offers. Fees, conversion quotes, sender costs, and eligibility vary; compare dated end-to-end quotes before choosing.",
+            },
+            {
+              heading: "Tip",
+              body: "If a platform lets you hold a foreign balance, you can convert when the rate is better instead of on arrival.",
+            },
           ]}
         />
         <Glossary items={PAYOUT_GLOSSARY} />
@@ -77,7 +110,11 @@ export default function PayoutComparePage() {
         title="Freelancer Payout Comparison"
         description="Getting paid by a client abroad? See which app puts the most pesos in your pocket. Compare Wise, Payoneer, PayPal, e-wallets, bank wires, remittance, and a crypto off-ramp — net of receiving fees, FX markup, and cash-out charges, on a live mid-market rate."
       />
-      <Suspense fallback={<div className="py-10 text-sm text-muted-foreground">Loading…</div>}>
+      <Suspense
+        fallback={
+          <div className="py-10 text-sm text-muted-foreground">Loading…</div>
+        }
+      >
         <PayoutCompare />
       </Suspense>
     </main>

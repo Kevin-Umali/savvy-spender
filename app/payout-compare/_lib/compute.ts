@@ -7,22 +7,30 @@ import type { PayoutPlatform, PayoutResult } from "./types";
 export function computeNet(
   platform: PayoutPlatform,
   gross: number,
-  phpPerUnit: number
+  phpPerUnit: number,
 ): PayoutResult {
   const grossPhpMid = gross * phpPerUnit;
 
-  const receiveFeeForeign = gross * (platform.receivePct / 100) + platform.receiveFixed;
+  const receiveFeeForeign =
+    gross * (platform.receivePct / 100) + platform.receiveFixed;
   const afterReceiveForeign = Math.max(0, gross - receiveFeeForeign);
 
   const phpMid = afterReceiveForeign * phpPerUnit;
   const afterFx = phpMid * (1 - platform.fxMarkupPct / 100);
   const fxCostPhp = phpMid - afterFx;
 
-  const withdrawFeePhp = afterFx * (platform.withdrawPct / 100) + platform.withdrawFixedPhp;
+  const fixedWithdrawal =
+    platform.freeWithdrawalAtPhp !== undefined &&
+    afterFx >= platform.freeWithdrawalAtPhp
+      ? 0
+      : platform.withdrawFixedPhp;
+  const withdrawFeePhp =
+    afterFx * (platform.withdrawPct / 100) + fixedWithdrawal;
   const netPhp = Math.max(0, afterFx - withdrawFeePhp);
 
   const totalFeePhp = grossPhpMid - netPhp;
-  const effectiveCostPct = grossPhpMid > 0 ? (totalFeePhp / grossPhpMid) * 100 : 0;
+  const effectiveCostPct =
+    grossPhpMid > 0 ? (totalFeePhp / grossPhpMid) * 100 : 0;
 
   return {
     platform,

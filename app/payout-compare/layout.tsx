@@ -5,7 +5,7 @@ import { breadcrumbLd, buildToolMetadata } from "@/app/_lib/seo";
 export const metadata: Metadata = buildToolMetadata({
   title: "Freelancer Payout Comparison",
   description:
-    "See which app nets a Filipino freelancer the most pesos — Wise, Payoneer, PayPal, GCash, banks, and crypto — after receiving fees, FX markup, and cash-out fees on a live mid-market rate.",
+    "Compare illustrative USD payout costs for Filipino freelancers, with provider sources and fee assumptions. Actual costs depend on the corridor, payment method, account, and dated quote.",
   path: "/payout-compare",
   keywords: [
     "wise vs payoneer philippines",
@@ -17,7 +17,11 @@ export const metadata: Metadata = buildToolMetadata({
   ],
 });
 
-export default function PayoutCompareLayout({ children }: { children: React.ReactNode }) {
+export default function PayoutCompareLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <JsonLd

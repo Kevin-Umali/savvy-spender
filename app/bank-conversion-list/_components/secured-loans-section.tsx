@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Body,
   DataTable,
@@ -5,55 +6,61 @@ import {
   Divider,
   SectionLabel,
   SectionTitle,
-  SourceNote,
 } from "./section-primitives";
 
 export function SecuredLoansSection() {
   return (
     <>
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
+        <SectionLabel>Loans · quote-dependent</SectionLabel>
         <SectionTitle>Car Loans (Auto Financing)</SectionTitle>
         <Body>
-          Philippine auto loans use add-on (flat) interest. All bank-financed vehicles require a
-          chattel mortgage registered with the LTO — typically 1–2% of the loan amount added to
-          total cost.
+          Interest methods and collateral charges vary by lender and offer. Do
+          not assume every auto loan uses the same flat rate or a universal
+          mortgage-fee percentage.
         </Body>
         <DataTable
-          headers={["Bank", "Monthly Rate", "Down Payment", "Terms", "Chattel Mortgage"]}
+          headers={["Compare", "Include in the quote"]}
           rows={[
-            ["BDO", "0.5%–1.2% flat", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["BPI", "0.5%–1.2% flat", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["Metrobank", "0.5%–1.2% flat", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["Security Bank", "Personalized", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["UnionBank", "Personalized", "20–30%", "12–60 months", "~1.5% of loan"],
-            ["In-house (dealers)", "1.5%–2.5% flat", "20–40%", "12–60 months", "Included"],
+            [
+              "Purchase price",
+              "Cash discounts, reservation credit, accessories, and dealer charges",
+            ],
+            [
+              "Financing",
+              "Principal, down payment, term, rate method, quoted monthly, and payment timing",
+            ],
+            [
+              "Other costs",
+              "Mortgage/security charges, insurance, registration, and recurring fees",
+            ],
+            [
+              "Included or waived fees",
+              "Avoid counting a fee twice when already included in a quoted amount",
+            ],
           ]}
         />
-        <SourceNote>
-          Sources: Bank-published rates and dealer financing disclosures. As of 2026.
-        </SourceNote>
+        <Link href="/loan-compare" className="text-xs underline">
+          Compare complete financing offers →
+        </Link>
       </DocSection>
-
       <Divider />
-
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
+        <SectionLabel>Loans · fixing and repricing matter</SectionLabel>
         <SectionTitle>Housing Loans (Private Banks)</SectionTitle>
         <Body>
-          Private bank housing loans supplement Pag-IBIG. They use declining balance amortization.
-          Rates are typically fixed for 1–5 years, then repriced.
+          Obtain a dated offer showing the interest rate, fixed-rate period,
+          repricing method, term, fees, insurance, and required down payment. A
+          promotional rate is not necessarily fixed for the full loan term.
         </Body>
-        <DataTable
-          headers={["Bank", "Typical Rate", "Max Term", "Max Loan"]}
-          rows={[
-            ["BDO", "5.5%–7.5% p.a.", "20 years", "₱20M"],
-            ["BPI", "5.5%–7.5% p.a.", "20 years", "₱25M"],
-            ["Metrobank", "5.5%–7.5% p.a.", "20 years", "₱25M"],
-            ["Security Bank", "5.75%–7.75% p.a.", "20 years", "Varies"],
-          ]}
-        />
-        <SourceNote>Sources: Bank-published mortgage rate tables. As of 2026.</SourceNote>
+        <Body>
+          Rent vs. Buy holds your chosen mortgage rate constant to explore
+          scenarios. Run several plausible rates; it does not forecast future
+          repricing or establish loan eligibility.
+        </Body>
+        <Link href="/rent-vs-buy" className="text-xs underline">
+          Explore constant-rate rent-versus-buy scenarios →
+        </Link>
       </DocSection>
     </>
   );

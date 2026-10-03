@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ShareStateProvider } from "@/components/share-state-provider";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Savvy Spender",
   },
   description:
-    "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and plan your retirement with interactive charts.",
+    "Free, open-source financial tools for Filipinos. Compare installments, car financing, card FX fees, payout estimates, rent versus buy, and Pag-IBIG property bids.",
   keywords: [
     "Philippine Financial Calculator",
     "Installment Calculator",
@@ -40,13 +42,13 @@ export const metadata: Metadata = {
     url: "https://www.savvyspender.info/",
     title: "Savvy Spender - Philippine Financial Calculator",
     description:
-      "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and more.",
+      "Free, open-source financial tools for Filipinos. Compare installments, financing, card FX fees, payout estimates, housing scenarios, and property bids.",
   },
   twitter: {
     site: "https://www.savvyspender.info/",
     title: "Savvy Spender - Philippine Financial Calculator",
     description:
-      "Free, open-source financial tools for Filipinos. Compare installment plans, calculate loans, salaries, taxes, and more.",
+      "Free, open-source financial tools for Filipinos. Compare installments, financing, card FX fees, payout estimates, housing scenarios, and property bids.",
   },
   referrer: "no-referrer-when-downgrade",
   formatDetection: {
@@ -63,7 +65,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"
           rel="stylesheet"
@@ -72,10 +78,12 @@ export default function RootLayout({
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider delayDuration={200}>
-          <Navbar />
-          {children}
-          <Footer />
-          <Toaster position="top-center" richColors />
+            <Navbar />
+            <NuqsAdapter>
+              <ShareStateProvider>{children}</ShareStateProvider>
+            </NuqsAdapter>
+            <Footer />
+            <Toaster position="top-center" richColors />
           </TooltipProvider>
         </ThemeProvider>
       </body>

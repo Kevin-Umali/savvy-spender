@@ -6,65 +6,79 @@ import {
   DocSection,
   SectionLabel,
   SectionTitle,
-  SourceNote,
 } from "./section-primitives";
 
 export function PersonalLoansSection() {
   return (
     <>
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
+        <SectionLabel>Loans · quote-dependent</SectionLabel>
         <SectionTitle>Personal Loans (Unsecured)</SectionTitle>
         <Body>
-          Standalone bank loans, separate from credit cards. Subject to Documentary Stamp Tax (DST)
-          on loan amounts above ₱250,000 (~0.75% of the loan face value, deducted from proceeds).
+          Use the lender’s actual offer rather than a generic bank rate. A
+          monthly add-on rate is not the same as a monthly effective rate;
+          multiplying an add-on rate by 12 does not give the annual effective
+          cost.
         </Body>
         <DataTable
-          headers={["Bank", "Monthly Rate", "Approx. EIR (p.a.)", "Terms", "Processing Fee", "Max Loan"]}
+          headers={["Quote field", "Why it matters"]}
           rows={[
-            ["BDO", "1.39%–1.79%", "18%–24%", "6–36 months", "₱1,300", "₱3M"],
-            ["BPI", "~1.20%", "25%–29%", "12–36 months", "₱1,500", "₱3M"],
-            ["Metrobank", "~1.25%", "30%–33%", "12–36 months", "₱1,500", "₱2M"],
-            ["UnionBank", "Personalized", "Varies", "Varies", "Varies", "₱2M"],
-            ["Security Bank", "Personalized", "Varies", "12–36 months", "Varies", "₱2M"],
-            ["RCBC", "~1.30%", "26%–30%", "12–36 months", "₱1,500", "₱1M"],
-            ["PSBank", "~1.75%", "Varies", "12–36 months", "₱1,500", "₱2M"],
+            [
+              "Interest method",
+              "Flat add-on, declining-balance nominal, or effective rate must be identified",
+            ],
+            [
+              "Amount and net proceeds",
+              "Fees deducted upfront reduce the cash you actually receive",
+            ],
+            [
+              "Term and payment",
+              "Use the exact number of installments and lender's quoted payment",
+            ],
+            [
+              "Fees and taxes",
+              "Include origination fees, applicable DST, insurance, and other mandatory charges",
+            ],
+            [
+              "DST estimate",
+              "0.75%; terms below one year are prorated by actual days / 365. Exemptions are conditional, not automatic for every loan below ₱250,000",
+            ],
           ]}
         />
         <Link
-          href="/calculator?type=personal-loan&rate=1.25&fee=1500&term=24"
-          className="inline-block mt-1 text-[12px] font-medium text-foreground underline underline-offset-4"
+          href="/calculator?type=personal-loan"
+          className="text-xs underline"
         >
-          Compute a personal loan in the calculator →
+          Compare a flat add-on personal-loan quote →
         </Link>
-        <SourceNote>
-          Sources: Bank-published rate tables and BSP Circular No. 1098. As of 2026.
-        </SourceNote>
+        <Body>
+          <a
+            href="https://www.lawphil.net/statutes/repacts/ra2025/ra_12214_2025.html"
+            className="underline"
+          >
+            RA 12214, Section 21
+          </a>{" "}
+          supplies the current debt-instrument DST formula. The calculator’s
+          month-based short-term tax estimate is not a tax assessment.
+        </Body>
       </DocSection>
-
       <Divider />
-
       <DocSection>
-        <SectionLabel>Loans</SectionLabel>
+        <SectionLabel>Loans · personalized offers</SectionLabel>
         <SectionTitle>Digital Banks &amp; E-Wallet Loans</SectionTitle>
         <Body>
-          Fast, small-ticket loans from digital banks and e-wallets — minimal paperwork, instant
-          disbursement. Monthly rates typically run ~1.58%–2.83% (EIR ~19%–34%). Rates are
-          personalized from your in-app credit score, so treat these as indicative.
+          Eligibility, limits, rates, and deductions are personalized. Read the
+          in-app disclosure before accepting. No generic “19%–34% EIR” range is
+          reliable across products with different interest methods and fees.
         </Body>
-        <DataTable
-          headers={["Lender", "Monthly Rate", "Terms", "Fee", "Max Loan"]}
-          rows={[
-            ["GCash GLoan", "from ~1.59%", "3–12 months", "Disbursement fee", "₱150K"],
-            ["Maya (Personal Loan)", "~1.5%–3%", "Varies", "Varies", "₱250K"],
-            ["Tonik", "~1.79%–3.46%", "6–24 months", "None", "₱250K"],
-            ["UnionDigital", "Personalized", "Varies", "Varies", "Varies"],
-            ["GoTyme / UNO / UnionBank Digital", "Personalized", "Varies", "Varies", "Varies"],
-          ]}
-        />
-        <SourceNote>
-          Sources: GCash Help Center, Maya, Tonik, and BitPinas digital-bank roundups. As of 2026.
-        </SourceNote>
+        <Body>
+          Enter the offer’s monthly add-on rate only if it explicitly uses
+          add-on interest. For a quoted payment or another rate method, use the
+          flexible financing comparison and itemize all charges.
+        </Body>
+        <Link href="/loan-compare" className="text-xs underline">
+          Compare quoted payments and rate methods →
+        </Link>
       </DocSection>
     </>
   );

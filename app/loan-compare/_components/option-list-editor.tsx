@@ -17,7 +17,16 @@ export const OptionListEditor: React.FC<{
   onAdd: () => void;
   onAddPreset: (option: FinancingOption) => void;
   disabled?: boolean;
-}> = ({ options, discountAppliesTo, onUpdate, onDuplicate, onRemove, onAdd, onAddPreset, disabled }) => (
+}> = ({
+  options,
+  discountAppliesTo,
+  onUpdate,
+  onDuplicate,
+  onRemove,
+  onAdd,
+  onAddPreset,
+  disabled,
+}) => (
   <div className="space-y-3">
     <div className="flex items-center justify-between">
       <SectionLabel>Financing options ({options.length})</SectionLabel>
@@ -26,7 +35,7 @@ export const OptionListEditor: React.FC<{
         variant="outline"
         size="sm"
         onClick={onAdd}
-        disabled={disabled}
+        disabled={disabled || options.length >= 20}
         className="gap-1.5 h-8 text-xs"
       >
         <Plus className="h-3.5 w-3.5" />
@@ -42,7 +51,7 @@ export const OptionListEditor: React.FC<{
         <button
           key={preset.key}
           type="button"
-          disabled={disabled}
+          disabled={disabled || options.length >= 20}
           onClick={() => onAddPreset(preset.build())}
           title={preset.note}
           className="rounded-sm border border-dashed border-border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-foreground/50 hover:text-foreground disabled:opacity-60"

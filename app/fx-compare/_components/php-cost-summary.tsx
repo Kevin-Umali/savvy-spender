@@ -20,15 +20,21 @@ export function PhpCostSummary({
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
-          <p className="text-[11px] text-muted-foreground">Base rate (no markup)</p>
+          <p className="text-[11px] text-muted-foreground">
+            Base rate (no markup)
+          </p>
           <p className="tabular-nums font-semibold">{fmtPhp(base)}</p>
         </div>
         <div>
-          <p className="text-[11px] text-muted-foreground">With 2% markup (typical)</p>
+          <p className="text-[11px] text-muted-foreground">
+            With 2% fee (example)
+          </p>
           <p className="tabular-nums font-semibold">{fmtPhp(base * 1.02)}</p>
         </div>
         <div>
-          <p className="text-[11px] text-emerald-700 dark:text-emerald-400">Savings with 0% card</p>
+          <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+            Illustrative 2% fee difference
+          </p>
           <p className="tabular-nums font-semibold text-emerald-700 dark:text-emerald-400">
             {fmtPhp(base * 0.02)} saved
           </p>

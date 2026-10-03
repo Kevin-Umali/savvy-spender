@@ -13,6 +13,6 @@ export const formatCurrency = (amount: number | string): string => {
 
 export const formatPercent = (value: number | string): string => {
   const num = typeof value === "string" ? parseFloat(value) : value;
-  if (isNaN(num)) return "0%";
+  if (!Number.isFinite(num)) return "N/A";
   return `${num}%`;
 };
